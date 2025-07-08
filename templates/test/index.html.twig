@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Test Index{% endblock %}
+
+{% block body %}
+    <div>
+        <p>
+            <b>Using join:</b>
+            {{ msgs|column('text')|slice(0,limit)|join }}
+        </p>
+        <p>
+            <b>Using loop</b>
+            {% for key, msg in msgs|slice(0,limit) %}
+            <p style="color: blue">
+            <a href="{{ path('app_test_show', {id: key+1} ) }}">
+                {{ msg.text }} - {{ msg.date }}
+            </a>
+            </p>
+            {% endfor %}
+        </p>
+    </div>
+{% endblock %}
