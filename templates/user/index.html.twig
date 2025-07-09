@@ -1,20 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello PeopleController!{% endblock %}
+{% block title %}Users{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/cbaltazar/www/inventory-app/src/Controller/PeopleController.php</code></li>
-        <li>Your template at <code>/Users/cbaltazar/www/inventory-app/templates/people/index.html.twig</code></li>
-    </ul>
-</div>
+    <div class="example-wrapper">
+        <h1>Users list</h1>
+
+        <ul>
+            {% for user in users %}
+                <a href="{{ path('app_user_show', {id: user.id} ) }}">
+                    <li>{{ user.name }} - {{ user.email }}</li>
+                </a>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
