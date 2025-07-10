@@ -3,19 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserType;
 use App\Repository\UserRepository;
-use Cassandra\Type\UserType;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/user', name: 'app_user_')]
 class UserController extends AbstractController
 {
-    #[Route('/user', name: 'app_user_index', methods: ['GET'])]
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(UserRepository $repository, EntityManagerInterface $entityManager): Response
     {
         dump($repository->findAll());
@@ -29,7 +29,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user/{id}', name: 'app_user_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
     public function show(User $user): Response
     {
         return $this->render('user/show.html.twig', [
@@ -37,16 +37,14 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user/edit', name: 'app_user_edit', methods: ['GET', 'POST'], priority: 2)]
+    #[Route('/edit', name: 'edit', methods: ['GET', 'POST'], priority: 2)]
     public function edit(Request $request, EntityManagerInterface $entityManager): Response
     {
-//        $form = $this->createForm(UserType::class, new User());
-        $form = $this->createFormBuilder(new User())
-            ->add('name')
-            ->add('email')
-            ->add('phone')
-            ->add('Save', SubmitType::class)
-            ->getForm();
+        $user = new User();
+        $user->setCreatedAt(new DateTimeImmutable());
+        $user->setUpdatedAt(new DateTimeImmutable());
+
+        $form = $this->createForm(UserType::class, $user);
 
         $form->handleRequest($request);
 
@@ -58,6 +56,10 @@ class UserController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
+
+            $this->addFlash('success', 'User saved');
+
+            return $this->redirectToRoute('app_user_index');
         }
 
         return $this->render('user/form.html.twig', [
