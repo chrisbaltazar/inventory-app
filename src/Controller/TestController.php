@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Item;
+use App\Entity\Metadata;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,8 +18,24 @@ class TestController extends AbstractController
     ];
 
     #[Route('/test/{limit<\d+>?3}', name: 'app_test_index')]
-    public function index(int $limit): Response
+    public function index(int $limit, EntityManagerInterface $entityManager): Response
     {
+        $item = new Item();
+        $item->setName('Item 1');
+        $item->setRegion('Region 1');
+        $item->setSize('S');
+        $item->setCreatedAt(new \DateTimeImmutable());
+        $item->setUpdatedAt(new \DateTimeImmutable());
+
+        $meta = new Metadata();
+        $meta->setName('Meta 1');
+        $meta->setValue('Value 1');
+        $meta->setItem($item);
+
+        $entityManager->persist($item);
+        $entityManager->persist($meta);
+        $entityManager->flush();
+
         return $this->render('test/index.html.twig', [
             'msgs' => $this->msgs,
             'limit' => $limit,
