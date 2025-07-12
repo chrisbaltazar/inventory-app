@@ -29,14 +29,15 @@ class Event
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column]
-    private ?int $updated_by = null;
-
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $deleted_by = null;
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $updatedBy = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?User $deletedBy = null;
 
     public function getId(): ?int
     {
@@ -103,18 +104,6 @@ class Event
         return $this;
     }
 
-    public function getUpdatedBy(): ?int
-    {
-        return $this->updated_by;
-    }
-
-    public function setUpdatedBy(int $updated_by): static
-    {
-        $this->updated_by = $updated_by;
-
-        return $this;
-    }
-
     public function getDeletedAt(): ?\DateTimeImmutable
     {
         return $this->deletedAt;
@@ -127,14 +116,26 @@ class Event
         return $this;
     }
 
-    public function getDeletedBy(): ?int
+    public function getUpdatedBy(): ?User
     {
-        return $this->deleted_by;
+        return $this->updatedBy;
     }
 
-    public function setDeletedBy(?int $deleted_by): static
+    public function setUpdatedBy(User $updatedBy): static
     {
-        $this->deleted_by = $deleted_by;
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getDeletedBy(): ?User
+    {
+        return $this->deletedBy;
+    }
+
+    public function setDeletedBy(?User $deletedBy): static
+    {
+        $this->deletedBy = $deletedBy;
 
         return $this;
     }
