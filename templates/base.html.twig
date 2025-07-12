@@ -16,7 +16,10 @@
     </head>
     <body>
         {% for message in app.flashes('success') %}
-        <b style="color: green">{{ message }}</b>
+        <div class="alert alert-success" role="alert">{{ message }}</div>
+        {% endfor %}
+        {% for error in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
         {% endfor %}
 
         {% block body %}{% endblock %}
