@@ -6,8 +6,8 @@
     <div class="container">
         <div class="row mt-5">
             <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
-                {% if errors %}
-                <div class="alert alert-danger" role="alert">{{ errors.message }}</div>
+                {% if error %}
+                <div class="alert alert-danger" role="alert">{{ error.message }}</div>
                 {% endif %}
                 <form method="POST" action="{{ path('app_login') }}">
                     <div class="form-group">
