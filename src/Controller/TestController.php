@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TestController extends AbstractController
 {
@@ -18,6 +19,7 @@ class TestController extends AbstractController
     ];
 
     #[Route('/test/{limit<\d+>?3}', name: 'app_test_index')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function index(int $limit, EntityManagerInterface $entityManager): Response
     {
         $item = new Item();

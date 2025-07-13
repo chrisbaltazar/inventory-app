@@ -22,6 +22,10 @@
             <div class="alert alert-danger" role="alert">{{ error }}</div>
         {% endfor %}
 
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {{ include('_menu.html.twig') }}
+        {% endif %}
+
         {% block body %}{% endblock %}
     </body>
 </html>

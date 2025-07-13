@@ -17,6 +17,8 @@ class AppFixtures extends Fixture
     {
         $user = new User();
         $user->setEmail('foo@test.com');
+        $user->setName('John Doe');
+        $user->setPhone('0123456789');
         $user->setPassword($this->hasher->hashPassword($user, '123'));
 
         $manager->persist($user);
