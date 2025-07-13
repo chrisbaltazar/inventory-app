@@ -24,7 +24,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     #[ORM\Column]
-    #[Assert\NotBlank()]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -32,7 +31,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $name = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Range(min: 1, max: 20)]
+    #[Assert\Length(min: 9, max: 20)]
     private ?string $phone = null;
 
     public function getId(): ?int

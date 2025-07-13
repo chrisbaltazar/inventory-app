@@ -5,31 +5,57 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/user', name: 'app_user_')]
+#[Route('/user')]
+#[IsGranted('ROLE_ADMIN')]
 class UserController extends AbstractController
 {
-    #[Route('/', name: 'index', methods: ['GET'])]
-    public function index(UserRepository $repository, EntityManagerInterface $entityManager): Response
+    #[Route('/', name: 'app_user_index', methods: ['GET'])]
+    public function index(UserRepository $userRepository): Response
     {
-        dump($repository->findAll());
-        dump($repository->find(1));
-        dump($repository->findOneBy(['email' => 'foo@test.com']));
-        dump($repository->findBy(['email' => 'foo@test.com']));
-        dump($repository->findByEmail('foo@test.com'));
-
         return $this->render('user/index.html.twig', [
-            'users' => $repository->findAll(),
+            'users' => $userRepository->findAll(),
         ]);
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $isAdmin = $form->get('isAdmin')->getData();
+            if ($isAdmin) {
+                $user->setRoles(['ROLE_ADMIN']);
+            }
+
+            $user->setPassword($hasher->hashPassword($user, $form->get('plainPassword')->getData()));
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('user/new.html.twig', [
+            'user' => $user,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
     public function show(User $user): Response
     {
         return $this->render('user/show.html.twig', [
@@ -37,33 +63,32 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/edit', name: 'edit', methods: ['GET', 'POST'], priority: 2)]
-    public function edit(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $user = new User();
-        $user->setCreatedAt(new DateTimeImmutable());
-        $user->setUpdatedAt(new DateTimeImmutable());
-
         $form = $this->createForm(UserType::class, $user);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User $user */
-            $user = $form->getData();
-            $user->setCreatedAt(new DateTimeImmutable());
-            $user->setUpdatedAt(new DateTimeImmutable());
-
-            $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'User saved');
-
-            return $this->redirectToRoute('app_user_index');
+            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('user/form.html.twig', [
+        return $this->render('user/edit.html.twig', [
+            'user' => $user,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
+    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
 }

@@ -6,3 +6,15 @@ import './bootstrap.js';
  * which should already be in your base.html.twig.
  */
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉')
+
+document.addEventListener('DOMContentLoaded', () => {
+    initDataTables()
+})
+
+function initDataTables() {
+    document.querySelectorAll('.js-datatable').forEach(el => new DataTable('#' + el.id))
+}
+
+function Modal(url, title, callback){
+
+}

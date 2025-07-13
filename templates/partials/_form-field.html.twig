@@ -1,0 +1,11 @@
+{% set error = form_errors(field) %}
+{% set classes = 'form-control' ~ (error ? ' is-invalid' : '') %}
+<div class="form-floating mb-3">
+    {{ form_widget(field, {'attr': {'class': classes, 'placeholder': ''} }) }}
+    <label>{{ label }}</label>
+    {% if error %}
+        <div class="invalid-feedback">
+            {{ form_errors(field) }}
+        </div>
+    {% endif %}
+</div>

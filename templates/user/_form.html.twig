@@ -1,0 +1,20 @@
+{% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+{{ form_start(form, {'attr': {'class': formClass}}) }}
+{{ form_errors(form) }}
+
+{% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
+
+{% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
+
+{% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
+
+{% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
+
+{% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
+
+{% include 'partials/_form-check.html.twig' with {'field': form.isAdmin, 'label': 'Administrador?', 'id': 'user_isAdmin'} %}
+
+{{ form_rest(form) }}
+<br>
+<button class="btn btn-success">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}
