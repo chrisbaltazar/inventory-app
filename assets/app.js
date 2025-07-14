@@ -7,14 +7,16 @@ import './bootstrap.js';
  */
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉')
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('turbo:load', function() {
+    console.log("Turbo page loaded");
+
     initDataTables()
 })
 
 function initDataTables() {
-    document.querySelectorAll('.js-datatable').forEach(el => new DataTable('#' + el.id))
-}
-
-function Modal(url, title, callback){
-
+    document.querySelectorAll('.js-datatable').forEach(function(el) {
+        new DataTable('#' + el.id, {
+            responsive: true
+        })
+    })
 }

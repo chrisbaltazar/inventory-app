@@ -1,13 +1,25 @@
+{% set ADMIN = 'ROLE_ADMIN' %}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Usuarios{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .fa-square-check {
+            color: greenyellow;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
     <div class="container mt-5">
         <h1>Lista de usuarios</h1>
 
-        <a type="button" class="btn btn-primary" href="{{ path('app_user_new') }}">
-            New User
+        <a type="button" class="btn btn-primary my-3" href="{{ path('app_user_new') }}">
+            <i class="fa-regular fa-plus"></i> Nuevo
         </a>
 
         <table class="table table-dark table-striped table-hover js-datatable" id="userTable">
@@ -16,9 +28,9 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Role</th>
-                <th>Phone</th>
-                <th>actions</th>
+                <th>Teléfono</th>
+                <th class="text-center">Admin</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -27,11 +39,17 @@
                     <td>{{ user.id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
                     <td>{{ user.phone }}</td>
+                    <td class="text-center">{{ ADMIN in user.roles ? '<i class="fa-solid fa-square-check fa-2x"></i>' : '' }}</td>
                     <td>
-                        <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
-                        <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+                        <a class="float-end mx-1 btn btn-warning btn-sm"
+                           href="{{ path('app_user_edit', {'id': user.id}) }}">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <a class="float-end mx-1 btn btn-primary btn-sm"
+                           href="{{ path('app_user_show', {'id': user.id}) }}">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
                     </td>
                 </tr>
             {% else %}
