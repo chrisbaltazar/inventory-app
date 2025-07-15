@@ -16,19 +16,10 @@ class Item
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column(length: 255)]
     private ?string $region = null;
 
-    #[ORM\Column(length: 10)]
-    private ?string $size = null;
-
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $color = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
@@ -39,9 +30,13 @@ class Item
     #[ORM\OneToMany(targetEntity: Metadata::class, mappedBy: 'item')]
     private Collection $metadata;
 
+    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item')]
+    private Collection $inventory;
+
     public function __construct()
     {
         $this->metadata = new ArrayCollection();
+        $this->inventory = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,42 +64,6 @@ class Item
     public function setRegion(string $region): static
     {
         $this->region = $region;
-
-        return $this;
-    }
-
-    public function getSize(): ?string
-    {
-        return $this->size;
-    }
-
-    public function setSize(string $size): static
-    {
-        $this->size = $size;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
-    }
-
-    public function setColor(?string $color): static
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -157,6 +116,36 @@ class Item
             // set the owning side to null (unless already changed)
             if ($metadata->getItem() === $this) {
                 $metadata->setItem(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Inventory>
+     */
+    public function getInventory(): Collection
+    {
+        return $this->inventory;
+    }
+
+    public function addInventory(Inventory $inventory): static
+    {
+        if (!$this->inventory->contains($inventory)) {
+            $this->inventory->add($inventory);
+            $inventory->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInventory(Inventory $inventory): static
+    {
+        if ($this->inventory->removeElement($inventory)) {
+            // set the owning side to null (unless already changed)
+            if ($inventory->getItem() === $this) {
+                $inventory->setItem(null);
             }
         }
 

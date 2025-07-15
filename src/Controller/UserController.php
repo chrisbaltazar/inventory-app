@@ -7,6 +7,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -17,6 +18,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class UserController extends AbstractController
 {
+
+    public function __construct(
+        private UserPasswordHasherInterface $hasher
+    ) {
+    }
+
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
@@ -28,7 +35,6 @@ class UserController extends AbstractController
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        UserPasswordHasherInterface $hasher,
         EntityManagerInterface $entityManager
     ): Response {
         $user = new User();
@@ -36,12 +42,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $isAdmin = $form->get('isAdmin')->getData();
-            if ($isAdmin) {
-                $user->setRoles(['ROLE_ADMIN']);
-            }
-
-            $user->setPassword($hasher->hashPassword($user, $form->get('plainPassword')->getData()));
+            $this->handleUserData($form, $user);
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -70,6 +71,8 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handleUserData($form, $user);
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
@@ -90,5 +93,19 @@ class UserController extends AbstractController
         }
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+
+    private function handleUserData(FormInterface $form, User $user): void
+    {
+        $isAdmin = $form->get('isAdmin')->getData();
+        if ($isAdmin) {
+            $user->setRoles(['ROLE_ADMIN']);
+        }
+
+        $pwd = $form->get('plainPassword')->getData();
+        if ($pwd) {
+            $user->setPassword($this->hasher->hashPassword($user, $pwd));
+        }
     }
 }

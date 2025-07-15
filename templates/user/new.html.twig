@@ -2,6 +2,19 @@
 
 {% block title %}New User{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        document.addEventListener('turbo:load', function () {
+            document.querySelectorAll('.user-pwd input').forEach(function (el) {
+                console.log(el)
+                el.disabled = false
+            })
+        })
+    </script>
+{% endblock %}
+
 {% block body %}
     <div class="container mt-5">
         <h1>Nuevo usuario</h1>

@@ -2,10 +2,38 @@
 
 {% block title %}Edit User{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        document.addEventListener('turbo:load', function () {
+            disablePwdFields(true)
+        })
+
+        function changePwd() {
+            disablePwdFields(false)
+        }
+
+        function disablePwdFields(state) {
+            document.querySelectorAll('.user-pwd input').forEach(function (el) {
+                el.disabled = state
+            })
+        }
+    </script>
+{% endblock %}
+
 {% block body %}
     <div class="container mt-5">
         <h1>Editar usuario</h1>
 
-        {{ include('user/_form.html.twig') }}
+        {% embed 'user/_form.html.twig' %}
+
+            {% block form_buttons %}
+                <a class="btn btn-warning" onclick="changePwd()">
+                    <i class="fa-solid fa-lock"></i> Cambiar password
+                </a>
+            {% endblock %}
+
+        {% endembed %}
     </div>
 {% endblock %}

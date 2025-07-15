@@ -1,24 +1,33 @@
 {% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
-{{ form_start(form, {'attr': {'class': formClass}}) }}
-{{ form_errors(form) }}
 
-{% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
+<div class="form-wrapper mt-4">
+    {{ form_start(form, {'attr': {'class': formClass}}) }}
+    {{ form_errors(form) }}
 
-{% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
+    {% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
 
-{% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
+    {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
 
-{% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
+    <div class="user-pwd">
+        {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
+    </div>
 
-{% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
+    {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
 
-{% include 'partials/_form-check.html.twig' with {'field': form.isAdmin, 'label': 'Administrador?', 'id': 'user_isAdmin'} %}
+    {% include 'partials/_form-check.html.twig' with {'field': form.isAdmin, 'label': 'Administrador?', 'id': 'user_isAdmin'} %}
 
-{{ form_rest(form) }}
+    {{ form_rest(form) }}
 
-<div class="d-flex justify-content-between mt-3">
-    <a class="btn btn-light" href="{{ path('app_user_index') }}">Volver</a>
-    <button class="btn btn-success">Guardar</button>
+    <div class="d-flex justify-content-between mt-4">
+        <a class="btn btn-light" href="{{ path('app_user_index') }}">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </a>
+        {% block form_buttons %}{% endblock %}
+        <button class="btn btn-success">
+            <i class="fa-solid fa-check"></i> Guardar
+        </button>
+    </div>
+
+    {{ form_end(form) }}
 </div>
-
-{{ form_end(form) }}

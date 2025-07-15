@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -15,21 +16,29 @@ class Event
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank()]
+    #[Assert\Type('date')]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Type('date')]
     private ?\DateTimeInterface $deliveryDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\Type('date')]
     private ?\DateTimeInterface $returnDate = null;
 
     #[ORM\Column]
+    #[Assert\Type('date')]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Type('date')]
     private ?\DateTimeImmutable $deletedAt = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
