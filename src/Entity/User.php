@@ -34,6 +34,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min: 9, max: 20)]
     private ?string $phone = null;
 
+    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
+    private ?self $updatedBy = null;
+
+    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
+    private ?self $deletedBy = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,6 +130,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getUpdatedBy(): ?self
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?self $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getDeletedBy(): ?self
+    {
+        return $this->deletedBy;
+    }
+
+    public function setDeletedBy(?self $deletedBy): static
+    {
+        $this->deletedBy = $deletedBy;
 
         return $this;
     }

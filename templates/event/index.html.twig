@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event index{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Lista de Eventos</h1>
+
+        <a class="btn btn-primary my-3" href="{{ path('app_event_new') }}">
+            <i class="fas fa-plus"></i> Nuevo Evento
+        </a>
+
+        <table class="table table-striped table-hover table-dark js-datatable" id="eventsTable">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Evento</th>
+                <th>Fecha</th>
+                <th>Entrega</th>
+                <th>Retorno</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.id }}</td>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.date ? event.date|date('d/m/Y') : '' }}</td>
+                    <td>{{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}</td>
+                    <td>{{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}</td>
+                    <td>
+                        <a class="float-end mx-1 btn btn-warning btn-sm"
+                           href="{{ path('app_event_edit', {'id': event.id}) }}">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <a class="float-end mx-1 btn btn-info btn-sm"
+                           href="{{ path('app_event_show', {'id': event.id}) }}">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

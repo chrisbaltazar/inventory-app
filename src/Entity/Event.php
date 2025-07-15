@@ -22,30 +22,27 @@ class Event
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank()]
-    #[Assert\Type('date')]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Assert\Type('date')]
     private ?\DateTimeInterface $deliveryDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Assert\Type('date')]
     private ?\DateTimeInterface $returnDate = null;
 
     #[ORM\Column]
-    #[Assert\Type('date')]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\Type('date')]
     private ?\DateTimeImmutable $deletedAt = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Column]
+    private ?bool $public = null;
+
+    #[ORM\ManyToOne]
     private ?User $updatedBy = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne]
     private ?User $deletedBy = null;
 
     public function getId(): ?int
@@ -125,12 +122,24 @@ class Event
         return $this;
     }
 
+    public function isPublic(): ?bool
+    {
+        return $this->public;
+    }
+
+    public function setPublic(bool $public): static
+    {
+        $this->public = $public;
+
+        return $this;
+    }
+
     public function getUpdatedBy(): ?User
     {
         return $this->updatedBy;
     }
 
-    public function setUpdatedBy(User $updatedBy): static
+    public function setUpdatedBy(?User $updatedBy): static
     {
         $this->updatedBy = $updatedBy;
 

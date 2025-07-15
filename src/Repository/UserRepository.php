@@ -16,7 +16,6 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
- * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
@@ -38,6 +37,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('u')->orderBy('u.name', 'ASC')->getQuery()->getResult();
     }
 
 //    /**

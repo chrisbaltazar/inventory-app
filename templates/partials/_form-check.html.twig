@@ -1,7 +1,7 @@
 {% set error = form_errors(field) %}
 {% set classes = 'form-check-input' ~ (error ? ' is-invalid' : '') %}
 <div class="form-check">
-    {{ form_widget(form.isAdmin, {'attr': {'class': classes, 'placeholder': ''} }) }}
+    {{ form_widget(field, {'attr': {'class': classes, 'placeholder': ''} }) }}
     <label class="form-check-label" for="{{ id }}">
         {{ label }}
     </label>

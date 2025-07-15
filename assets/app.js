@@ -16,7 +16,9 @@ document.addEventListener('turbo:load', function() {
 function initDataTables() {
     document.querySelectorAll('.js-datatable').forEach(function(el) {
         new DataTable('#' + el.id, {
-            responsive: true
+            responsive: true,
+            "pageLength": 25,
+            order: [] // remove default sorting
         })
     })
 }
