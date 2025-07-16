@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests\Application\Controller;
 
-use App\Repository\UserRepository;
 use App\Tests\Trait\WithUser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

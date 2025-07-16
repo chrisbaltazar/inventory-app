@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-class Event
+class Event implements SoftDeleteInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -115,11 +115,9 @@ class Event
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): void
     {
         $this->deletedAt = $deletedAt;
-
-        return $this;
     }
 
     public function isPublic(): ?bool

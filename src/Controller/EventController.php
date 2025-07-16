@@ -76,7 +76,7 @@ class EventController extends AbstractController
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($event);
+            $event->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
         }
 

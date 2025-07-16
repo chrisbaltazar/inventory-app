@@ -22,7 +22,10 @@ class EventRepository extends ServiceEntityRepository
 
     public function findAll(): array
     {
-        return $this->createQueryBuilder('e')->orderBy('e.date', 'ASC')->getQuery()->getResult();
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.date', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

@@ -88,7 +88,7 @@ class UserController extends AbstractController
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($user);
+            $user->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
         }
 
