@@ -23,7 +23,6 @@ $container = $kernel->getContainer();
 $application = new Application($kernel);
 $application->setAutoExit(false);
 
-// Only run this if using SQLite (adjust if needed for your DB engine)
 $fs = new Filesystem();
 $databasePath = $container->getParameter('kernel.project_dir') . '/var/data_test.db';
 if (!$fs->exists($databasePath)) {
