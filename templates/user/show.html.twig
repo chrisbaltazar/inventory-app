@@ -28,6 +28,10 @@
                 <th>Admin</th>
                 <td>{{ 'ROLE_ADMIN' in user.roles ? 'SI' : 'NO' }}</td>
             </tr>
+            <tr>
+                <th>Actualizado</th>
+                <td>{{ user.updatedAt ? user.updatedAt|date('d/m/Y H:i:s') : '' }}</td>
+            </tr>
             </tbody>
         </table>
 

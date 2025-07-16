@@ -40,6 +40,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
     private ?self $deletedBy = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotBlank()]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,6 +161,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeletedBy(?self $deletedBy): static
     {
         $this->deletedBy = $deletedBy;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
