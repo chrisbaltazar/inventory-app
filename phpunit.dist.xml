@@ -2,7 +2,7 @@
 
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
          colors="true"
          failOnDeprecation="true"
          failOnNotice="true"
@@ -38,7 +38,4 @@
             <function>trigger_deprecation</function>
         </deprecationTrigger>
     </source>
-
-    <extensions>
-    </extensions>
 </phpunit>
