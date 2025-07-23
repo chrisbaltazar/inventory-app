@@ -16,22 +16,22 @@
                 </li>
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="nav-item">
-                        <a class="nav-link {{ route is same as 'app_user_index' ? 'active':'' }}" aria-current="page" href="{{ path('app_user_index') }}">
+                        <a class="nav-link {{ route starts with 'app_user' ? 'active':'' }}" aria-current="page" href="{{ path('app_user_index') }}">
                             Usuarios
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ route is same as 'app_event_index' ? 'active':'' }}" aria-current="page" href="{{ path('app_event_index') }}">
+                        <a class="nav-link {{ route starts with 'app_event' ? 'active':'' }}" aria-current="page" href="{{ path('app_event_index') }}">
                             Eventos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ route is same as 'app_item_index' ? 'active':'' }}" aria-current="page" href="{{ path('app_item_index') }}">
+                        <a class="nav-link {{ route starts with 'app_item' ? 'active':'' }}" aria-current="page" href="{{ path('app_item_index') }}">
                             Vestuario
                         </a>
                     </li>
                     <li class="nav-item">
-{#                        <a class="nav-link {{ route is same as 'app_inventory_index' ? 'active':'' }}" aria-current="page" href="{{ path('app_inventory_index') }}">#}
+{#                        <a class="nav-link {{ route starts with 'app_inventory' ? 'active':'' }}" aria-current="page" href="{{ path('app_inventory_index') }}">#}
 {#                            Inventario#}
 {#                        </a>#}
                     </li>
