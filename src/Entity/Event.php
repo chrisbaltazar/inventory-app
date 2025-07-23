@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-class Event implements SoftDeleteInterface
+class Event implements UpdatedAwareInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -41,9 +41,6 @@ class Event implements SoftDeleteInterface
 
     #[ORM\ManyToOne]
     private ?User $updatedBy = null;
-
-    #[ORM\ManyToOne]
-    private ?User $deletedBy = null;
 
     public function getId(): ?int
     {
@@ -115,9 +112,11 @@ class Event implements SoftDeleteInterface
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): void
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
     }
 
     public function isPublic(): ?bool
@@ -137,21 +136,9 @@ class Event implements SoftDeleteInterface
         return $this->updatedBy;
     }
 
-    public function setUpdatedBy(?User $updatedBy): static
+    public function setUpdatedBy(User $updatedBy): static
     {
         $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getDeletedBy(): ?User
-    {
-        return $this->deletedBy;
-    }
-
-    public function setDeletedBy(?User $deletedBy): static
-    {
-        $this->deletedBy = $deletedBy;
 
         return $this;
     }

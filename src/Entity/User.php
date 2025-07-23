@@ -9,7 +9,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, SoftDeleteInterface
+class User implements
+    UserInterface, PasswordAuthenticatedUserInterface, UpdatedAwareInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,11 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, SoftDel
     #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
     private ?self $updatedBy = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
-    private ?self $deletedBy = null;
-
     #[ORM\Column(nullable: true)]
-    #[Assert\NotBlank()]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -153,24 +150,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, SoftDel
         return $this;
     }
 
-    public function getDeletedBy(): ?self
-    {
-        return $this->deletedBy;
-    }
-
-    public function setDeletedBy(?self $deletedBy): static
-    {
-        $this->deletedBy = $deletedBy;
-
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 
@@ -182,8 +167,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, SoftDel
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): void
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
     }
 }

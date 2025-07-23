@@ -4,11 +4,11 @@ namespace App\Enum;
 
 enum RegionEnum: string
 {
-    use WithValues;
+    use WithEnumValues;
 
     case JALISCO = 'JALISCO';
-    case HUASTECA = 'HUASTECA';
     case HIDALGO = 'HIDALGO';
     case OAXACA = 'OAXACA';
-    case QUETERARO = 'QUETERARO';
+    case QUERETARO = 'QUERÉTARO';
+    case VERACRUZ = 'VERACRÚZ';
 }

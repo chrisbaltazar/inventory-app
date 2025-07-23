@@ -32,7 +32,7 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->handleEventData($event);
+//            $this->handleEventData($event);
             $entityManager->persist($event);
             $entityManager->flush();
 
@@ -60,7 +60,6 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->handleEventData($event);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
@@ -81,11 +80,5 @@ class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    private function handleEventData(Event $event)
-    {
-        $event->setUpdatedAt(new \DateTimeImmutable());
-        $event->setUpdatedBy($this->getUser());
     }
 }

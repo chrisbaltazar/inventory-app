@@ -14,9 +14,12 @@ class ItemType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $regions = array_combine(RegionEnum::values(), RegionEnum::values());
+        asort($regions);
+
         $builder
             ->add('region', ChoiceType::class, [
-                'choices' => RegionEnum::values(),
+                'choices' => $regions,
             ])
             ->add('name', TextType::class);
     }

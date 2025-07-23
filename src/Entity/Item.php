@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
-class Item
+class Item implements UpdatedAwareInterface, SoftDeleteInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -90,7 +90,7 @@ class Item
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
 

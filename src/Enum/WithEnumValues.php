@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-trait WithValues
+trait WithEnumValues
 {
     public static function values(): array
     {
