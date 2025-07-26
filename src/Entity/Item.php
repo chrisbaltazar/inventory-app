@@ -35,7 +35,8 @@ class Item implements UpdatedAwareInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\OneToMany(targetEntity: Metadata::class, mappedBy: 'item')]
     private Collection $metadata;
 
-    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item')]
+    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: ['persist'])]
+    #[Assert\Valid]
     private Collection $inventory;
 
     #[ORM\ManyToOne]

@@ -27,8 +27,7 @@ class InventoryType extends AbstractType
             ])
             ->add('color', TextType::class, [
                 'required' => false,
-            ])
-            ->add('comments', TextType::class);
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

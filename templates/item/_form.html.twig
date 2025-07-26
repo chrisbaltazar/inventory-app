@@ -21,7 +21,7 @@
                 <td class="w-25">
                     {% include 'partials/_form-field.html.twig' with {'field': row.quantity, 'label': 'Cantidad'} %}
                 </td>
-                <td class="w-50">
+                <td class="w-25">
                     {% include 'partials/_form-field.html.twig' with {'field': row.size, 'label': 'Talla'} %}
                 </td>
                 <td>
@@ -33,14 +33,14 @@
 
     <template data-form-collection-target="template" id="inventoryTemplate">
         <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.quantity, 'label': 'Cantidad'} %}</td>
-        <td class="w-50">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.size, 'label': 'Talla'} %}</td>
+        <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.size, 'label': 'Talla'} %}</td>
         <td>{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.color, 'label': 'Color'} %}</td>
     </template>
 
     {{ form_rest(form) }}
 
     <div class="d-flex justify-content-between mt-4">
-        <a class="btn btn-light" href="{{ path('app_user_index') }}">
+        <a class="btn btn-light" href="{{ path('app_item_index') }}">
             <i class="fa-solid fa-arrow-left"></i> Volver
         </a>
         {% block form_buttons %}{% endblock %}
