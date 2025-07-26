@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="container mt-5">
-        <h1>Pieza</h1>
+        <h1>Detalles</h1>
 
         <table class="table">
             <tbody>
@@ -13,12 +13,20 @@
                 <td>{{ item.id }}</td>
             </tr>
             <tr>
-                <th>Region</th>
+                <th>Región</th>
                 <td>{{ item.region }}</td>
             </tr>
             <tr>
-                <th>Name</th>
+                <th>Descripción</th>
                 <td>{{ item.name }}</td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td>{{ item.total }}</td>
+            </tr>
+            <tr>
+                <th>Tallas</th>
+                <td>{{ item.sizes|join(', ') }}</td>
             </tr>
             <tr>
                 <th>Actualizado</th>

@@ -147,6 +147,7 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         if (!$this->inventory->contains($inventory)) {
             $this->inventory->add($inventory);
             $inventory->setItem($this);
+            $this->total += $inventory->getQuantity();
         }
 
         return $this;
@@ -174,5 +175,17 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         $this->updatedBy = $updatedBy;
 
         return $this;
+    }
+
+    public function getTotal(): int
+    {
+        return array_reduce($this->inventory->toArray(), function (float $carry, Inventory $inventory) {
+            return $carry + $inventory->getQuantity();
+        }, 0);
+    }
+
+    public function getSizes(): array
+    {
+        return array_unique(array_map(fn($i) => $i->getSize(), $this->inventory->toArray()));
     }
 }

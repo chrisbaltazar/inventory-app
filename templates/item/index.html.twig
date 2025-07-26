@@ -14,8 +14,9 @@
             <thead>
             <tr>
                 <th>Id</th>
-                <th>Region</th>
-                <th>Nombre</th>
+                <th>Región</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
                 <th></th>
             </tr>
             </thead>
@@ -25,6 +26,7 @@
                     <td>{{ item.id }}</td>
                     <td>{{ item.region }}</td>
                     <td>{{ item.name }}</td>
+                    <td>{{ item.total }}</td>
                     <td>
                         <a class="float-end mx-1 btn btn-warning btn-sm"
                            href="{{ path('app_item_edit', {'id': item.id}) }}">
