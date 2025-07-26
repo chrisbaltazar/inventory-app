@@ -32,7 +32,7 @@ class Inventory
 
     #[ORM\Column]
     #[Assert\NotBlank]
-    #[Assert\Range(min: 0)]
+    #[Assert\PositiveOrZero]
     private ?int $quantity = null;
 
     #[ORM\Column]

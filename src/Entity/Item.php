@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
-class Item implements UpdatedAwareInterface, SoftDeleteInterface
+class Item implements UpdatedAwareInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,6 +37,9 @@ class Item implements UpdatedAwareInterface, SoftDeleteInterface
 
     #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item')]
     private Collection $inventory;
+
+    #[ORM\ManyToOne]
+    private ?User $updatedBy = null;
 
     public function __construct()
     {
@@ -153,6 +156,18 @@ class Item implements UpdatedAwareInterface, SoftDeleteInterface
                 $inventory->setItem(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(User $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
 
         return $this;
     }
