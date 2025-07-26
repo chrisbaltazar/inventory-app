@@ -2,8 +2,8 @@
 
 namespace App\Service\Database;
 
-use App\Entity\CreatedAwareInterface;
-use App\Entity\UpdatedAwareInterface;
+use App\Entity\Contract\CreatedStampInterface;
+use App\Entity\Contract\UpdatedStampInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
@@ -28,7 +28,7 @@ class DoctrineEntityTimestampsListener
 
     private function handleCreated(object $entity): void
     {
-        if (!$entity instanceof CreatedAwareInterface) {
+        if (!$entity instanceof CreatedStampInterface) {
             return;
         }
 
@@ -41,7 +41,7 @@ class DoctrineEntityTimestampsListener
 
     private function handleUpdated(object $entity): void
     {
-        if (!$entity instanceof UpdatedAwareInterface) {
+        if (!$entity instanceof UpdatedStampInterface) {
             return;
         }
 

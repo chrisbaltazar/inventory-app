@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Contract;
 
-interface UpdatedAwareInterface
+interface UpdatedStampInterface
 {
     public function setUpdatedAt(\DateTimeImmutable $updatedAt);
 

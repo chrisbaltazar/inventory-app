@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
+use App\Entity\Contract\SoftDeleteInterface;
+use App\Entity\Contract\UpdatedStampInterface;
+use App\Entity\Contract\UserAwareInterface;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-class Event implements UpdatedAwareInterface, SoftDeleteInterface, UserAwareInterface
+class Event implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

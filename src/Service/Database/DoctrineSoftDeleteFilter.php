@@ -2,7 +2,7 @@
 
 namespace App\Service\Database;
 
-use App\Entity\SoftDeleteInterface;
+use App\Entity\Contract\SoftDeleteInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Filter\SQLFilter;
 

@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Entity\Contract\SoftDeleteInterface;
+use App\Entity\Contract\UpdatedStampInterface;
 use App\Repository\InventoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InventoryRepository::class)]
-class Inventory implements UpdatedAwareInterface, SoftDeleteInterface
+class Inventory implements UpdatedStampInterface, SoftDeleteInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

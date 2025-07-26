@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Contract\SoftDeleteInterface;
+use App\Entity\Contract\UpdatedStampInterface;
+use App\Entity\Contract\UserAwareInterface;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -10,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements
-    UserInterface, PasswordAuthenticatedUserInterface, UpdatedAwareInterface, SoftDeleteInterface, UserAwareInterface
+    UserInterface, PasswordAuthenticatedUserInterface, UpdatedStampInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

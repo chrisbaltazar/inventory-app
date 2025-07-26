@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Contract;
+
+use App\Entity\User;
 
 interface UserAwareInterface
 {
