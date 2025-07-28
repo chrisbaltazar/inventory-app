@@ -6,6 +6,8 @@ use App\Entity\Contract\SoftDeleteInterface;
 use App\Entity\Contract\UpdatedStampInterface;
 use App\Entity\Contract\UserAwareInterface;
 use App\Repository\EventRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -44,6 +46,14 @@ class Event implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInte
 
     #[ORM\ManyToOne]
     private ?User $updatedBy = null;
+
+    #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'Event', orphanRemoval: true)]
+    private Collection $loans;
+
+    public function __construct()
+    {
+        $this->loans = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -142,6 +152,36 @@ class Event implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInte
     public function setUpdatedBy(User $updatedBy): static
     {
         $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Loan>
+     */
+    public function getLoans(): Collection
+    {
+        return $this->loans;
+    }
+
+    public function addLoan(Loan $loan): static
+    {
+        if (!$this->loans->contains($loan)) {
+            $this->loans->add($loan);
+            $loan->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLoan(Loan $loan): static
+    {
+        if ($this->loans->removeElement($loan)) {
+            // set the owning side to null (unless already changed)
+            if ($loan->getEvent() === $this) {
+                $loan->setEvent(null);
+            }
+        }
 
         return $this;
     }
