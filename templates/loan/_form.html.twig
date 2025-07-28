@@ -1,4 +1,39 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+{% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+
+<div class="form-wrapper mt-4">
+    {{ form_start(form, {'attr': {'class': formClass}}) }}
+    {{ form_errors(form) }}
+
+    {% include 'partials/_form-field.html.twig' with {'field': form.event, 'label': 'Evento'} %}
+
+    {% include 'partials/_form-field.html.twig' with {'field': form.user, 'label': 'Persona'} %}
+
+    {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
+
+</div>
+
+<script>
+    document.addEventListener('turbo:load', () => {
+        document.querySelectorAll('select#loan_region').forEach(function (el) {
+            if (el.dataset.bound) {
+                return
+            }
+
+            el.addEventListener('change', () => buildUrl())
+
+            el.dataset.bound = 'true'
+        })
+    })
+
+    const buildUrl = () => {
+        const event = document.querySelector('select#loan_event')
+        const user = document.querySelector('select#loan_user')
+        const region = document.querySelector('select#loan_region')
+        const url = new URL('{{ url('app_loan_new') }}')
+        // url.searchParams.append('event', event.value)
+        // url.searchParams.append('user', user.value)
+        url.pathname += '/' + event.value + '/' + user.value
+        url.searchParams.append('region', region.value)
+        location.href = url.href
+    }
+</script>

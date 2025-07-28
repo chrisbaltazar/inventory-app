@@ -45,7 +45,7 @@ class Loan
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
     #[Assert\Json]
-    #[Assert\length(max: 255)]
+    #[Assert\Length(max: 255)]
     private ?string $info = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -55,7 +55,6 @@ class Loan
     #[Assert\NotBlank]
     #[Assert\Length(max: 10)]
     private ?string $status = null;
-
 
     public function getId(): ?int
     {

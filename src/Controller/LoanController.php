@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
 use App\Entity\Loan;
+use App\Entity\User;
 use App\Form\LoanType;
 use App\Repository\LoanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/loan')]
@@ -22,11 +25,20 @@ class LoanController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_loan_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{event?}/{user?}', name: 'app_loan_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ?Event $event,
+        ?User $user,
+    ): Response
     {
         $loan = new Loan();
-        $form = $this->createForm(LoanType::class, $loan);
+        $form = $this->createForm(LoanType::class, $loan, [
+            'event' => $event,
+            'user' => $user,
+            'region' => $request->get('region'),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -71,7 +83,7 @@ class LoanController extends AbstractController
     #[Route('/{id}', name: 'app_loan_delete', methods: ['POST'])]
     public function delete(Request $request, Loan $loan, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$loan->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $loan->getId(), $request->request->get('_token'))) {
             $entityManager->remove($loan);
             $entityManager->flush();
         }
