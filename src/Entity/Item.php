@@ -38,7 +38,7 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\OneToMany(targetEntity: Metadata::class, mappedBy: 'item')]
     private Collection $metadata;
 
-    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Assert\Valid]
     private Collection $inventory;
 
@@ -147,7 +147,6 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         if (!$this->inventory->contains($inventory)) {
             $this->inventory->add($inventory);
             $inventory->setItem($this);
-            $this->total += $inventory->getQuantity();
         }
 
         return $this;

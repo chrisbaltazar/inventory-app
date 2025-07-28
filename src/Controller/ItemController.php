@@ -72,7 +72,7 @@ class ItemController extends AbstractController
     public function delete(Request $request, Item $item, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$item->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($item);
+            $item->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
         }
 

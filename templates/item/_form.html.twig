@@ -27,6 +27,11 @@
                 <td>
                     {% include 'partials/_form-field.html.twig' with {'field': row.color, 'label': 'Color'} %}
                 </td>
+                <td>
+                    <button type="button" class="float-end mt-3 btn btn-danger js-remove-inventory">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </td>
             </tr>
         {% endfor %}
     </table>
@@ -64,6 +69,16 @@
             el.dataset.bound = 'true'
         })
 
+        document.querySelectorAll('.js-remove-inventory').forEach(function (el) {
+            if (el.dataset.bound) return
+
+            el.addEventListener('click', function (e) {
+                removeInventoryRow(e.currentTarget)
+            })
+
+            el.dataset.bound = 'true'
+        })
+
         const addInventoryRow = () => {
             const table = document.getElementById('tableInventory')
             // console.log('table', table)
@@ -75,6 +90,11 @@
             row.innerHTML = template.innerHTML.replace(/__name__/g, index.toString())
             // console.log('content', row)
             table.appendChild(row)
+        }
+
+        const removeInventoryRow = (el) => {
+            const row = el.closest('tr')
+            row.remove()
         }
     })
 </script>
