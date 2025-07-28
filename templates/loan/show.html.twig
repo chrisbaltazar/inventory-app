@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Loan{% endblock %}
+
+{% block body %}
+    <h1>Loan</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ loan.id }}</td>
+            </tr>
+            <tr>
+                <th>StartDate</th>
+                <td>{{ loan.startDate ? loan.startDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EndDate</th>
+                <td>{{ loan.endDate ? loan.endDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Quantity</th>
+                <td>{{ loan.quantity }}</td>
+            </tr>
+            <tr>
+                <th>Comments</th>
+                <td>{{ loan.comments }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ loan.status }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_loan_index') }}">back to list</a>
+
+    <a href="{{ path('app_loan_edit', {'id': loan.id}) }}">edit</a>
+
+    {{ include('loan/_delete_form.html.twig') }}
+{% endblock %}

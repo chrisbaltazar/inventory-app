@@ -45,10 +45,14 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\ManyToOne]
     private ?User $updatedBy = null;
 
+    #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'item')]
+    private Collection $loans;
+
     public function __construct()
     {
         $this->metadata = new ArrayCollection();
         $this->inventory = new ArrayCollection();
+        $this->loans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -186,5 +190,35 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     public function getSizes(): array
     {
         return array_unique(array_map(fn($i) => $i->getSize(), $this->inventory->toArray()));
+    }
+
+    /**
+     * @return Collection<int, Loan>
+     */
+    public function getLoans(): Collection
+    {
+        return $this->loans;
+    }
+
+    public function addLoan(Loan $loan): static
+    {
+        if (!$this->loans->contains($loan)) {
+            $this->loans->add($loan);
+            $loan->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLoan(Loan $loan): static
+    {
+        if ($this->loans->removeElement($loan)) {
+            // set the owning side to null (unless already changed)
+            if ($loan->getItem() === $this) {
+                $loan->setItem(null);
+            }
+        }
+
+        return $this;
     }
 }

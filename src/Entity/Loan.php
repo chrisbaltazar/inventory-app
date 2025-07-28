@@ -32,22 +32,30 @@ class Loan
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $endDate = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'loans')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank]
-    private ?Inventory $item = null;
+    private ?Item $item = null;
 
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Assert\Positive]
     private ?int $quantity = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Json]
+    #[Assert\length(max: 255)]
+    private ?string $info = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comments = null;
 
     #[ORM\Column(length: 10)]
     #[Assert\NotBlank]
+    #[Assert\Length(max: 10)]
     private ?string $status = null;
+
 
     public function getId(): ?int
     {
@@ -102,18 +110,6 @@ class Loan
         return $this;
     }
 
-    public function getItem(): ?Inventory
-    {
-        return $this->item;
-    }
-
-    public function setItem(?Inventory $item): static
-    {
-        $this->item = $item;
-
-        return $this;
-    }
-
     public function getQuantity(): ?int
     {
         return $this->quantity;
@@ -146,6 +142,30 @@ class Loan
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getItem(): ?Item
+    {
+        return $this->item;
+    }
+
+    public function setItem(?Item $item): static
+    {
+        $this->item = $item;
+
+        return $this;
+    }
+
+    public function getInfo(): ?string
+    {
+        return $this->info;
+    }
+
+    public function setInfo(?string $info): static
+    {
+        $this->info = $info;
 
         return $this;
     }
