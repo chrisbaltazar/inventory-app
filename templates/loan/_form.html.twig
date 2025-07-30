@@ -21,7 +21,7 @@
                                 <label><strong>{{ item }}</strong></label>
                             </td>
                             <td>
-                                <select class="form-control" name="item[]">
+                                <select class="form-control" name="loan[item][]">
                                     <option value="">Seleccione...</option>
                                     {% for key,value in values %}
                                         <option value="{{ key }}">{{ value }}</option>
