@@ -10,6 +10,30 @@
 
     {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
 
+    {% if inventory|length %}
+        <div class="mt-4 w-75 mx-auto">
+            <h3>Selección de piezas</h3>
+            <div class="mt-3">
+                <table class="table table-striped">
+                    {% for item,values in inventory %}
+                        <tr>
+                            <td>
+                                <label><strong>{{ item }}</strong></label>
+                            </td>
+                            <td>
+                                <select class="form-control">
+                                    <option>Seleccione...</option>
+                                    {% for key,value in values %}
+                                        <option value="{{ key }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 <script>
@@ -30,8 +54,6 @@
         const user = document.querySelector('select#loan_user')
         const region = document.querySelector('select#loan_region')
         const url = new URL('{{ url('app_loan_new') }}')
-        // url.searchParams.append('event', event.value)
-        // url.searchParams.append('user', user.value)
         url.pathname += '/' + event.value + '/' + user.value
         url.searchParams.append('region', region.value)
         location.href = url.href

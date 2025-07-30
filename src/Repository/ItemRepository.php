@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Inventory;
 use App\Entity\Item;
+use App\Enum\RegionEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,7 +26,17 @@ class ItemRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('i')
             ->orderBy('i.region', 'ASC')
-            ->orderBy('i.name', 'ASC')
+            ->addOrderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByRegion(RegionEnum $region)
+    {
+        return $this->createQueryBuilder('it')
+            ->where('it.region = :region')
+            ->setParameter('region', $region->value)
+            ->orderBy('it.name', 'ASC')
             ->getQuery()
             ->getResult();
     }

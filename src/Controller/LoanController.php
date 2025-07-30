@@ -5,13 +5,14 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Entity\Loan;
 use App\Entity\User;
+use App\Enum\RegionEnum;
 use App\Form\LoanType;
 use App\Repository\LoanRepository;
+use App\Service\Inventory\InventoryDataService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/loan')]
@@ -31,26 +32,28 @@ class LoanController extends AbstractController
         EntityManagerInterface $entityManager,
         ?Event $event,
         ?User $user,
-    ): Response
-    {
+        InventoryDataService $inventoryDataService
+    ): Response {
+        $region = $request->get('region');
         $loan = new Loan();
         $form = $this->createForm(LoanType::class, $loan, [
             'event' => $event,
             'user' => $user,
-            'region' => $request->get('region'),
+            'region' => $region,
         ]);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($loan);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_loan_index', [], Response::HTTP_SEE_OTHER);
+        $inventory = [];
+        if ($region) {
+            $region = RegionEnum::from($region);
+            $inventory = $inventoryDataService->getRegionInventory($region);
         }
+
+        $form->handleRequest($request);
 
         return $this->render('loan/new.html.twig', [
             'loan' => $loan,
             'form' => $form,
+            'inventory' => $inventory,
         ]);
     }
 
