@@ -12,7 +12,7 @@ class InventoryDataService
     {
     }
 
-    public function getRegionInventory(RegionEnum $region): array
+    public function __invoke(RegionEnum $region): array
     {
         $inventory = $this->inventoryRepository->findByRegion($region);
         $inventory = array_filter($inventory, fn(Inventory $i) => $i->getQuantity() > 0);
@@ -38,6 +38,11 @@ class InventoryDataService
 
     private function formatKey(Inventory $inventory): string
     {
-        return sprintf('%s:%s', $inventory->getSize(), $inventory->getColor());
+        return sprintf(
+            '%d|%s|%s',
+            $inventory->getItem()->getId(),
+            $inventory->getSize(),
+            $inventory->getColor()
+        );
     }
 }

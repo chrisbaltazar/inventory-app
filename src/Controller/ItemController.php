@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/item')]
+#[IsGranted("ROLE_ADMIN")]
 class ItemController extends AbstractController
 {
     #[Route('/', name: 'app_item_index', methods: ['GET'])]

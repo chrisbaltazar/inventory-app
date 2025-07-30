@@ -21,8 +21,8 @@
                                 <label><strong>{{ item }}</strong></label>
                             </td>
                             <td>
-                                <select class="form-control">
-                                    <option>Seleccione...</option>
+                                <select class="form-control" name="item[]">
+                                    <option value="">Seleccione...</option>
                                     {% for key,value in values %}
                                         <option value="{{ key }}">{{ value }}</option>
                                     {% endfor %}
@@ -31,6 +31,11 @@
                         </tr>
                     {% endfor %}
                 </table>
+            </div>
+            <div class="mt-2 mx auto text-center">
+                <button type="button" class="btn btn-success" id="btnSave">
+                    <i class="fas fa-check"></i> Guardar todo
+                </button>
             </div>
         </div>
     {% endif %}
@@ -47,7 +52,34 @@
 
             el.dataset.bound = 'true'
         })
+
+        document.querySelectorAll('button#btnSave').forEach(el => el.addEventListener('click', async function () {
+                alert('send')
+                const form = document.querySelector('form')
+                const data = new FormData(form)
+                await saveForm(data)
+            })
+        )
     })
+
+    const saveForm = async (body) => {
+        try {
+            const response = await fetch('{{ path('app_loan_new') }}', {
+                method: 'POST',
+                body: body,
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Server error: ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log('Success:', data);
+        } catch (error) {
+            console.error('Fetch error:', error.message);
+        }
+    }
 
     const buildUrl = () => {
         const event = document.querySelector('select#loan_event')

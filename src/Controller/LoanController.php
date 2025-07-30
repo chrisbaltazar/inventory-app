@@ -9,13 +9,16 @@ use App\Enum\RegionEnum;
 use App\Form\LoanType;
 use App\Repository\LoanRepository;
 use App\Service\Inventory\InventoryDataService;
+use App\Service\Loan\LoanDataProcessor;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/loan')]
+#[IsGranted("ROLE_ADMIN")]
 class LoanController extends AbstractController
 {
     #[Route('/', name: 'app_loan_index', methods: ['GET'])]
@@ -29,14 +32,23 @@ class LoanController extends AbstractController
     #[Route('/new/{event?}/{user?}', name: 'app_loan_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager,
         ?Event $event,
         ?User $user,
-        InventoryDataService $inventoryDataService
+        InventoryDataService $inventoryDataService,
+        LoanDataProcessor $loanDataProcessor
     ): Response {
+        if ($request->isMethod('POST')) {
+            try {
+                $loanDataProcessor($request->getPayload()->all());
+
+                return $this->json('OK');
+            } catch (\Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         $region = $request->get('region');
-        $loan = new Loan();
-        $form = $this->createForm(LoanType::class, $loan, [
+        $form = $this->createForm(LoanType::class, new Loan(), [
             'event' => $event,
             'user' => $user,
             'region' => $region,
@@ -45,13 +57,12 @@ class LoanController extends AbstractController
         $inventory = [];
         if ($region) {
             $region = RegionEnum::from($region);
-            $inventory = $inventoryDataService->getRegionInventory($region);
+            $inventory = $inventoryDataService($region);
         }
 
         $form->handleRequest($request);
 
         return $this->render('loan/new.html.twig', [
-            'loan' => $loan,
             'form' => $form,
             'inventory' => $inventory,
         ]);

@@ -48,15 +48,6 @@ class LoanType extends AbstractType
                 'mapped' => false,
                 'data' => $options['region'] ?? '',
             ]);
-
-        if (isset($options['region'])) {
-//            $builder->add('items', EntityType::class, [
-//                'class' => Item::class,
-//                'choice_label' => function ($item) {
-//
-//                },
-//            ]);
-        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
