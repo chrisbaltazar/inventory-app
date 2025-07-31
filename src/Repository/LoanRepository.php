@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Item;
 use App\Entity\Loan;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,6 +20,31 @@ class LoanRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Loan::class);
+    }
+
+    public function findOpenByUserAndItem(int $userId, int $itemId): ?Loan
+    {
+        return $this->createQueryBuilder('l')
+            ->where('l.endDate IS NULL')
+            ->andWhere('l.user = :user')
+            ->andWhere('l.item = :item')
+            ->setParameter('user', $userId)
+            ->setParameter('item', $itemId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findOpenByItem(int|Item $item): array
+    {
+        is_int($item) || $item = $item->getId();
+
+        return $this->createQueryBuilder('l')
+            ->join('l.item', 'i')
+            ->where('l.endDate IS NULL')
+            ->andWhere('i.id = :itemId')
+            ->setParameter('itemId', $item)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

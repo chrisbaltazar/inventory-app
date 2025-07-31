@@ -29,24 +29,13 @@ class LoanController extends AbstractController
         ]);
     }
 
-    #[Route('/new/{event?}/{user?}', name: 'app_loan_new', methods: ['GET', 'POST'])]
+    #[Route('/new/{event?}/{user?}', name: 'app_loan_new', methods: ['GET'])]
     public function new(
         Request $request,
         ?Event $event,
         ?User $user,
         InventoryDataService $inventoryDataService,
-        LoanDataProcessor $loanDataProcessor
     ): Response {
-        if ($request->isMethod('POST')) {
-            try {
-                $loanDataProcessor($request->getPayload()->all());
-
-                return $this->json('OK');
-            } catch (\Exception $e) {
-                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-            }
-        }
-
         $region = $request->get('region');
         $form = $this->createForm(LoanType::class, new Loan(), [
             'event' => $event,
@@ -54,18 +43,32 @@ class LoanController extends AbstractController
             'region' => $region,
         ]);
 
+        $form->handleRequest($request);
+
         $inventory = [];
         if ($region) {
             $region = RegionEnum::from($region);
             $inventory = $inventoryDataService($region);
         }
 
-        $form->handleRequest($request);
-
         return $this->render('loan/new.html.twig', [
             'form' => $form,
             'inventory' => $inventory,
         ]);
+    }
+
+    #[Route('/store', name: 'app_loan_store', methods: ['POST'])]
+    public function store(Request $request, LoanDataProcessor $loanDataProcessor): Response
+    {
+        try {
+            $loanDataProcessor($request->getPayload()->all('loan'));
+
+            return $this->json('OK');
+        } catch (\UnexpectedValueException $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $t) {
+            return $this->json(['error' => $t->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     #[Route('/{id}', name: 'app_loan_show', methods: ['GET'])]

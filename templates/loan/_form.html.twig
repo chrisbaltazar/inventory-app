@@ -62,11 +62,11 @@
         )
     })
 
-    const saveForm = async (body) => {
+    const saveForm = async (formData) => {
         try {
-            const response = await fetch('{{ path('app_loan_new') }}', {
+            const response = await fetch('{{ path('app_loan_store') }}', {
                 method: 'POST',
-                body: body,
+                body: formData,
             });
 
             if (!response.ok) {
