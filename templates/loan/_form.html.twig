@@ -33,6 +33,9 @@
                 </table>
             </div>
             <div class="mt-2 mx auto text-center">
+                <div class="alert alert-danger alert-dismissible fade show" style="display: none" role="alert" id="errorPanel">
+                    <span></span>
+                </div>
                 <button type="button" class="btn btn-success" id="btnSave">
                     <i class="fas fa-check"></i> Guardar todo
                 </button>
@@ -48,16 +51,20 @@
                 return
             }
 
-            el.addEventListener('change', () => buildUrl())
+            el.addEventListener('change', () => handleNavigation(true))
 
             el.dataset.bound = 'true'
         })
 
         document.querySelectorAll('button#btnSave').forEach(el => el.addEventListener('click', async function () {
-                alert('send')
+                const button = document.getElementById('btnSave')
+                button.setAttribute('dissabled', 'disabled')
+                showError()
+
                 const form = document.querySelector('form')
                 const data = new FormData(form)
                 await saveForm(data)
+                button.removeAttribute('disabled')
             })
         )
     })
@@ -70,24 +77,37 @@
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Server error: ${errorText}`);
+                const errorData = await response.json();
+                throw errorData;
             }
 
             const data = await response.json();
-            console.log('Success:', data);
-        } catch (error) {
-            console.error('Fetch error:', error.message);
+
+            handleNavigation(false)
+        } catch (e) {
+            await showError(e.message)
+            console.error('Fetch error:', e?.error);
         }
     }
 
-    const buildUrl = () => {
+    const handleNavigation = (withQuery) => {
         const event = document.querySelector('select#loan_event')
         const user = document.querySelector('select#loan_user')
         const region = document.querySelector('select#loan_region')
         const url = new URL('{{ url('app_loan_new') }}')
         url.pathname += '/' + event.value + '/' + user.value
-        url.searchParams.append('region', region.value)
+        if (withQuery) {
+            url.searchParams.append('region', region.value)
+        }
+
         location.href = url.href
+    }
+
+    const showError = (error = '') => {
+        console.log(error)
+        const panel = document.getElementById('errorPanel')
+        const errorMessage = panel.querySelector('span')
+        errorMessage.textContent = error
+        panel.style.display = error ? 'block' : 'none'
     }
 </script>

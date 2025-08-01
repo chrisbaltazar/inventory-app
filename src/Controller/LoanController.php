@@ -63,12 +63,14 @@ class LoanController extends AbstractController
         try {
             $loanDataProcessor($request->getPayload()->all('loan'));
 
+            $this->addFlash('success', 'Asignación correcta.');
+
             return $this->json('OK');
         } catch (\UnexpectedValueException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            return $this->json(['message' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $t) {
-            throw $t;
-//            return $this->json(['error' => $t->getTraceAsString()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['message' => $t->getMessage(), 'error' => $t->getTraceAsString()],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

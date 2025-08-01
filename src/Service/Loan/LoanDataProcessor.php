@@ -108,7 +108,7 @@ class LoanDataProcessor
             $loan->setEvent($event);
             $loan->setItem($item['item']);
             unset($item['item']);
-            $info = json_encode($item);
+            $info = json_encode($item, JSON_UNESCAPED_UNICODE);
             $loan->setInfo($info);
             $loan->setQuantity(1);
             $loan->setStartDate(new \DateTimeImmutable());

@@ -26,12 +26,20 @@
         {% endif %}
 
         <div id="main" class="py-5">
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success" role="alert">{{ message }}</div>
-            {% endfor %}
-            {% for error in app.flashes('error') %}
-                <div class="alert alert-danger" role="alert">{{ error }}</div>
-            {% endfor %}
+            <div class="flash-messages mt-2">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+                {% for error in app.flashes('error') %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
 
             {% block body %}{% endblock %}
         </div>
