@@ -131,4 +131,12 @@ class Inventory implements UpdatedStampInterface, SoftDeleteInterface
 
         return $this;
     }
+
+    public function getInfo(): array
+    {
+        return [
+            'size' => $this->getSize(),
+            'description' => $this->getColor(),
+        ];
+    }
 }

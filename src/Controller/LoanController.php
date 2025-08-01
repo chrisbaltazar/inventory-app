@@ -67,7 +67,8 @@ class LoanController extends AbstractController
         } catch (\UnexpectedValueException $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $t) {
-            return $this->json(['error' => $t->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw $t;
+//            return $this->json(['error' => $t->getTraceAsString()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

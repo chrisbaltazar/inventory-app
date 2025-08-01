@@ -3,30 +3,33 @@
 namespace App\Service\Loan;
 
 use App\Entity\Event;
-use App\Entity\Inventory;
+use App\Entity\Item;
 use App\Entity\Loan;
 use App\Entity\User;
+use App\Enum\LoanStatusEnum;
 use App\Repository\EventRepository;
-use App\Repository\ItemRepository;
+use App\Repository\InventoryRepository;
 use App\Repository\LoanRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class LoanDataProcessor
 {
     public function __construct(
         private LoanRepository $loanRepository,
-        private ItemRepository $itemRepository,
+        private InventoryRepository $inventoryRepository,
         private UserRepository $userRepository,
         private EventRepository $eventRepository,
+        private EntityManagerInterface $entityManager
     ) {
     }
 
     public function __invoke(array $data)
     {
         [$user, $event, $items] = $this->validateData($data);
-        $this->checkOpenLoanFor($user, $items);
-        $this->verifyItemsExistence($items);
-        $this->persistItems($items, $user, $event);
+        $validItems = $this->verifyItemsExistence($items);
+        $this->checkOpenLoanFor($user, $validItems);
+        $this->persistItems($validItems, $user, $event);
     }
 
 
@@ -53,58 +56,81 @@ class LoanDataProcessor
         return [
             $this->userRepository->find($userId),
             $this->eventRepository->find($eventId),
-            $items
+            $items,
         ];
     }
 
     private function checkOpenLoanFor(User $user, array $items): void
     {
         foreach ($items as $item) {
-            $itemId = $this->getItemId($item);
-            $loan = $this->loanRepository->findOpenByUserAndItem($user->getId(), $itemId);
+            /** @var Item $item */
+            $item = $item['item'];
+            $loan = $this->loanRepository->findOpenByUserAndItem($user, $item);
             if ($loan) {
-                throw new \UnexpectedValueException('User with open loan for: ' . $loan->getItem()->getName());
+                throw new \UnexpectedValueException('User with open loan for: ' . $item->getName());
             }
         }
     }
 
-    private function verifyItemsExistence(array $items): void
+    private function verifyItemsExistence(array $items): array
     {
-        foreach ($items as $item) {
-            $itemId = $this->getItemId($item);
-            $item = $this->itemRepository->find($itemId);
+        return array_map(function ($itemData) {
+            $id = $this->getInventoryId($itemData);
+            $inventory = $this->inventoryRepository->find($id);
+            $item = $inventory?->getItem();
 //            dump($item);
             if (!$item) {
-                throw new \UnexpectedValueException('Item not found: ' . $itemId);
+                throw new \UnexpectedValueException('Item not found for: ' . $itemData);
             }
 
             $loans = $this->loanRepository->findOpenByItem($item);
 //            dump($loans);
-            $totalLoans = array_reduce($loans, fn($carry, Loan $loan) => $carry + $loan->getQuantity(), 0);
-            $totalInventory = array_reduce(
-                $item->getInventory()->toArray(),
-                fn($carry, Inventory $inv) => $carry + $inv->getQuantity(),
-                0
-            );
+            $totalLoans = $this->getTotalLoans($loans, $inventory->getInfo());
 //            dd($totalLoans, $totalInventory);
-            if (++$totalLoans > $totalInventory) {
-                throw new \UnexpectedValueException('Not enough availability for: ' . $item->getName());
+            if (++$totalLoans > $inventory->getQuantity()) {
+                throw new \UnexpectedValueException("Not enough availability for: {$item->getName()} ($itemData)");
             }
-        }
+
+            return array_merge($inventory->getInfo(), ['item' => $item]);
+        }, $items);
     }
 
-    private function getItemId(string $item): int
+    private function getInventoryId(string $item): int
     {
-        return current(explode('|', $item));
+        return (int) current(explode('|', $item));
     }
 
     private function persistItems(array $items, User $user, Event $event): void
     {
-        $loan = new Loan();
-        $loan->setUser($user);
-        $loan->setEvent($event);
         foreach ($items as $item) {
+            $loan = new Loan();
+            $loan->setUser($user);
+            $loan->setEvent($event);
+            $loan->setItem($item['item']);
+            unset($item['item']);
+            $info = json_encode($item);
+            $loan->setInfo($info);
+            $loan->setQuantity(1);
+            $loan->setStartDate(new \DateTimeImmutable());
+            $loan->setStatus(LoanStatusEnum::OPEN->value);
 
+            $this->entityManager->persist($loan);
         }
+
+        $this->entityManager->flush();
+    }
+
+    private function getTotalLoans(array $loans, array $data): int
+    {
+        return array_reduce($loans, function ($carry, Loan $loan) use ($data) {
+            $quantity = 0;
+            $info = json_decode($loan->getInfo(), true);
+            $search = array_intersect_key($data, $info);
+            if (count($search) === count($data)) {
+                $quantity = $loan->getQuantity();
+            }
+
+            return $carry + $quantity;
+        }, 0);
     }
 }

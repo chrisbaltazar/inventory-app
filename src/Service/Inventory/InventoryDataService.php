@@ -38,11 +38,8 @@ class InventoryDataService
 
     private function formatKey(Inventory $inventory): string
     {
-        return sprintf(
-            '%d|%s|%s',
-            $inventory->getItem()->getId(),
-            $inventory->getSize(),
-            $inventory->getColor()
-        );
+        $data = array_merge(['id' => $inventory->getId()], $inventory->getInfo());
+
+        return implode('|', $data);
     }
 }
