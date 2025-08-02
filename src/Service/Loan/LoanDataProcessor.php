@@ -78,20 +78,18 @@ class LoanDataProcessor
             $id = $this->getInventoryId($itemData);
             $inventory = $this->inventoryRepository->find($id);
             $item = $inventory?->getItem();
-//            dump($item);
-            if (!$item) {
+            if (!$inventory || !$item) {
                 throw new \UnexpectedValueException('Item not found for: ' . $itemData);
             }
 
+            $info = $inventory->getInfo();
             $loans = $this->loanRepository->findOpenByItem($item);
-//            dump($loans);
-            $totalLoans = $this->getTotalLoans($loans, $inventory->getInfo());
-//            dd($totalLoans, $totalInventory);
+            $totalLoans = $this->getTotalLoans($loans, $info);
             if (++$totalLoans > $inventory->getQuantity()) {
                 throw new \UnexpectedValueException("Not enough availability for: {$item->getName()} ($itemData)");
             }
 
-            return array_merge($inventory->getInfo(), ['item' => $item]);
+            return array_merge($info, ['item' => $item]);
         }, $items);
     }
 
@@ -125,8 +123,10 @@ class LoanDataProcessor
         return array_reduce($loans, function ($carry, Loan $loan) use ($data) {
             $quantity = 0;
             $info = json_decode($loan->getInfo(), true);
-            $search = array_intersect_key($data, $info);
-            if (count($search) === count($data)) {
+            $search = array_intersect_key($info, $data);
+            ksort($data);
+            ksort($search);
+            if ($data === $search) {
                 $quantity = $loan->getQuantity();
             }
 
