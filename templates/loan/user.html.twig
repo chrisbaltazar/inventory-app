@@ -1,13 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Asignación {{ user ? user.name : '' }}
+{% block title %}Asignación {{ user ? user.name : '' }}{% endblock %}
 
 {% block body %}
     <div class="container mt-5">
         <div class="row">
             <h1>Asignación por persona</h1>
+            <div class="col-md-10 col-sm-12 my-3">
+                <div class="mb-3">
+                    <label>Persona</label>
+                    <select class="form-control" id="cmbPerson">
+                        <option value="">Seleccione...</option>
+                        {% for person in users %}
+                            <option value="{{ person.id }}" {{ user and person.id is same as user.id ? 'selected' : '' }}>{{ person.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
+                <div class="mb-3">
+                    {% if loans|length %}
+                        <h3>Open loans</h3>
+                        <table class="table table-striped table-hover">
+                            {% for loan in loans %}
+                                <tr>
+                                    <td>{{ loan.id }}</td>
+                                    <td>{{ loan.event.name }}</td>
+                                    <td>{{ loan.startDate|date('d/m/Y') }}</td>
+                                    <td>{{ loan.item.name }}</td>
+                                    <td>{{ loan.info }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-{% endblock %}
 
+    <script>
+        document.addEventListener('turbo:load', () => {
+            document.querySelectorAll('select#cmbPerson').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('change', (e) => refreshPage(e.currentTarget.value))
+
+                el.dataset.bound = 'true'
+            })
+        })
+
+        const refreshPage = (userId) => {
+            if (!userId) {
+                return
+            }
+            const url = '{{ path('app_loan_user') }}'
+            location.href = url + '/' + userId
+        }
+    </script>
+{% endblock %}

@@ -7,10 +7,9 @@ use App\Entity\Loan;
 use App\Entity\User;
 use App\Enum\RegionEnum;
 use App\Form\LoanType;
-use App\Repository\LoanRepository;
+use App\Repository\UserRepository;
 use App\Service\Inventory\InventoryDataService;
 use App\Service\Loan\LoanDataProcessor;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,15 +66,16 @@ class LoanController extends AbstractController
     }
 
     #[Route('/user/{id?}', name: 'app_loan_user', methods: ['GET'])]
-   public function showUser(?User $user = null): Response
-   {
+    public function showUser(UserRepository $userRepository, ?User $user = null): Response
+    {
         return $this->render('loan/user.html.twig', [
             'user' => $user,
+            'loans' => $user?->getLoans() ?? [],
+            'users' => $userRepository->findAll(),
         ]);
-   }
+    }
 
-   public function showItem(): Response
-   {
-
-   }
+    public function showItem(): Response
+    {
+    }
 }
