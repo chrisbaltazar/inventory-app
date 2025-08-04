@@ -24,16 +24,18 @@
 
 {% block body %}
     <div class="container mt-5">
-        <h1>Editar usuario</h1>
+        <div class="row">
+            <h1>Editar usuario</h1>
 
-        {% embed 'user/_form.html.twig' %}
+            {% embed 'user/_form.html.twig' %}
 
-            {% block form_buttons %}
-                <a class="btn btn-warning" onclick="changePwd()">
-                    <i class="fa-solid fa-lock"></i> Cambiar password
-                </a>
-            {% endblock %}
+                {% block form_buttons %}
+                    <a class="btn btn-warning" onclick="changePwd()">
+                        <i class="fa-solid fa-lock"></i> Cambiar password
+                    </a>
+                {% endblock %}
 
-        {% endembed %}
+            {% endembed %}
+        </div>
     </div>
 {% endblock %}

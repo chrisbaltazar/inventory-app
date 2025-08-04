@@ -21,14 +21,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted("ROLE_ADMIN")]
 class LoanController extends AbstractController
 {
-    #[Route('/', name: 'app_loan_index', methods: ['GET'])]
-    public function index(LoanRepository $loanRepository): Response
-    {
-        return $this->render('loan/index.html.twig', [
-            'loans' => $loanRepository->findAll(),
-        ]);
-    }
-
     #[Route('/new/{event?}/{user?}', name: 'app_loan_new', methods: ['GET'])]
     public function new(
         Request $request,
@@ -74,40 +66,16 @@ class LoanController extends AbstractController
         }
     }
 
-    #[Route('/{id}', name: 'app_loan_show', methods: ['GET'])]
-    public function show(Loan $loan): Response
-    {
-        return $this->render('loan/show.html.twig', [
-            'loan' => $loan,
+    #[Route('/user/{id?}', name: 'app_loan_user', methods: ['GET'])]
+   public function showUser(?User $user = null): Response
+   {
+        return $this->render('loan/user.html.twig', [
+            'user' => $user,
         ]);
-    }
+   }
 
-    #[Route('/{id}/edit', name: 'app_loan_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Loan $loan, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(LoanType::class, $loan);
-        $form->handleRequest($request);
+   public function showItem(): Response
+   {
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_loan_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('loan/edit.html.twig', [
-            'loan' => $loan,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_loan_delete', methods: ['POST'])]
-    public function delete(Request $request, Loan $loan, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $loan->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($loan);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_loan_index', [], Response::HTTP_SEE_OTHER);
-    }
+   }
 }

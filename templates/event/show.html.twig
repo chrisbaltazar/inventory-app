@@ -4,47 +4,49 @@
 
 {% block body %}
     <div class="container mt-5">
-        <h1>Evento</h1>
+        <div class="row">
+            <h1>Evento</h1>
 
-        <table class="table">
-            <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ event.id }}</td>
-            </tr>
-            <tr>
-                <th>Evento</th>
-                <td>{{ event.name }}</td>
-            </tr>
-            <tr>
-                <th>Fecha</th>
-                <td>{{ event.date ? event.date|date('d/m/Y') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Entrega</th>
-                <td>{{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Retorno</th>
-                <td>{{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Actualizado</th>
-                <td>{{ event.updatedAt ? event.updatedAt|date('d/m/Y H:i:s') : '' }}</td>
-            </tr>
-            </tbody>
-        </table>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Id</th>
+                    <td>{{ event.id }}</td>
+                </tr>
+                <tr>
+                    <th>Evento</th>
+                    <td>{{ event.name }}</td>
+                </tr>
+                <tr>
+                    <th>Fecha</th>
+                    <td>{{ event.date ? event.date|date('d/m/Y') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Entrega</th>
+                    <td>{{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Retorno</th>
+                    <td>{{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}</td>
+                </tr>
+                <tr>
+                    <th>Actualizado</th>
+                    <td>{{ event.updatedAt ? event.updatedAt|date('d/m/Y H:i:s') : '' }}</td>
+                </tr>
+                </tbody>
+            </table>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a class="btn btn-light" href="{{ path('app_event_index') }}">
-                <i class="fa-solid fa-arrow-left"></i> Volver
-            </a>
-            {% block form_buttons %}
-                {{ include('event/_delete_form.html.twig') }}
-            {% endblock %}
-            <a class="btn btn-warning" href="{{ path('app_event_edit', {'id': event.id}) }}">
-                <i class="fa-solid fa-pencil"></i> Editar
-            </a>
+            <div class="d-flex justify-content-between mt-4">
+                <a class="btn btn-light" href="{{ path('app_event_index') }}">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </a>
+                {% block form_buttons %}
+                    {{ include('event/_delete_form.html.twig') }}
+                {% endblock %}
+                <a class="btn btn-warning" href="{{ path('app_event_edit', {'id': event.id}) }}">
+                    <i class="fa-solid fa-pencil"></i> Editar
+                </a>
+            </div>
         </div>
     </div>
 

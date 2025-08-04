@@ -30,10 +30,18 @@
                             Vestuario
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ route starts with 'app_loan' ? 'active':'' }}" aria-current="page" href="{{ path('app_loan_index') }}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ route starts with 'app_loan' ? 'active':'' }}" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                             Asignación
                         </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('app_loan_new') }}">Nueva</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ path('app_loan_new') }}">Por persona</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_loan_new') }}">Por pieza</a></li>
+                        </ul>
                     </li>
                 {% endif %}
                 <li class="nav-item dropdown">

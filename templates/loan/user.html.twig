@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Loan{% endblock %}
+{% block title %}Asignación {{ user ? user.name : '' }}
 
 {% block body %}
     <div class="container mt-5">
         <div class="row">
-            <h1>Nueva asignación</h1>
+            <h1>Asignación por persona</h1>
 
-            {{ include('loan/_form.html.twig') }}
         </div>
     </div>
 {% endblock %}
+

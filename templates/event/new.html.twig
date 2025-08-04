@@ -4,8 +4,10 @@
 
 {% block body %}
     <div class="container mt-5">
-        <h1>Nuevo Evento</h1>
+        <div class="row">
+            <h1>Nuevo Evento</h1>
 
-        {{ include('event/_form.html.twig') }}
+            {{ include('event/_form.html.twig') }}
+        </div>
     </div>
 {% endblock %}
