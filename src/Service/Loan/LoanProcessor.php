@@ -13,7 +13,7 @@ use App\Repository\LoanRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class LoanDataProcessor
+class LoanProcessor
 {
     public function __construct(
         private LoanRepository $loanRepository,

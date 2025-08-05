@@ -9,7 +9,8 @@ use App\Enum\RegionEnum;
 use App\Form\LoanType;
 use App\Repository\UserRepository;
 use App\Service\Inventory\InventoryDataService;
-use App\Service\Loan\LoanDataProcessor;
+use App\Service\Loan\LoanDataService;
+use App\Service\Loan\LoanProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,7 +50,7 @@ class LoanController extends AbstractController
     }
 
     #[Route('/store', name: 'app_loan_store', methods: ['POST'])]
-    public function store(Request $request, LoanDataProcessor $loanDataProcessor): Response
+    public function store(Request $request, LoanProcessor $loanDataProcessor): Response
     {
         try {
             $loanDataProcessor($request->getPayload()->all('loan'));
@@ -66,11 +67,15 @@ class LoanController extends AbstractController
     }
 
     #[Route('/user/{id?}', name: 'app_loan_user', methods: ['GET'])]
-    public function showUser(UserRepository $userRepository, ?User $user = null): Response
-    {
+    public function showUser(
+        UserRepository $userRepository,
+        LoanDataService $loanDataService,
+        ?User $user = null
+    ): Response {
+        dump($loanDataService->getUserLoansByEvent($user));
         return $this->render('loan/user.html.twig', [
             'user' => $user,
-            'loans' => $user?->getLoans() ?? [],
+            'loans' => $user ? $loanDataService->getUserLoansByEvent($user) : [],
             'users' => $userRepository->findAll(),
         ]);
     }
