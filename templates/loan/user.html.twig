@@ -41,9 +41,9 @@
                                                 <td>{{ row.startDate }}</td>
                                                 <td>{{ row.endDate }}</td>
                                                 <td>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#modal">Entrega
+                                                    <button type="button" class="btn btn-danger btn-sm js-close-loan"
+                                                            data-loan-id="{{ row.id }}">
+                                                        Entrega
                                                     </button>
                                                 </td>
                                             </tr>
@@ -76,9 +76,10 @@
                                                     <td>{{ row.startDate }}</td>
                                                     <td>{{ row.endDate }}</td>
                                                     <td>
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#modal">Entrega
+                                                        <button type="button"
+                                                                class="btn btn-danger btn-sm js-close-loan"
+                                                                data-loan-id="{{ row.id }}">
+                                                            Entrega
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -96,6 +97,8 @@
     </div>
 
     <script>
+        let loanId = null
+
         document.addEventListener('turbo:load', () => {
             document.querySelectorAll('select#cmbPerson').forEach(function (el) {
                 if (el.dataset.bound) {
@@ -103,6 +106,35 @@
                 }
 
                 el.addEventListener('change', (e) => refreshPage(e.currentTarget.value))
+
+                el.dataset.bound = 'true'
+            })
+
+            document.querySelectorAll('form[name="loan_return"]').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('submit', async (e) => {
+                    e.preventDefault()
+                    const data = new FormData(e.currentTarget)
+                    await closeLoan(data)
+                })
+
+                el.dataset.bound = 'true'
+            })
+
+            document.querySelectorAll('.js-close-loan').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.loanId
+                    document.getElementById('txtLoanId').value = id
+                    const modal = new bootstrap.Modal('#modal')
+                    modal.show()
+                })
 
                 el.dataset.bound = 'true'
             })
@@ -114,6 +146,24 @@
             }
             const url = '{{ path('app_loan_user') }}'
             location.href = url + '/' + userId
+        }
+
+        const closeLoan = async (formData) => {
+            try {
+                const response = await fetch('{{ path('app_loan_update') }}', {
+                    method: 'POST',
+                    body: formData,
+                })
+
+                if (!response.ok) {
+                    throw await response.json();
+                }
+
+                const data = await response.json();
+            } catch (e) {
+                // await showError(e.message)
+                console.error('Fetch error:', e);
+            }
         }
     </script>
 {% endblock %}

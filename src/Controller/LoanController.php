@@ -8,13 +8,16 @@ use App\Entity\User;
 use App\Enum\RegionEnum;
 use App\Form\LoanReturnType;
 use App\Form\LoanType;
+use App\Repository\LoanRepository;
 use App\Repository\UserRepository;
 use App\Service\Inventory\InventoryDataService;
 use App\Service\Loan\LoanDataService;
 use App\Service\Loan\LoanProcessor;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -104,5 +107,34 @@ class LoanController extends AbstractController
 
     public function showItem(): Response
     {
+    }
+
+    #[Route('/update', name: 'app_loan_update', methods: ['POST'])]
+    public function update(
+        Request $request,
+        LoanRepository $loanRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        try {
+            $id = $request->get('id');
+            $loan = $loanRepository->find($id) ?? throw new NotFoundHttpException();
+            $form = $this->createForm(LoanReturnType::class, $loan);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $endDate = $form->get('endDate')->getData();
+                if ($endDate < $loan->getEvent()->getDate()) {
+                    throw new \UnexpectedValueException('Invalid end date provided');
+                }
+
+                $entityManager->flush();
+
+                return $this->json('OK');
+            }
+
+            return $this->json(['errors' => $form->getErrors()], Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $t) {
+            return $this->json(['message' => $t->getMessage(), 'error' => $t->getTraceAsString()],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

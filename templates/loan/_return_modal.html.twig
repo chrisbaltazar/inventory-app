@@ -9,11 +9,14 @@
         {{ form_start(form, {'attr': {'class': formClass}}) }}
         {{ form_errors(form) }}
 
+        <input type="hidden" name="id" id="txtLoanId">
         {% include 'partials/_form-field.html.twig' with {'field': form.endDate, 'label': 'Fecha'} %}
         {% include 'partials/_form-field.html.twig' with {'field': form.status, 'label': 'Cierre'} %}
         {% include 'partials/_form-field.html.twig' with {'field': form.comments, 'label': 'Comentarios'} %}
 
-        <button type="button" class="btn btn-warning js-close-loan">
+        {{ form_rest(form) }}
+
+        <button type="submit" class="btn btn-warning">
             <i class="fa-solid fa-clipboard"></i> Entregar
         </button>
     </div>
