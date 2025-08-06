@@ -3,7 +3,9 @@
 {% block title %}Asignación {{ user ? user.name : '' }}{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
+    {% include 'loan/_return_modal.html.twig' %}
+
+    <div class="container-sm mt-5">
         <div class="row">
             <h1>Asignación por persona</h1>
             <div class="col-sm-12 my-3">
@@ -18,29 +20,31 @@
                 </div>
 
                 <div class="mb-3">
-                    {% if loans|length %}
-                        <h3>Eventos abiertos</h3>
-                        {% for event,item in loans|filter(e => e.data.returnDate is empty or date(e.data.returnDate) >= date()) %}
+                    {% if openLoans|length %}
+                        <h3 class="mb-3">Eventos abiertos</h3>
+                        {% for event,item in openLoans %}
                             <div class="card border-warning mb-3 shadow">
                                 <div class="card-header">{{ event }}</div>
                                 <div class="card-body">
-                                    <h5 class="card-title">
+                                    <div class="card-title mb-2">
                                         <h4 class="badge text-bg-primary">Fecha {{ item.data.date }}</h4>
                                         {% if item.data.returnDate %}
                                             <h4 class="badge text-bg-success">Cierre {{ item.data.returnDate }}</h4>
                                         {% endif %}
-                                    </h5>
+                                    </div>
                                     <table class="table table-hover">
                                         {% for row in item.rows %}
-                                            <tr class="{{ row.endDate is empty and item.data.returnDate and date(item.data.returnDate) < date() ? 'table-danger' : '' }}">
+                                            <tr>
                                                 <td>{{ row.region }}</td>
                                                 <td>{{ row.item }}</td>
                                                 <td>{{ row.info }}</td>
                                                 <td>{{ row.startDate }}</td>
                                                 <td>{{ row.endDate }}</td>
                                                 <td>
-                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                            data-bs-target="#delete-{{ row.id }}"></button>
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modal">Entrega
+                                                    </button>
                                                 </td>
                                             </tr>
                                         {% endfor %}
@@ -48,22 +52,24 @@
                                 </div>
                             </div>
                         {% endfor %}
+                    {% endif %}
 
-                        <h3>Eventos cerrados</h3>
-                        {% for event,item in loans|filter(e => e.data.returnDate is not empty and date(e.data.returnDate) < date()) %}
+                    {% if closedLoans|length %}
+                        <h3 class="mb-3">Eventos cerrados</h3>
+                        {% for event,item in closedLoans %}
                             <div class="card border-info mb-3 shadow">
                                 <div class="card-header">{{ event }}</div>
                                 <div class="card-body">
-                                    <h5 class="card-title">
+                                    <div class="card-title mb-2">
                                         <h4 class="badge text-bg-primary">Fecha {{ item.data.date }}</h4>
                                         {% if item.data.returnDate %}
-                                            <h4 class="badge text-bg-success">Cierre {{ item.data.returnDate }}</h4>
+                                            <h4 class="badge text-bg-warning">Cierre {{ item.data.returnDate }}</h4>
                                         {% endif %}
-                                    </h5>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-hover">
                                             {% for row in item.rows %}
-                                                <tr class="{{ row.endDate is empty and item.data.returnDate and date(item.data.returnDate) < date() ? 'table-danger' : '' }}">
+                                                <tr class="{{ row.endDate is empty ? 'table-danger' : '' }}">
                                                     <td>{{ row.region }}</td>
                                                     <td>{{ row.item }}</td>
                                                     <td>{{ row.info }}</td>
@@ -72,7 +78,7 @@
                                                     <td>
                                                         <button type="button" class="btn btn-danger btn-sm"
                                                                 data-bs-toggle="modal"
-                                                                data-bs-target="#delete-{{ row.id }}">Entrega
+                                                                data-bs-target="#modal">Entrega
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -82,8 +88,8 @@
                                 </div>
                             </div>
                         {% endfor %}
-
                     {% endif %}
+
                 </div>
             </div>
         </div>

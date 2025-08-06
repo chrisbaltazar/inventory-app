@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\Loan;
 use App\Entity\User;
 use App\Enum\RegionEnum;
+use App\Form\LoanReturnType;
 use App\Form\LoanType;
 use App\Repository\UserRepository;
 use App\Service\Inventory\InventoryDataService;
@@ -72,11 +73,32 @@ class LoanController extends AbstractController
         LoanDataService $loanDataService,
         ?User $user = null
     ): Response {
-        dump($loanDataService->getUserLoansByEvent($user));
+        $openLoans = [];
+        $closedLoans = [];
+        if ($user) {
+            $allLoans = $loanDataService->getUserLoansByEvent($user);
+            $openLoans = array_filter($allLoans, function (array $loan) {
+                $returnDate = new \DateTimeImmutable($loan['data']['returnDate'] ?? '');
+
+                return $returnDate >= new \DateTimeImmutable();
+            });
+            $closedLoans = array_filter($allLoans, function (array $loan) {
+                $returnDate = new \DateTimeImmutable($loan['data']['returnDate'] ?? '');
+
+                return $returnDate < new \DateTimeImmutable();
+            });
+        }
+
+        $loan = new Loan();
+        $loan->setEndDate(new \DateTimeImmutable());
+        $returnForm = $this->createForm(LoanReturnType::class, $loan);
+
         return $this->render('loan/user.html.twig', [
             'user' => $user,
-            'loans' => $user ? $loanDataService->getUserLoansByEvent($user) : [],
             'users' => $userRepository->findAll(),
+            'form' => $returnForm,
+            'openLoans' => $openLoans,
+            'closedLoans' => $closedLoans,
         ]);
     }
 

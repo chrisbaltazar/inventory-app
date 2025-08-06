@@ -1,0 +1,22 @@
+{% extends 'partials/_modal.html.twig' %}
+
+{% block modalTitle %}Entrega de vestuario{% endblock %}
+
+{% block modalBody %}
+
+    {% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+    <div class="form-wrapper mt-4">
+        {{ form_start(form, {'attr': {'class': formClass}}) }}
+        {{ form_errors(form) }}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.endDate, 'label': 'Fecha'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.status, 'label': 'Cierre'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.comments, 'label': 'Comentarios'} %}
+
+        <button type="button" class="btn btn-warning js-close-loan">
+            <i class="fa-solid fa-clipboard"></i> Entregar
+        </button>
+    </div>
+
+{% endblock %}
+

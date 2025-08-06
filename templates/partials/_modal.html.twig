@@ -1,6 +1,19 @@
 <!-- Modal -->
-<div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" id="mainModalContent">
-        {{ include('partials/_modal-content.html.twig') }}
+<div class="modal fade" id="{% block modalId %}modal{% endblock %}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="modalContent">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="modalTitle">{% block modalTitle %}Modal title{% endblock %}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                {% block modalBody %}...{% endblock %}
+            </div>
+            <div class="modal-footer">
+                {% block modalActons %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                {% endblock %}
+            </div>
+        </div>
     </div>
 </div>

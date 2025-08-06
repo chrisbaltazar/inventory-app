@@ -22,7 +22,6 @@
     <body>
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
             {{ include('_menu.html.twig') }}
-            {{ include('partials/_modal.html.twig') }}
         {% endif %}
 
         <div id="main" class="py-5">
