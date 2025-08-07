@@ -115,12 +115,17 @@ class LoanController extends AbstractController
         LoanRepository $loanRepository,
         EntityManagerInterface $entityManager
     ): Response {
+        $id = $request->get('id');
+        $loan = $loanRepository->find($id) ?? throw new NotFoundHttpException();
         try {
-            $id = $request->get('id');
-            $loan = $loanRepository->find($id) ?? throw new NotFoundHttpException();
-            $form = $this->createForm(LoanReturnType::class, $loan);
+            $form = $this->createForm(LoanReturnType::class, $loan, [
+                'csrf_protection' => false,
+            ]);
+
             $form->handleRequest($request);
+
             if ($form->isSubmitted() && $form->isValid()) {
+                /** @var \DateTime $endDate */
                 $endDate = $form->get('endDate')->getData();
                 if ($endDate < $loan->getEvent()->getDate()) {
                     throw new \UnexpectedValueException('Invalid end date provided');
