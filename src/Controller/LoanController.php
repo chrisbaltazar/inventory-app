@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Entity\Loan;
 use App\Entity\User;
+use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
 use App\Form\LoanReturnType;
 use App\Form\LoanType;
@@ -102,6 +103,7 @@ class LoanController extends AbstractController
             'form' => $returnForm,
             'openLoans' => $openLoans,
             'closedLoans' => $closedLoans,
+            'closedStatus' => LoanStatusEnum::CLOSED->value,
         ]);
     }
 

@@ -10,7 +10,7 @@
             <h1>Asignación por persona</h1>
             <div class="col-sm-12 my-3">
                 <div class="mb-3">
-                    <label>Persona</label>
+                    <h4>Nombre</h4>
                     <select class="form-control" id="cmbPerson">
                         <option value="">Seleccione...</option>
                         {% for person in users %}
@@ -42,12 +42,24 @@
                                                 <td>{{ row.endDate }}</td>
                                                 <td>
                                                     <div class="btn-group" role="group">
-                                                        <button type="button" class="btn btn-outline-danger btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <button type="button"
+                                                                class="btn btn-outline-danger btn-sm dropdown-toggle close-loan-action"
+                                                                data-loan-id="{{ row.id }}" data-bs-toggle="dropdown">
                                                             Entrega
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><button type="button" class="dropdown-item js-close-loan-ok" data-loan-id="{{ row.id }}">Correcto</button></li>
-                                                            <li><button type="button" class="dropdown-item js-close-loan-more" data-loan-id="{{ row.id }}">Más...</button></li>
+                                                            <li>
+                                                                <button type="button"
+                                                                        class="dropdown-item js-close-loan-ok"
+                                                                        data-loan-id="{{ row.id }}">Correcto
+                                                                </button>
+                                                            </li>
+                                                            <li>
+                                                                <button type="button"
+                                                                        class="dropdown-item js-close-loan-more"
+                                                                        data-loan-id="{{ row.id }}">Más...
+                                                                </button>
+                                                            </li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -81,11 +93,27 @@
                                                     <td>{{ row.startDate }}</td>
                                                     <td>{{ row.endDate }}</td>
                                                     <td>
-                                                        <button type="button"
-                                                                class="btn btn-outline-danger btn-sm js-close-loan"
-                                                                data-loan-id="{{ row.id }}">
-                                                            Entrega
-                                                        </button>
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button"
+                                                                    class="btn btn-outline-danger btn-sm dropdown-toggle close-loan-action"
+                                                                    data-loan-id="{{ row.id }}" data-bs-toggle="dropdown">
+                                                                Entrega
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li>
+                                                                    <button type="button"
+                                                                            class="dropdown-item js-close-loan-ok"
+                                                                            data-loan-id="{{ row.id }}">Correcto
+                                                                    </button>
+                                                                </li>
+                                                                <li>
+                                                                    <button type="button"
+                                                                            class="dropdown-item js-close-loan-more"
+                                                                            data-loan-id="{{ row.id }}">Más...
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             {% endfor %}
@@ -102,6 +130,9 @@
     </div>
 
     <script>
+        let loan = null
+        const modal = new bootstrap.Modal('#modal')
+
         document.addEventListener('turbo:load', () => {
             document.querySelectorAll('select#cmbPerson').forEach(function (el) {
                 if (el.dataset.bound) {
@@ -122,6 +153,7 @@
                     e.preventDefault()
                     const data = new FormData(e.currentTarget)
                     await closeLoan(data)
+                    modal.hide()
                 })
 
                 el.dataset.bound = 'true'
@@ -133,9 +165,7 @@
                 }
 
                 el.addEventListener('click', (e) => {
-                    const id = e.currentTarget.dataset.loanId
-                    document.getElementById('txtLoanId').value = id
-                    const modal = new bootstrap.Modal('#modal')
+                    loan = e.currentTarget.dataset.loanId
                     modal.show()
                 })
 
@@ -147,13 +177,12 @@
                     return
                 }
 
-                el.addEventListener('click', (e) => {
-                    const id = e.currentTarget.dataset.loanId
+                el.addEventListener('click', async (e) => {
+                    loan = e.currentTarget.dataset.loanId
                     const formData = new FormData()
-                    formData.append('id', id)
                     formData.append('loan_return[endDate]', '{{ "now"|date("Y-m-d") }}')
-                    formData.append('loan_return[status]', 'CORRECTO')
-                    closeLoan(formData)
+                    formData.append('loan_return[status]', '{{ closedStatus }}')
+                    await closeLoan(formData)
                 })
 
                 el.dataset.bound = 'true'
@@ -170,6 +199,7 @@
 
         const closeLoan = async (formData) => {
             try {
+                formData.append('id', loan)
                 const response = await fetch('{{ path('app_loan_update') }}', {
                     method: 'POST',
                     body: formData,
@@ -180,10 +210,21 @@
                 }
 
                 const data = await response.json();
+
+                toggleLoanButton(loan)
             } catch (e) {
-                // await showError(e.message)
+                alert(e.message || e.error || e.errors)
                 console.error('Fetch error:', e);
             }
+        }
+
+        const toggleLoanButton = (id) => {
+            const selector = 'button.close-loan-action[data-loan-id="' + id + '"]'
+            const button = document.querySelector(selector)
+            console.log(button.classList)
+            button.classList.remove('btn-outline-danger')
+            button.classList.add('btn-outline-success')
+            button.innerHTML = '<i class="fa-solid fa-check-circle"></i>'
         }
     </script>
 {% endblock %}
