@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Asignación {{ item ? item.name : '' }}{% endblock %}
+
+{% block body %}
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-3">Asignación por pieza</h1>
+                <h4 class="mb-2">Descripción</h4>
+                <select class="form-control" id="cmbItem">
+                    <option value="">Seleccione...</option>
+                    {% for row in items %}
+                        <option value="{{ row.id }}" {{ item and item.id is same as row.id ? 'selected' : '' }}>{{ row.region }}: {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('turbo:load', () => {
+            document.querySelectorAll('select#cmbItem').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('change', (e) => refreshPage(e.currentTarget.value))
+
+                el.dataset.bound = 'true'
+            })
+        })
+
+        const refreshPage = (itemId) => {
+            if (!itemId) {
+                return
+            }
+            const url = '{{ path('app_loan_item') }}'
+            location.href = url + '/' + itemId
+        }
+    </script>
+{% endblock %}
+

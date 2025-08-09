@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\Item;
 use App\Entity\Loan;
 use App\Entity\User;
 use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
 use App\Form\LoanReturnType;
 use App\Form\LoanType;
+use App\Repository\ItemRepository;
 use App\Repository\LoanRepository;
 use App\Repository\UserRepository;
 use App\Service\Inventory\InventoryDataService;
@@ -109,8 +111,13 @@ class LoanController extends AbstractController
         ]);
     }
 
-    public function showItem(): Response
+    #[Route('/item/{id?}', name: 'app_loan_item', methods: ['GET'])]
+    public function showItem(ItemRepository $itemRepository, ?Item $item = null): Response
     {
+        return $this->render('loan/item.html.twig', [
+            'items' => $itemRepository->findAll(),
+            'item' => $item,
+        ]);
     }
 
     #[Route('/update', name: 'app_loan_update', methods: ['POST'])]
