@@ -10,7 +10,7 @@
         {{ form_errors(form) }}
 
         {% include 'partials/_form-field.html.twig' with {'field': form.endDate, 'label': 'Fecha'} %}
-        {% include 'partials/_form-field.html.twig' with {'field': form.status, 'label': 'Cierre'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.status, 'label': 'Estado'} %}
         {% include 'partials/_form-field.html.twig' with {'field': form.comments, 'label': 'Comentarios'} %}
 
         {{ form_rest(form) }}

@@ -27,43 +27,15 @@
                                 <div class="card-header">{{ event }}</div>
                                 <div class="card-body">
                                     <div class="card-title mb-2">
-                                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date }}</h4>
+                                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
                                         {% if item.data.returnDate %}
-                                            <h4 class="badge text-bg-success">Cierre {{ item.data.returnDate }}</h4>
+                                            <h4 class="badge text-bg-success">
+                                                Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
                                         {% endif %}
                                     </div>
                                     <table class="table table-hover">
                                         {% for row in item.rows %}
-                                            <tr>
-                                                <td>{{ row.region }}</td>
-                                                <td>{{ row.item }}</td>
-                                                <td>{{ row.info }}</td>
-                                                <td>{{ row.startDate }}</td>
-                                                <td>{{ row.endDate }}</td>
-                                                <td>
-                                                    <div class="btn-group" role="group">
-                                                        <button type="button"
-                                                                class="btn btn-outline-danger btn-sm dropdown-toggle close-loan-action"
-                                                                data-loan-id="{{ row.id }}" data-bs-toggle="dropdown">
-                                                            Entrega
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li>
-                                                                <button type="button"
-                                                                        class="dropdown-item js-close-loan-ok"
-                                                                        data-loan-id="{{ row.id }}">Correcto
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <button type="button"
-                                                                        class="dropdown-item js-close-loan-more"
-                                                                        data-loan-id="{{ row.id }}">Más...
-                                                                </button>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                            {% include 'loan/_loan_user_row.html.twig' %}
                                         {% endfor %}
                                     </table>
                                 </div>
@@ -78,44 +50,16 @@
                                 <div class="card-header">{{ event }}</div>
                                 <div class="card-body">
                                     <div class="card-title mb-2">
-                                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date }}</h4>
+                                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
                                         {% if item.data.returnDate %}
-                                            <h4 class="badge text-bg-warning">Cierre {{ item.data.returnDate }}</h4>
+                                            <h4 class="badge text-bg-warning">
+                                                Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
                                         {% endif %}
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table table-hover">
                                             {% for row in item.rows %}
-                                                <tr class="{{ row.endDate is empty ? 'table-danger' : '' }}">
-                                                    <td>{{ row.region }}</td>
-                                                    <td>{{ row.item }}</td>
-                                                    <td>{{ row.info }}</td>
-                                                    <td>{{ row.startDate }}</td>
-                                                    <td>{{ row.endDate }}</td>
-                                                    <td>
-                                                        <div class="btn-group" role="group">
-                                                            <button type="button"
-                                                                    class="btn btn-outline-danger btn-sm dropdown-toggle close-loan-action"
-                                                                    data-loan-id="{{ row.id }}" data-bs-toggle="dropdown">
-                                                                Entrega
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <button type="button"
-                                                                            class="dropdown-item js-close-loan-ok"
-                                                                            data-loan-id="{{ row.id }}">Correcto
-                                                                    </button>
-                                                                </li>
-                                                                <li>
-                                                                    <button type="button"
-                                                                            class="dropdown-item js-close-loan-more"
-                                                                            data-loan-id="{{ row.id }}">Más...
-                                                                    </button>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                {% include 'loan/_loan_user_row.html.twig' with {'rowClass': row.endDate is empty ? 'table-danger' : ''} %}
                                             {% endfor %}
                                         </table>
                                     </div>
@@ -166,6 +110,12 @@
 
                 el.addEventListener('click', (e) => {
                     loan = e.currentTarget.dataset.loanId
+                    const row = e.currentTarget.closest('tr.loan-user-row')
+
+                    document.getElementById('loan_return_endDate').value = row.dataset.loanEndDate
+                    document.getElementById('loan_return_comments').value = row.dataset.loanComments
+                    document.getElementById('loan_return_status').value = row.dataset.loanStatus
+
                     modal.show()
                 })
 
@@ -184,6 +134,16 @@
                     formData.append('loan_return[status]', '{{ closedStatus }}')
                     await closeLoan(formData)
                 })
+
+                el.dataset.bound = 'true'
+            })
+
+            document.querySelectorAll('.js-loan-reopen').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('click', (e) => reOpenLoan(e.currentTarget.dataset.loanEndpoint))
 
                 el.dataset.bound = 'true'
             })
@@ -221,10 +181,30 @@
         const toggleLoanButton = (id) => {
             const selector = 'button.close-loan-action[data-loan-id="' + id + '"]'
             const button = document.querySelector(selector)
-            console.log(button.classList)
-            button.classList.remove('btn-outline-danger')
+            button.classList.remove('btn-outline-dark')
             button.classList.add('btn-outline-success')
             button.innerHTML = '<i class="fa-solid fa-check-circle"></i>'
+        }
+
+        const reOpenLoan = async (endpoint) => {
+            if (!confirm('Re-abrir asignación?')) {
+                return
+            }
+
+            try {
+                const response = await fetch(endpoint)
+
+                if (!response.ok) {
+                    throw await response.json();
+                }
+
+                const data = await response.json();
+
+                location.reload()
+            } catch (e) {
+                alert(e.message || e.error || e.errors)
+                console.error('Fetch error:', e);
+            }
         }
     </script>
 {% endblock %}

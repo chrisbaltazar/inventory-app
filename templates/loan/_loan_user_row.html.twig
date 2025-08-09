@@ -1,0 +1,42 @@
+<tr class="loan-user-row {{ rowClass }}" data-loan-end-date="{{ row.endDate|date('Y-m-d') }}" data-loan-comments="{{ row.comments }}"
+    data-loan-status="{{ row.status }}">
+    <td>{{ row.region }}</td>
+    <td>{{ row.item }}</td>
+    <td>{{ row.info }}</td>
+    <td>{{ row.startDate|date('d/m/Y') }}</td>
+    <td>{{ row.endDate ? row.endDate|date('d/m/Y') : '' }}</td>
+    <td>
+        <div class="btn-group" role="group">
+            <button type="button"
+                    class="btn btn-outline-dark btn-sm dropdown-toggle close-loan-action"
+                    data-loan-id="{{ row.id }}" data-bs-toggle="dropdown">
+                Entrega
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button type="button" {{ row.isOpen ? '' : 'disabled' }}
+                            class="dropdown-item js-close-loan-ok"
+                            data-loan-id="{{ row.id }}">Correcto
+                    </button>
+                </li>
+                <li>
+                    <button type="button"
+                            class="dropdown-item js-close-loan-more"
+                            data-loan-id="{{ row.id }}">Más...
+                    </button>
+                </li>
+                {% if not row.isOpen %}
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <button type="button"
+                                class="dropdown-item js-loan-reopen"
+                                data-loan-endpoint="{{ path('app_loan_reopen', {id: row.id}) }}">Re-abrir
+                        </button>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </td>
+</tr>

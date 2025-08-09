@@ -36,8 +36,11 @@ class LoanDataService
             'item' => $loan->getItem()->getName(),
             'info' => implode(', ', $info),
             'quantity' => $loan->getQuantity(),
-            'startDate' => $loan->getStartDate()->format('d/m/Y'),
-            'endDate' => $loan->getEndDate()?->format('d/m/Y'),
+            'startDate' => $loan->getStartDate(),
+            'endDate' => $loan->getEndDate(),
+            'comments' => $loan->getComments(),
+            'status' => $loan->getStatus(),
+            'isOpen' => empty($loan->getEndDate()),
         ];
     }
 
@@ -46,8 +49,8 @@ class LoanDataService
         return [
             'id' => $loan->getEvent()->getId(),
             'name' => $loan->getEvent()->getName(),
-            'date' => $loan->getEvent()->getDate()->format('d/m/Y'),
-            'returnDate' => $loan->getEvent()->getReturnDate()?->format('d/m/Y'),
+            'date' => $loan->getEvent()->getDate(),
+            'returnDate' => $loan->getEvent()->getReturnDate(),
         ];
     }
 }

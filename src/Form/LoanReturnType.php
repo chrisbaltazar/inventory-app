@@ -17,6 +17,7 @@ class LoanReturnType extends AbstractType
     {
         $status = array_column(LoanStatusEnum::getClosureValues(), 'value');
         $status = array_combine($status, $status);
+        $status = ['Seleccione' => ''] + $status;
 
         $builder
             ->add('endDate', DateType::class, [

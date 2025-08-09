@@ -82,12 +82,14 @@ class LoanController extends AbstractController
         if ($user) {
             $allLoans = $loanDataService->getUserLoansByEvent($user);
             $openLoans = array_filter($allLoans, function (array $loan) {
-                $returnDate = new \DateTimeImmutable($loan['data']['returnDate'] ?? '');
+                $returnDate = $loan['data']['returnDate'] ?? '';
+                empty($returnDate) && $returnDate = new \DateTimeImmutable($returnDate);
 
                 return $returnDate >= new \DateTimeImmutable();
             });
             $closedLoans = array_filter($allLoans, function (array $loan) {
-                $returnDate = new \DateTimeImmutable($loan['data']['returnDate'] ?? '');
+                $returnDate = $loan['data']['returnDate'] ?? '';
+                empty($returnDate) && $returnDate = new \DateTimeImmutable($returnDate);
 
                 return $returnDate < new \DateTimeImmutable();
             });
@@ -143,5 +145,15 @@ class LoanController extends AbstractController
             return $this->json(['message' => $t->getMessage(), 'error' => $t->getTraceAsString()],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    #[Route('/{id}/reopen', name: 'app_loan_reopen', methods: ['GET'])]
+    public function reOpenLoan(Loan $loan, EntityManagerInterface $entityManager): Response
+    {
+        $loan->setEndDate(null);
+        $loan->setStatus(LoanStatusEnum::OPEN->value);
+        $entityManager->flush();
+
+        return $this->json('OK');
     }
 }
