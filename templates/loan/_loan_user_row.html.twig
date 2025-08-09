@@ -6,7 +6,7 @@
     <td>{{ row.startDate|date('d/m/Y') }}</td>
     <td>{{ row.endDate ? row.endDate|date('d/m/Y') : '' }}</td>
     <td>
-        <div class="btn-group" role="group">
+        <div class="btn-group dropstart" role="group">
             <button type="button"
                     class="btn btn-outline-dark btn-sm dropdown-toggle close-loan-action"
                     data-loan-id="{{ row.id }}" data-bs-toggle="dropdown">
