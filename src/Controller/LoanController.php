@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\Inventory;
 use App\Entity\Item;
 use App\Entity\Loan;
 use App\Entity\User;
@@ -111,12 +112,19 @@ class LoanController extends AbstractController
         ]);
     }
 
-    #[Route('/item/{id?}', name: 'app_loan_item', methods: ['GET'])]
-    public function showItem(ItemRepository $itemRepository, ?Item $item = null): Response
-    {
+    #[Route('/item/{item?}/{invent?}', name: 'app_loan_item', methods: ['GET'])]
+    public function showItem(
+        ItemRepository $itemRepository,
+        LoanRepository $loanRepository,
+        ?Item $item = null,
+        ?Inventory $invent = null
+    ): Response {
         return $this->render('loan/item.html.twig', [
             'items' => $itemRepository->findAll(),
             'item' => $item,
+            'inventory' => $item?->getInventory() ?? [],
+            'info' => $invent?->getId(),
+            'loans' => $item ? $loanRepository->findAllByItem($item, $invent) : [],
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Inventory;
 use App\Entity\Item;
 use App\Entity\Loan;
 use App\Entity\User;
@@ -35,6 +36,9 @@ class LoanRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return Loan[]
+     */
     public function findOpenByItem(int|Item $item): array
     {
         is_int($item) || $item = $item->getId();
@@ -65,28 +69,26 @@ class LoanRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-//    /**
-//     * @return Loan[] Returns an array of Loan objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findAllByItem(Item $item, ?Inventory $invent = null): array
+    {
+        $query = $this->createQueryBuilder('l')
+            ->select('l', 'e', 'u')
+            ->join('l.event', 'e')
+            ->join('l.user', 'u')
+            ->join('l.item', 'i')
+            ->where('l.item = :item')
+            ->setParameter('item', $item);
 
-//    public function findOneBySomeField($value): ?Loan
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if ($invent) {
+            $index = 0;
+            foreach ($invent->getInfo() as $key => $value) {
+                $infoVar = 'info_' . ++$index;
+                $info = sprintf('"%s":"%s"', $key, $value);
+                $query->andWhere('l.info LIKE :' . $infoVar);
+                $query->setParameter($infoVar, "%$info%");
+            }
+        }
+
+        return $query->getQuery()->getResult();
+    }
 }

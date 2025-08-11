@@ -7,36 +7,50 @@
         <div class="row">
             <div class="col-12">
                 <h1 class="mb-3">Asignación por pieza</h1>
-                <h4 class="mb-2">Descripción</h4>
-                <select class="form-control" id="cmbItem">
+                <h4 class="mb-2">Nombre</h4>
+                <select class="form-control mb-3 js-loan-search" id="cmbItem">
                     <option value="">Seleccione...</option>
                     {% for row in items %}
                         <option value="{{ row.id }}" {{ item and item.id is same as row.id ? 'selected' : '' }}>{{ row.region }}: {{ row.name }}</option>
                     {% endfor %}
                 </select>
+                <h4 class="mb-3">Descripción</h4>
+                <select class="form-control mb-3 js-loan-search" id="cmbDescription">
+                    <option value="">TODAS</option>
+                    {% for row in inventory %}
+                        <option value="{{ row.id }}" {{ info is same as row.id ? 'selected' : '' }}>{{ row.info|join(', ') }}</option>
+                    {% endfor %}
+                </select>
             </div>
+        </div>
+        <div class="row mt-3">
+            {{ dump(loans) }}
         </div>
     </div>
 
     <script>
         document.addEventListener('turbo:load', () => {
-            document.querySelectorAll('select#cmbItem').forEach(function (el) {
+            document.querySelectorAll('.js-loan-search').forEach(function (el) {
                 if (el.dataset.bound) {
                     return
                 }
 
-                el.addEventListener('change', (e) => refreshPage(e.currentTarget.value))
+                el.addEventListener('change', () => refreshPage())
 
                 el.dataset.bound = 'true'
             })
         })
 
-        const refreshPage = (itemId) => {
+        const refreshPage = () => {
+            const itemId = document.getElementById('cmbItem').value
+            const description = document.getElementById('cmbDescription').value
             if (!itemId) {
                 return
             }
-            const url = '{{ path('app_loan_item') }}'
-            location.href = url + '/' + itemId
+
+            const url = '{{ path('app_loan_item') }}/' + itemId + '/' + description
+
+            location.href = url
         }
     </script>
 {% endblock %}
