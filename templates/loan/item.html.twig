@@ -3,6 +3,8 @@
 {% block title %}Asignación {{ item ? item.name : '' }}{% endblock %}
 
 {% block body %}
+    {% include 'loan/_modal-comments.html.twig' %}
+
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-12">
@@ -44,7 +46,7 @@
                             <td>{{ loan.startDate|date('d/m/Y') }}</td>
                             <td>{{ loan.endDate|date('d/m/Y') }}</td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-link js-loan-comment">
+                                <button type="button" class="btn btn-sm btn-link js-loan-comment" data-loan-comments="{{ loan.comments }}">
                                     {{ loan.status }}
                                 </button>
                             </td>
@@ -63,22 +65,34 @@
                     return
                 }
 
-                el.addEventListener('change', () => refreshPage())
+                el.addEventListener('change', () => refreshItemPage())
+
+                el.dataset.bound = 'true'
+            })
+
+            document.querySelectorAll('.js-loan-comment').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('click', (e) => {
+                    const modal = new bootstrap.Modal('#modal')
+                    document.getElementById('txtComments').value = e.currentTarget.dataset.loanComments
+                    modal.show()
+                })
 
                 el.dataset.bound = 'true'
             })
         })
 
-        const refreshPage = () => {
+        const refreshItemPage = () => {
             const itemId = document.getElementById('cmbItem').value
             const description = document.getElementById('cmbDescription').value
             if (!itemId) {
                 return
             }
 
-            const url = '{{ path('app_loan_item') }}/' + itemId + '/' + description
-
-            location.href = url
+            location.href = '{{ path('app_loan_item') }}/' + itemId + '/' + description
         }
     </script>
 {% endblock %}

@@ -83,7 +83,7 @@
                     return
                 }
 
-                el.addEventListener('change', (e) => refreshPage(e.currentTarget.value))
+                el.addEventListener('change', (e) => refreshUserPage(e.currentTarget.value))
 
                 el.dataset.bound = 'true'
             })
@@ -149,7 +149,7 @@
             })
         })
 
-        const refreshPage = (userId) => {
+        const refreshUserPage = (userId) => {
             if (!userId) {
                 return
             }

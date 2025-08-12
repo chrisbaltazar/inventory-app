@@ -89,6 +89,7 @@ class LoanRepository extends ServiceEntityRepository
             }
         }
 
-        return $query->getQuery()->getResult();
+        return $query->orderBy('e.date', 'DESC')->addOrderBy('l.startDate', 'DESC')
+            ->getQuery()->getResult();
     }
 }
