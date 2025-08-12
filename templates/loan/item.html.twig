@@ -6,12 +6,13 @@
     <div class="container-fluid mt-5">
         <div class="row">
             <div class="col-12">
-                <h1 class="mb-3">Asignación por pieza</h1>
+                <h1 class="mb-4">Asignación por pieza</h1>
                 <h4 class="mb-2">Nombre</h4>
                 <select class="form-control mb-3 js-loan-search" id="cmbItem">
                     <option value="">Seleccione...</option>
                     {% for row in items %}
-                        <option value="{{ row.id }}" {{ item and item.id is same as row.id ? 'selected' : '' }}>{{ row.region }}: {{ row.name }}</option>
+                        <option value="{{ row.id }}" {{ item and item.id is same as row.id ? 'selected' : '' }}>{{ row.region }}
+                            : {{ row.name }}</option>
                     {% endfor %}
                 </select>
                 <h4 class="mb-3">Descripción</h4>
@@ -24,7 +25,34 @@
             </div>
         </div>
         <div class="row mt-3">
-            {{ dump(loans) }}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>Evento</th>
+                        <th>Persona</th>
+                        <th style="width: 120px">Desde</th>
+                        <th style="width: 120px">Hasta</th>
+                        <th style="width: 100px">Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for loan in loans %}
+                        <tr class="{{ loan.event.returnDate and loan.event.returnDate|date('U') < loan.endDate|date('U') ? 'table-danger' : '' }}">
+                            <td>{{ loan.event.name }}</td>
+                            <td>{{ loan.user.name }}</td>
+                            <td>{{ loan.startDate|date('d/m/Y') }}</td>
+                            <td>{{ loan.endDate|date('d/m/Y') }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-link js-loan-comment">
+                                    {{ loan.status }}
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
