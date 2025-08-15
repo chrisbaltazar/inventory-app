@@ -3,45 +3,45 @@
 {% block title %}Item index{% endblock %}
 
 {% block body %}
-    <div class="container-fluid mt-5">
-        <div class="row">
-            <h1>Lista de Vestuario</h1>
 
-            <a type="button" class="btn btn-primary my-3" href="{{ path('app_item_new') }}">
-                <i class="fa-regular fa-plus"></i> Nueva pieza
-            </a>
+    <div class="row">
+        <h1>Lista de Vestuario</h1>
 
-            <table class="table table-striped table-hover table-dark js-datatable" id="itemsTable">
-                <thead>
+        <a type="button" class="btn btn-primary my-3" href="{{ path('app_item_new') }}">
+            <i class="fa-regular fa-plus"></i> Nueva pieza
+        </a>
+
+        <table class="table table-striped table-hover table-dark js-datatable" id="itemsTable">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Región</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
                 <tr>
-                    <th>Id</th>
-                    <th>Región</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th></th>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.region }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.total }}</td>
+                    <td>
+                        <a class="float-end mx-1 btn btn-warning btn-sm"
+                           href="{{ path('app_item_edit', {'id': item.id}) }}">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <a class="float-end mx-1 btn btn-info btn-sm"
+                           href="{{ path('app_item_show', {'id': item.id}) }}">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for item in items %}
-                    <tr>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.region }}</td>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.total }}</td>
-                        <td>
-                            <a class="float-end mx-1 btn btn-warning btn-sm"
-                               href="{{ path('app_item_edit', {'id': item.id}) }}">
-                                <i class="fa-solid fa-pencil"></i>
-                            </a>
-                            <a class="float-end mx-1 btn btn-info btn-sm"
-                               href="{{ path('app_item_show', {'id': item.id}) }}">
-                                <i class="fa-solid fa-circle-info"></i>
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+
 {% endblock %}

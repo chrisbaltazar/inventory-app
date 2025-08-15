@@ -5,70 +5,68 @@
 {% block body %}
     {% include 'loan/_return_modal.html.twig' %}
 
-    <div class="container-fluid mt-5">
-        <div class="row">
-            <h1>Asignación por persona</h1>
-            <div class="col-sm-12 my-3">
-                <div class="mb-3">
-                    <h4>Nombre</h4>
-                    <select class="form-control" id="cmbPerson">
-                        <option value="">Seleccione...</option>
-                        {% for person in users %}
-                            <option value="{{ person.id }}" {{ user and person.id is same as user.id ? 'selected' : '' }}>{{ person.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+    <div class="row">
+        <h1>Asignación por persona</h1>
+        <div class="col-sm-12 my-3">
+            <div class="mb-3">
+                <h4>Nombre</h4>
+                <select class="form-control" id="cmbPerson">
+                    <option value="">Seleccione...</option>
+                    {% for person in users %}
+                        <option value="{{ person.id }}" {{ user and person.id is same as user.id ? 'selected' : '' }}>{{ person.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                <div class="mb-3">
-                    {% if openLoans|length %}
-                        <h3 class="mb-3">Eventos abiertos</h3>
-                        {% for event,item in openLoans %}
-                            <div class="card border-warning mb-3 shadow">
-                                <div class="card-header">{{ event }}</div>
-                                <div class="card-body">
-                                    <div class="card-title mb-2">
-                                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
-                                        {% if item.data.returnDate %}
-                                            <h4 class="badge text-bg-success">
-                                                Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
-                                        {% endif %}
-                                    </div>
+            <div class="mb-3">
+                {% if openLoans|length %}
+                    <h3 class="mb-3">Eventos abiertos</h3>
+                    {% for event,item in openLoans %}
+                        <div class="card border-warning mb-3 shadow">
+                            <div class="card-header">{{ event }}</div>
+                            <div class="card-body">
+                                <div class="card-title mb-2">
+                                    <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
+                                    {% if item.data.returnDate %}
+                                        <h4 class="badge text-bg-success">
+                                            Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
+                                    {% endif %}
+                                </div>
+                                <table class="table table-hover">
+                                    {% for row in item.rows %}
+                                        {% include 'loan/_loan_user_row.html.twig' %}
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if closedLoans|length %}
+                    <h3 class="mb-3">Eventos cerrados</h3>
+                    {% for event,item in closedLoans %}
+                        <div class="card border-info mb-3 shadow">
+                            <div class="card-header">{{ event }}</div>
+                            <div class="card-body">
+                                <div class="card-title mb-2">
+                                    <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
+                                    {% if item.data.returnDate %}
+                                        <h4 class="badge text-bg-warning">
+                                            Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
+                                    {% endif %}
+                                </div>
+                                <div class="table-responsive">
                                     <table class="table table-hover">
                                         {% for row in item.rows %}
-                                            {% include 'loan/_loan_user_row.html.twig' %}
+                                            {% include 'loan/_loan_user_row.html.twig' with {'rowClass': row.endDate is empty ? 'table-danger' : ''} %}
                                         {% endfor %}
                                     </table>
                                 </div>
                             </div>
-                        {% endfor %}
-                    {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-                    {% if closedLoans|length %}
-                        <h3 class="mb-3">Eventos cerrados</h3>
-                        {% for event,item in closedLoans %}
-                            <div class="card border-info mb-3 shadow">
-                                <div class="card-header">{{ event }}</div>
-                                <div class="card-body">
-                                    <div class="card-title mb-2">
-                                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
-                                        {% if item.data.returnDate %}
-                                            <h4 class="badge text-bg-warning">
-                                                Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
-                                        {% endif %}
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            {% for row in item.rows %}
-                                                {% include 'loan/_loan_user_row.html.twig' with {'rowClass': row.endDate is empty ? 'table-danger' : ''} %}
-                                            {% endfor %}
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                </div>
             </div>
         </div>
     </div>

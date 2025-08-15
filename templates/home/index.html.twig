@@ -3,17 +3,18 @@
 {% block title %}Inicio{% endblock %}
 
 {% block body %}
-    <div class="container-fluid mt-5">
-        <div class="p-5 text-center bg-body-tertiary rounded-3"><h1 class="text-body-emphasis">Bienvenid@ {{ app.user.name }}!</h1>
-            <p class="lead">
-                A continuación puedes ver un extracto de lo más importante en el grupo ahora...
-            </p>
-        </div>
 
-        {% if is_granted('ROLE_ADMIN') %}
-            {% include 'home/admin.html.twig' %}
-        {% else %}
-            {% include 'home/user.html.twig' %}
-        {% endif %}
+    <div class="p-5 text-center bg-body-tertiary rounded-3"><h1 class="text-body-emphasis">
+            Bienvenid@ {{ app.user.name }}!</h1>
+        <p class="lead">
+            A continuación puedes ver un extracto de lo más importante en el grupo ahora...
+        </p>
     </div>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        {% include 'home/admin.html.twig' %}
+    {% else %}
+        {% include 'home/user.html.twig' %}
+    {% endif %}
+
 {% endblock %}
