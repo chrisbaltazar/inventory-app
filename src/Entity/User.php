@@ -40,7 +40,7 @@ class User implements
     #[Assert\Length(min: 9, max: 20)]
     private ?string $phone = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: self::class, cascade: ['remove'])]
     private ?self $updatedBy = null;
 
     #[ORM\Column(nullable: true)]

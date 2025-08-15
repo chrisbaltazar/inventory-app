@@ -22,6 +22,12 @@ class DoctrineEntityUserAwareListener
 
     public function prePersist(PrePersistEventArgs $args): void
     {
+        /** @var User $user */
+        $user = $this->security->getUser();
+        if (!$user) {
+            return;
+        }
+
         $entity = $args->getObject();
         $this->handleUpdated($entity);
     }
