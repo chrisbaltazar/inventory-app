@@ -10,8 +10,8 @@
                 <div class="alert alert-danger" role="alert">{{ error.message }}</div>
             {% endif %}
             <form method="POST" action="{{ path('app_login') }}">
-                <img class="mb-4" src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
-                <h1 class="h3 mb-3 fw-normal">Login</h1>
+                <h1 class="h3 mb-3 fw-normal text-center">Login</h1>
+                <img class="mb-4 w-100" src="{{ asset('img/logo.PNG') }}" alt="">
 
                 <div class="form-floating">
                     <input type="email" class="form-control" id="username" name="_username"
