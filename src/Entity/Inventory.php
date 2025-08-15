@@ -26,7 +26,7 @@ class Inventory implements UpdatedStampInterface, SoftDeleteInterface
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Assert\Length(max: 20)]
-    private ?string $color = null;
+    private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Length(max: 255)]
@@ -72,14 +72,14 @@ class Inventory implements UpdatedStampInterface, SoftDeleteInterface
         return $this;
     }
 
-    public function getColor(): ?string
+    public function getDescription(): ?string
     {
-        return $this->color;
+        return $this->description;
     }
 
-    public function setColor(?string $color): static
+    public function setDescription(?string $description): static
     {
-        $this->color = $color;
+        $this->description = $description;
 
         return $this;
     }
@@ -136,7 +136,7 @@ class Inventory implements UpdatedStampInterface, SoftDeleteInterface
     {
         return [
             'size' => $this->getSize(),
-            'description' => $this->getColor(),
+            'description' => $this->getDescription(),
         ];
     }
 }

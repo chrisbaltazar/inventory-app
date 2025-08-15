@@ -26,7 +26,7 @@
                         {% include 'partials/_form-field.html.twig' with {'field': row.size, 'label': 'Talla'} %}
                     </td>
                     <td>
-                        {% include 'partials/_form-field.html.twig' with {'field': row.color, 'label': 'Descripción'} %}
+                        {% include 'partials/_form-field.html.twig' with {'field': row.description, 'label': 'Descripción'} %}
                     </td>
                     <td>
                         <button type="button" class="float-end mt-3 btn btn-danger js-remove-inventory">
@@ -41,7 +41,7 @@
     <template data-form-collection-target="template" id="inventoryTemplate">
         <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.quantity, 'label': 'Cantidad'} %}</td>
         <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.size, 'label': 'Talla'} %}</td>
-        <td>{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.color, 'label': 'Color'} %}</td>
+        <td>{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.description, 'label': 'Descripción'} %}</td>
     </template>
 
     {{ form_rest(form) }}

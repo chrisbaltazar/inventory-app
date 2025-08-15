@@ -24,7 +24,7 @@ class InventoryType extends AbstractType
             ->add('size', ChoiceType::class, [
                 'choices' => $sizes,
             ])
-            ->add('color', TextType::class, [
+            ->add('description', TextType::class, [
                 'required' => false,
             ]);
     }

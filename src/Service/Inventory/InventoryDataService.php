@@ -31,7 +31,7 @@ class InventoryDataService
     {
         return trim(vsprintf('Talla: %s %s', [
                 $inventory->getSize(),
-                $inventory->getColor(),
+                $inventory->getDescription(),
             ])
         );
     }
