@@ -20,6 +20,9 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    /**
+     * @return Event[]
+     */
     public function findAll(): array
     {
         return $this->createQueryBuilder('e')
@@ -28,28 +31,17 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-//    /**
-//     * @return Event[] Returns an array of Event objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Event
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return Event[]
+     */
+    public function findAllOpen(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.returnDate IS NULL')
+            ->orWhere('e.returnDate >= :now')
+            ->setParameter('now', new \DateTime('now'))
+            ->orderBy('e.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

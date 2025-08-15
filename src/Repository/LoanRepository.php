@@ -69,6 +69,9 @@ class LoanRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Loan[]
+     */
     public function findAllByItem(Item $item, ?Inventory $invent = null): array
     {
         $query = $this->createQueryBuilder('l')
@@ -91,5 +94,26 @@ class LoanRepository extends ServiceEntityRepository
 
         return $query->orderBy('e.date', 'DESC')->addOrderBy('l.startDate', 'DESC')
             ->getQuery()->getResult();
+    }
+
+    /**
+     * @return Loan[]
+     */
+    public function findAllDelayed(): array
+    {
+        return $this->createQueryBuilder('l')
+            ->select('l', 'e', 'u', 'i')
+            ->join('l.event', 'e')
+            ->join('l.item', 'i')
+            ->join('l.user', 'u')
+            ->where('e.returnDate IS NOT NULL')
+            ->andWhere('e.returnDate < :now')
+            ->andWhere('l.endDate IS NULL')
+            ->setParameter('now', new \DateTime('now'))
+            ->orderBy('e.returnDate', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
+            ->addOrderBy('i.region', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

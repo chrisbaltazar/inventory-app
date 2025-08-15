@@ -1,0 +1,70 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card text-bg-primary mb-4 shadow rounded">
+            <div class="card-header">Eventos abiertos</div>
+            <div class="card-body">
+                <h5 class="card-title">Resúmen de eventos recientes</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Evento</th>
+                            <th style="width: 120px">Fecha</th>
+                            <th style="width: 120px">Entrega</th>
+                            <th style="width: 120px">Retorno</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for event in events %}
+                            <tr>
+                                <td>
+                                    <a class="btn btn-link p-0"
+                                       href="{{ path('app_event_edit', {id: event.id}) }}">{{ event.name }}
+                                    </a>
+                                </td>
+                                <td>{{ event.date|date('d/m/Y') }}</td>
+                                <td>{{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}</td>
+                                <td>{{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card text-bg-warning mb-3 shadow rounded">
+            <div class="card-header">Asignaciones con retardo</div>
+            <div class="card-body">
+                <h5 class="card-title">Retorno de vestuario en espera</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Persona</th>
+                            <th>Evento</th>
+                            <th>Región</th>
+                            <th>Pieza</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for loan in loans %}
+                            <tr>
+                                <td>
+                                    <a class="btn btn-link p-0"
+                                       href="{{ path('app_loan_user', {id: loan.user.id}) }}">
+                                        {{ loan.user.name }}
+                                    </a>
+                                </td>
+                                <td>{{ loan.event.name }}</td>
+                                <td>{{ loan.item.region }}</td>
+                                <td>{{ loan.item.name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
