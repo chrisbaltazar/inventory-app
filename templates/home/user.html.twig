@@ -1,0 +1,78 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card text-bg-primary mb-4 shadow rounded">
+            <div class="card-header">Eventos programados</div>
+            <div class="card-body">
+                <h5 class="card-title">Resúmen de eventos próximos</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Evento</th>
+                            <th style="width: 120px">Fecha</th>
+                            <th style="width: 120px">Entrega</th>
+                            <th style="width: 120px">Retorno</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for event in events %}
+                            <tr>
+                                <td>
+                                    <span class="fs-6 badge text-bg-warning rounded-pill">{{ event.name }}</span>
+                                </td>
+                                <td>
+                                    <span class="fs-6 badge text-bg-info rounded-pill">{{ event.date|date('d/m/Y') }}</span>
+                                </td>
+                                <td>
+                                <span class="fs-6 badge text-bg-success rounded-pill">
+                                    {{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}
+                                </span>
+                                </td>
+                                <td>
+                                <span class="fs-6 badge text-bg-dark rounded-pill">
+                                    {{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}
+                                </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card text-bg-{{ isDelayed ? 'danger' : 'info' }} mb-3 shadow rounded">
+            <div class="card-header">
+                Asignación personal
+                {% if isDelayed %}
+                    <strong>(RETRASADO)</strong>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Lista de vestuario asignado</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Región</th>
+                            <th>Pieza</th>
+                            <th>Descripción</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for loan in loans %}
+                            <tr>
+                                <td>{{ loan.startDate|date('d/m/Y') }}</td>
+                                <td>{{ loan.item.region }}</td>
+                                <td>{{ loan.item.name }}</td>
+                                <td>{{ loan.info|json_decode|join(', ') }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

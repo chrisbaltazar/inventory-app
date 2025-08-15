@@ -55,6 +55,24 @@ class LoanRepository extends ServiceEntityRepository
     /**
      * @return Loan[]
      */
+    public function findOpenByUser(User $user): array
+    {
+        return $this->createQueryBuilder('l')
+            ->select('l', 'i', 'e')
+            ->join('l.item', 'i')
+            ->join('l.event', 'e')
+            ->where('l.endDate IS NULL')
+            ->andWhere('l.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('l.startDate', 'ASC')
+            ->addOrderBy('i.region', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Loan[]
+     */
     public function findAllByUser(User $user): array
     {
         return $this->createQueryBuilder('l')
