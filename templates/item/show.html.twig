@@ -30,6 +30,12 @@
                     <td>{{ item.sizes|join(', ') }}</td>
                 </tr>
                 <tr>
+                    <th>Asignado</th>
+                    <td>
+                        <a class="btn btn-link p-0" href="{{ path('app_loan_item', {item: item.id}) }}">{{ item.loans|length }} piezas</a>
+                    </td>
+                </tr>
+                <tr>
                     <th>Actualizado</th>
                     <td>
                         {{ item.updatedAt ? item.updatedAt|date('d/m/Y H:i:s') : '' }}

@@ -8,33 +8,35 @@
 
     {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Pieza'} %}
 
-    <div class="w-100 mb-2 me-2 d-flex justify-content-between">
+    <div class="w-100 my-3 me-2 d-flex justify-content-between">
         <h4 class="me-2">Inventario</h4>
         <button type="button" class="btn btn-info btn-sm js-add-inventory">
             <i class="fas fa-plus"></i> Agregar
         </button>
     </div>
 
-    <table class="table table-sm" id="tableInventory">
-        {% for row in form.inventory %}
-            <tr>
-                <td class="w-25">
-                    {% include 'partials/_form-field.html.twig' with {'field': row.quantity, 'label': 'Cantidad'} %}
-                </td>
-                <td class="w-25">
-                    {% include 'partials/_form-field.html.twig' with {'field': row.size, 'label': 'Talla'} %}
-                </td>
-                <td>
-                    {% include 'partials/_form-field.html.twig' with {'field': row.color, 'label': 'Color'} %}
-                </td>
-                <td>
-                    <button type="button" class="float-end mt-3 btn btn-danger js-remove-inventory">
-                        <i class="fa-solid fa-times"></i>
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div class="table-responsive">
+        <table class="table table-sm" id="tableInventory">
+            {% for row in form.inventory %}
+                <tr>
+                    <td style="width: 150px">
+                        {% include 'partials/_form-field.html.twig' with {'field': row.quantity, 'label': 'Total'} %}
+                    </td>
+                    <td>
+                        {% include 'partials/_form-field.html.twig' with {'field': row.size, 'label': 'Talla'} %}
+                    </td>
+                    <td>
+                        {% include 'partials/_form-field.html.twig' with {'field': row.color, 'label': 'Descripción'} %}
+                    </td>
+                    <td>
+                        <button type="button" class="float-end mt-3 btn btn-danger js-remove-inventory">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 
     <template data-form-collection-target="template" id="inventoryTemplate">
         <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.quantity, 'label': 'Cantidad'} %}</td>
