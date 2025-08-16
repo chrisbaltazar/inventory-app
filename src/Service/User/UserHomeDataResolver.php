@@ -25,6 +25,7 @@ class UserHomeDataResolver implements ValueResolverInterface
         return match (true) {
             $this->security->isGranted('ROLE_ADMIN') => [$this->adminHomeDataService],
             $this->security->isGranted('ROLE_USER') => [$this->userHomeDataService],
+            default => [],
         };
     }
 }

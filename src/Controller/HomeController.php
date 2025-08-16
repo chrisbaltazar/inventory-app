@@ -14,8 +14,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home_index')]
-    public function index(#[ValueResolver(UserHomeDataResolver::class)] UserHomeDataInterface $dataService): Response
+    public function index(#[ValueResolver(UserHomeDataResolver::class)] ?UserHomeDataInterface $dataService): Response
     {
-        return $this->render('home/index.html.twig', [... $dataService->getData()]);
+        return $this->render('home/index.html.twig', [... $dataService?->getData()]);
     }
 }
