@@ -1,0 +1,18 @@
+{% do field.setRendered %}
+{% set error = form_errors(field) %}
+{% set classes = 'form-check-input' ~ (error ? ' is-invalid' : '') %}
+<div class="mb-2"><label>{{ label }}</label></div>
+<div class="btn-group mb-2" role="group">
+    {% for key,choice in field.vars.choices %}
+        {% set id = field.vars.id ~ '_' ~ key %}
+        <input type="radio" class="btn-check" name="{{ field.vars.full_name }}" id="{{ id }}"
+               value="{{ choice.data }}"
+               autocomplete="off" {{ choice.data is same as field.vars.data ? 'checked' : '' }}>
+        <label class="btn btn-outline-primary" for="{{ id }}">{{ choice.label }}</label>
+    {% endfor %}
+    {% if error %}
+        <div class="invalid-feedback">
+            {{ form_errors(field) }}
+        </div>
+    {% endif %}
+</div>

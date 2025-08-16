@@ -15,7 +15,7 @@
 
     {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
 
-    {% include 'partials/_form-check.html.twig' with {'field': form.isAdmin, 'label': 'Administrador?', 'id': 'user_isAdmin'} %}
+    {% include 'partials/_form-radio.html.twig' with {'field': form.isAdmin, 'label': 'Tipo de usuario'} %}
 
     {{ form_rest(form) }}
 

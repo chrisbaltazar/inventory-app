@@ -40,7 +40,7 @@ class User implements
     #[Assert\Length(min: 9, max: 20)]
     private ?string $phone = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, cascade: ['remove'])]
+    #[ORM\OneToOne(targetEntity: self::class)]
     private ?self $updatedBy = null;
 
     #[ORM\Column(nullable: true)]
@@ -215,5 +215,10 @@ class User implements
         }
 
         return $this;
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->getRoles());
     }
 }

@@ -67,7 +67,7 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, ['isAdmin' => (int) $user->isAdmin()]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -98,6 +98,8 @@ class UserController extends AbstractController
 
     private function handleUserData(FormInterface $form, User $user): void
     {
+        $user->setRoles([]);
+
         $isAdmin = $form->get('isAdmin')->getData();
         if ($isAdmin) {
             $user->setRoles(['ROLE_ADMIN']);

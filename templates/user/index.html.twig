@@ -29,7 +29,6 @@
                 <th>Id</th>
                 <th>Nombre</th>
                 <th>Email</th>
-                <th>Teléfono</th>
                 <th class="text-center">Admin</th>
                 <th></th>
             </tr>
@@ -40,7 +39,6 @@
                     <td>{{ user.id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.phone }}</td>
                     <td class="text-center">{{ ADMIN in user.roles ? '<i class="fa-solid fa-square-check fa-2x"></i>' : '' }}</td>
                     <td>
                         <a class="float-end mx-1 btn btn-warning btn-sm"
