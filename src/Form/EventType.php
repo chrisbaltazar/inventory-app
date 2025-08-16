@@ -7,6 +7,7 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,6 +17,9 @@ class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var Event $event */
+        $event = $options['data'] ?? null;
+
         $builder
             ->add('name', TextType::class)
             ->add('date', DateType::class, [
@@ -29,8 +33,9 @@ class EventType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false,
             ])
-            ->add('public', CheckboxType::class, [
-                'required' => false,
+            ->add('public', ChoiceType::class, [
+                'choices' => ['Visible para todos' => 1, 'Solo para admin' => 0],
+                'data' => (int) $event?->isPublic(),
             ]);
     }
 

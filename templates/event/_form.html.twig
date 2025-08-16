@@ -12,7 +12,7 @@
 
     {% include 'partials/_form-field.html.twig' with {'field': form.returnDate, 'label': 'Retorno'} %}
 
-    {% include 'partials/_form-check.html.twig' with {'field': form.public, 'label': 'Visible al grupo?', 'id': 'event_public'} %}
+    {%  include 'partials/_form-radio.html.twig' with {'field': form.public, 'label': 'Tipo de evento'} %}
 
     {{ form_rest(form) }}
 
