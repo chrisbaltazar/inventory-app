@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LoanRepository::class)]
+#[ORM\Index(name: 'loan_end_date_idx', columns: ['end_date'])]
+#[ORM\Index(name: 'loan_info_idx', columns: ['info'])]
 class Loan
 {
     #[ORM\Id]

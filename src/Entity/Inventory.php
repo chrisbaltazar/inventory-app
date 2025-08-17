@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InventoryRepository::class)]
+#[ORM\Index(name: 'invent_item_idx', columns: ['item_id'])]
 class Inventory implements UpdatedStampInterface, SoftDeleteInterface
 {
     #[ORM\Id]
@@ -24,8 +25,8 @@ class Inventory implements UpdatedStampInterface, SoftDeleteInterface
     #[Assert\Length(max: 20)]
     private ?string $size = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Length(max: 20)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]

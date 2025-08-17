@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
+#[ORM\Index(name: 'item_region_idx', columns: ['region'])]
+#[ORM\Index(name: 'item_deleted_idx', columns: ['deleted_at'])]
 class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]

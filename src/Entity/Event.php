@@ -13,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\Index(name: 'events_return_date_idx', columns: ['return_date'])]
+#[ORM\Index(name: 'events_deleted_idx', columns: ['deleted_at'])]
 class Event implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]

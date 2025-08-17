@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Index(name: 'user_deleted_idx', columns: ['deleted_at'])]
 class User implements
     UserInterface, PasswordAuthenticatedUserInterface, UpdatedStampInterface, SoftDeleteInterface, UserAwareInterface
 {
