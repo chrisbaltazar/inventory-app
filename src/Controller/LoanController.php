@@ -21,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -140,8 +141,9 @@ class LoanController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 /** @var \DateTime $endDate */
                 $endDate = $form->get('endDate')->getData();
-                if ($endDate < $loan->getEvent()->getDate()) {
-                    throw new \UnexpectedValueException('Invalid end date provided');
+                $eventClose = $loan->getEvent()->getReturnDate();
+                if ($endDate->getTimestamp() < $eventClose->getTimestamp()) {
+                    throw new BadRequestHttpException('Invalid end date before event closing');
                 }
 
                 $entityManager->flush();
