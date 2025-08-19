@@ -33,11 +33,17 @@ document.addEventListener('turbo:load', function () {
 
 function initDataTables() {
     document.querySelectorAll('.js-datatable').forEach(function (el) {
+        if(el.dataset.boundTable){
+            return
+        }
+
         new DataTable('#' + el.id, {
             responsive: true,
             "pageLength": 25,
             "bLengthChange": false,
             order: [] // remove default sorting
         })
+
+        el.dataset.boundTable = 'true'
     })
 }
