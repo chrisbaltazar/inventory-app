@@ -187,4 +187,9 @@ class Event implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInte
 
         return $this;
     }
+
+    public function isOpen(): bool
+    {
+        return empty($this->returnDate) || $this->returnDate->getTimestamp() > time();
+    }
 }

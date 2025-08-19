@@ -40,7 +40,7 @@ class LoanDataService
             'endDate' => $loan->getEndDate(),
             'comments' => $loan->getComments(),
             'status' => $loan->getStatus(),
-            'isOpen' => empty($loan->getEndDate()),
+            'isActive' => empty($loan->getEndDate()),
         ];
     }
 
@@ -51,6 +51,7 @@ class LoanDataService
             'name' => $loan->getEvent()->getName(),
             'date' => $loan->getEvent()->getDate(),
             'returnDate' => $loan->getEvent()->getReturnDate(),
+            'isOpen' => $loan->getEvent()->isOpen(),
         ];
     }
 }

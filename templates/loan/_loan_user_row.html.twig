@@ -14,7 +14,7 @@
             </button>
             <ul class="dropdown-menu">
                 <li>
-                    <button type="button" {{ row.isOpen ? '' : 'disabled' }}
+                    <button type="button" {{ row.isActive ? '' : 'disabled' }}
                             class="dropdown-item js-close-loan-ok"
                             data-loan-id="{{ row.id }}">Correcto
                     </button>
@@ -25,7 +25,7 @@
                             data-loan-id="{{ row.id }}">Más...
                     </button>
                 </li>
-                {% if not row.isOpen %}
+                {% if not row.isActive %}
                     <li>
                         <hr class="dropdown-divider">
                     </li>

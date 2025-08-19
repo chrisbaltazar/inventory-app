@@ -85,16 +85,10 @@ class LoanController extends AbstractController
         if ($user) {
             $allLoans = $loanDataService->getUserLoansByEvent($user);
             $openLoans = array_filter($allLoans, function (array $loan) {
-                $returnDate = $loan['data']['returnDate'] ?? '';
-                empty($returnDate) && $returnDate = new \DateTimeImmutable($returnDate);
-
-                return $returnDate >= new \DateTimeImmutable();
+                return $loan['data']['isOpen'];
             });
             $closedLoans = array_filter($allLoans, function (array $loan) {
-                $returnDate = $loan['data']['returnDate'] ?? '';
-                empty($returnDate) && $returnDate = new \DateTimeImmutable($returnDate);
-
-                return $returnDate < new \DateTimeImmutable();
+                return !$loan['data']['isOpen'];
             });
         }
 

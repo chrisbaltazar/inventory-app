@@ -21,6 +21,7 @@ class LoanType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $regions = array_combine(RegionEnum::values(), RegionEnum::values());
+        ksort($regions);
         $regions = ['' => ''] + $regions;
 
         $builder
