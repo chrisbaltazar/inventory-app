@@ -3,7 +3,8 @@
         <div class="card text-bg-primary mb-4 shadow rounded">
             <div class="card-header">Eventos abiertos</div>
             <div class="card-body">
-                <h5 class="card-title">Resúmen de eventos recientes</h5>
+                <h5 class="card-title">{{ events|length ? "Resúmen de eventos recientes" : 'No existen eventos abiertos...' }}</h5>
+                {% if events|length %}
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -30,13 +31,15 @@
                         </tbody>
                     </table>
                 </div>
+                {% endif %}
             </div>
         </div>
 
         <div class="card text-bg-warning mb-3 shadow rounded">
             <div class="card-header">Asignaciones con retardo</div>
             <div class="card-body">
-                <h5 class="card-title">Retorno de vestuario en espera</h5>
+                <h5 class="card-title">{{ loans|length ? 'Retorno de vestuario en espera' : 'No existen entregas pendientes...'  }}</h5>
+                {% if loans|length %}
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -64,6 +67,7 @@
                         </tbody>
                     </table>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

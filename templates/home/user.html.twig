@@ -3,7 +3,9 @@
         <div class="card text-bg-primary mb-4 shadow rounded">
             <div class="card-header">Eventos programados</div>
             <div class="card-body">
-                <h5 class="card-title">Resúmen de eventos próximos</h5>
+                <h5 class="card-title"></h5>
+                <h5 class="card-title">{{ events|length ? 'Resúmen de eventos próximos' : 'No existen eventos abiertos...' }}</h5>
+                {% if events|length %}
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -38,10 +40,11 @@
                         </tbody>
                     </table>
                 </div>
+                {% endif %}
             </div>
         </div>
 
-        <div class="card text-bg-{{ isDelayed ? 'danger' : 'info' }} mb-3 shadow rounded">
+        <div class="card text-bg-{{ isDelayed ? 'danger' : 'success' }} mb-3 shadow rounded">
             <div class="card-header">
                 Asignación personal
                 {% if isDelayed %}
@@ -49,7 +52,8 @@
                 {% endif %}
             </div>
             <div class="card-body">
-                <h5 class="card-title">Lista de vestuario asignado</h5>
+                <h5 class="card-title">{{ loans|length ? 'Lista de vestuario asignado' : 'No hay vestuario asignado por ahora...'  }}</h5>
+                {% if loans|length %}
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -72,6 +76,7 @@
                         </tbody>
                     </table>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
