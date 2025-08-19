@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User{% endblock %}
+{% block title %}Usuario {{ user.name }}{% endblock %}
 
 {% block body %}
 
@@ -22,7 +22,7 @@
                 <td>{{ user.email }}</td>
             </tr>
             <tr>
-                <th>Phone</th>
+                <th>Teléfono</th>
                 <td>{{ user.phone }}</td>
             </tr>
             <tr>
