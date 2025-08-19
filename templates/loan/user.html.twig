@@ -93,9 +93,12 @@
 
                 el.addEventListener('submit', async (e) => {
                     e.preventDefault()
+                    const button = e.currentTarget.querySelector('button[type="submit"]')
+                    button.disabled = 'disabled'
                     const data = new FormData(e.currentTarget)
                     await closeLoan(data)
                     modal.hide()
+                    button.removeAttribute('disabled')
                 })
 
                 el.dataset.bound = 'true'
