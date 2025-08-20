@@ -70,4 +70,9 @@ Run the following to load fixtures:
 ```
 php bin/console doctrine:fixtures:load
 ```
+This will create:
+```
+Admin – admin@test.com / 123456 
+User – user@test.com / 123456
+```
 ### _Docker installation WIP_
