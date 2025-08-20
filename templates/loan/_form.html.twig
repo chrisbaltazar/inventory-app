@@ -1,48 +1,50 @@
-{% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+{% embed 'partials/_form-wrapper.html.twig' %}
 
-<div class="form-wrapper mt-4">
-    {{ form_start(form, {'attr': {'class': formClass}}) }}
-    {{ form_errors(form) }}
+    {% block form_fields %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.event, 'label': 'Evento'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.event, 'label': 'Evento'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.user, 'label': 'Persona'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.user, 'label': 'Persona'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
 
-    {% if inventory|length %}
-        <div class="mt-4 p-2 mx-auto border rounded shadow">
-            <h3>Selección de piezas:</h3>
-            <div class="mt-3">
-                <table class="table table-striped">
-                    {% for item,values in inventory %}
-                        <tr>
-                            <td>
-                                <label><strong>{{ item }}</strong></label>
-                            </td>
-                            <td>
-                                <select class="form-control" name="loan[item][]">
-                                    <option value="">Seleccione...</option>
-                                    {% for key,value in values %}
-                                        <option value="{{ key }}">{{ value }}</option>
-                                    {% endfor %}
-                                </select>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <div class="mt-2 mx auto text-center">
-                <div class="alert alert-danger alert-dismissible fade show" style="display: none" role="alert" id="errorPanel">
-                    <span></span>
+        {% if inventory|length %}
+            <div class="mt-4 p-2 mx-auto border rounded shadow">
+                <h3>Selección de piezas:</h3>
+                <div class="mt-3">
+                    <table class="table table-striped">
+                        {% for item,values in inventory %}
+                            <tr>
+                                <td>
+                                    <label><strong>{{ item }}</strong></label>
+                                </td>
+                                <td>
+                                    <select class="form-control" name="loan[item][]">
+                                        <option value="">Seleccione...</option>
+                                        {% for key,value in values %}
+                                            <option value="{{ key }}">{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
                 </div>
-                <button type="button" class="btn btn-success" id="btnSave">
-                    <i class="fas fa-check"></i> Guardar todo
-                </button>
+                <div class="mt-2 mx auto text-center">
+                    <div class="alert alert-danger alert-dismissible fade show" style="display: none" role="alert"
+                         id="errorPanel">
+                        <span></span>
+                    </div>
+                    <button type="button" class="btn btn-success" id="btnSave">
+                        <i class="fas fa-check"></i> Guardar todo
+                    </button>
+                </div>
             </div>
-        </div>
-    {% endif %}
-</div>
+        {% endif %}
+
+    {% endblock %}
+
+{% endembed %}
 
 <script>
     document.addEventListener('turbo:load', () => {

@@ -1,33 +1,32 @@
-{% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+{% embed 'partials/_form-wrapper.html.twig' %}
 
-<div class="form-wrapper mt-4">
-    {{ form_start(form, {'attr': {'class': formClass}}) }}
-    {{ form_errors(form) }}
+    {% block form_fields %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
 
-    <div class="user-pwd">
-        {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
-        {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
-    </div>
+        <div class="user-pwd">
+            {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
+            {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
+        </div>
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
 
-    {% include 'partials/_form-radio.html.twig' with {'field': form.isAdmin, 'label': 'Tipo de usuario'} %}
+        {% include 'partials/_form-radio.html.twig' with {'field': form.isAdmin, 'label': 'Tipo de usuario'} %}
 
-    {{ form_rest(form) }}
+    {% endblock %}
 
-    <div class="d-flex justify-content-between mt-4">
-        <a class="btn btn-light" href="{{ path('app_user_index') }}">
-            <i class="fa-solid fa-arrow-left"></i> Volver
-        </a>
-        {% block form_buttons %}{% endblock %}
-        <button class="btn btn-success" type="submit">
-            <i class="fa-solid fa-check"></i> Guardar
-        </button>
-    </div>
+    {% block form_actions %}
+        <div class="d-flex justify-content-between mt-4">
+            <a class="btn btn-light" href="{{ path('app_user_index') }}">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+            {% block form_buttons %}{% endblock %}
+            <button class="btn btn-success" type="submit">
+                <i class="fa-solid fa-check"></i> Guardar
+            </button>
+        </div>
+    {% endblock %}
 
-    {{ form_end(form) }}
-</div>
+{% endembed %}

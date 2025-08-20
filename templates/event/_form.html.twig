@@ -1,30 +1,32 @@
-{% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+{% embed 'partials/_form-wrapper.html.twig' %}
 
-<div class="form-wrapper mt-4">
-    {{ form_start(form, {'attr': {'class': formClass}}) }}
-    {{ form_errors(form) }}
+    {% block form_fields %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Evento'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Evento'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.date, 'label': 'Fecha'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.date, 'label': 'Fecha'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.deliveryDate, 'label': 'Entrega'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.deliveryDate, 'label': 'Entrega'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.returnDate, 'label': 'Retorno'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.returnDate, 'label': 'Retorno'} %}
 
-    {%  include 'partials/_form-radio.html.twig' with {'field': form.public, 'label': 'Tipo de evento'} %}
+        {% include 'partials/_form-radio.html.twig' with {'field': form.public, 'label': 'Tipo de evento'} %}
 
-    {{ form_rest(form) }}
+    {% endblock %}
 
-    <div class="d-flex justify-content-between mt-4">
-        <a class="btn btn-light" href="{{ path('app_event_index') }}">
-            <i class="fa-solid fa-arrow-left"></i> Volver
-        </a>
-        {% block form_buttons %}{% endblock %}
-        <button class="btn btn-success">
-            <i class="fa-solid fa-check"></i> Guardar
-        </button>
-    </div>
 
-    {{ form_end(form) }}
-</div>
+    {% block form_actions %}
+
+        <div class="d-flex justify-content-between mt-4">
+            <a class="btn btn-light" href="{{ path('app_event_index') }}">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+            {% block form_buttons %}{% endblock %}
+            <button class="btn btn-success">
+                <i class="fa-solid fa-check"></i> Guardar
+            </button>
+        </div>
+
+    {% endblock %}
+
+{% endembed %}
