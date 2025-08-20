@@ -102,8 +102,8 @@ class LoanRepository extends ServiceEntityRepository
 
         if ($invent) {
             $index = 0;
-            $info = array_filter($invent->getInfo());
-            foreach ($info as $key => $value) {
+            $infoItems = array_filter($invent->getInfo());
+            foreach ($infoItems as $key => $value) {
                 $infoVar = 'info_' . ++$index;
                 $info = sprintf('"%s":"%s"', $key, $value);
                 $query->andWhere('l.info LIKE :' . $infoVar);
