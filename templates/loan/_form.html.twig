@@ -14,9 +14,16 @@
                 <div class="mt-3">
                     <table class="table table-striped">
                         {% for item,values in inventory %}
+                            {% set badge = 'secondary' %}
+                            {% set name = item|split('|') %}
+                            {% set badge = name[1] is same as 'Mujer' ? 'warning' : badge %}
+                            {% set badge = name[1] is same as 'Hombre' ? 'primary' : badge %}
                             <tr>
                                 <td>
-                                    <label><strong>{{ item }}</strong></label>
+                                    <label>
+                                        <strong>{{ name[0] }}</strong>
+                                        <span class="badge text-bg-{{ badge }}">{{ name[1] }}</span>
+                                    </label>
                                 </td>
                                 <td>
                                     <select class="form-control" name="loan[item][]">

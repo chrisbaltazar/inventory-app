@@ -14,17 +14,18 @@ class InventoryDataService
 
     public function __invoke(RegionEnum $region): array
     {
+        $items = [];
         $inventory = $this->inventoryRepository->findByRegion($region);
         $inventory = array_filter($inventory, fn(Inventory $i) => $i->getQuantity() > 0);
-        $items = [];
         /** @var Inventory $inventoryItem */
         foreach ($inventory as $inventoryItem) {
-            $items[$inventoryItem->getItem()->getName()][$this->formatKey($inventoryItem)] = $this->formatItem(
-                $inventoryItem
-            );
+            $name = $this->getItemName($inventoryItem);
+            $key = $this->formatKey($inventoryItem);
+            $description = $this->formatItem($inventoryItem);
+            $items[$name][$key] = $description;
         }
 
-        return $items;
+        return $this->sortItemsByGender($items);
     }
 
     private function formatItem(Inventory $inventory): string
@@ -40,6 +41,16 @@ class InventoryDataService
     {
         $data = array_merge(['id' => $inventory->getId()], $inventory->getInfo());
 
-        return implode('|', $data);
+        return trim(implode('|', $data), '|');
+    }
+
+    private function getItemName(Inventory $inventoryItem): string
+    {
+        return sprintf('%s|%s', $inventoryItem->getItem()->getName(), $inventoryItem->getItem()->getGenderName());
+    }
+
+    private function sortItemsByGender(array $items):array
+    {
+
     }
 }

@@ -51,6 +51,7 @@ class LoanController extends AbstractController
             $region = RegionEnum::from($region);
             $inventory = $inventoryDataService($region);
         }
+//        dd($inventory);
 
         return $this->render('loan/new.html.twig', [
             'form' => $form,
