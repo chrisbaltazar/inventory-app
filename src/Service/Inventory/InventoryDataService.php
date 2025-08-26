@@ -3,6 +3,7 @@
 namespace App\Service\Inventory;
 
 use App\Entity\Inventory;
+use App\Enum\GenderEnum;
 use App\Enum\RegionEnum;
 use App\Repository\InventoryRepository;
 
@@ -14,17 +15,22 @@ class InventoryDataService
 
     public function __invoke(RegionEnum $region): array
     {
-        $inventory = $this->inventoryRepository->findByRegion($region);
-        $inventory = array_filter($inventory, fn(Inventory $i) => $i->getQuantity() > 0);
         $items = [];
+        $inventory = $this->inventoryRepository->findByRegion($region);
         /** @var Inventory $inventoryItem */
         foreach ($inventory as $inventoryItem) {
-            $items[$inventoryItem->getItem()->getName()][$this->formatKey($inventoryItem)] = $this->formatItem(
-                $inventoryItem
-            );
+            if ($inventoryItem->getQuantity() <= 0) {
+                continue;
+            }
+
+            $name = $inventoryItem->getItem()->getName();
+            $key = $this->formatKey($inventoryItem);
+            $description = $this->formatItem($inventoryItem);
+            $items[$name]['values'][$key] = $description;
+            $items[$name]['gender'] = $inventoryItem->getItem()->getGender();
         }
 
-        return $items;
+        return $this->sortItemsByGender($items);
     }
 
     private function formatItem(Inventory $inventory): string
@@ -40,6 +46,26 @@ class InventoryDataService
     {
         $data = array_merge(['id' => $inventory->getId()], $inventory->getInfo());
 
-        return implode('|', $data);
+        return trim(implode('|', $data), '|');
+    }
+
+    private function sortItemsByGender(array $items): array
+    {
+        $items = array_map(function (array $itemData) {
+            $gender = GenderEnum::fromName($itemData['gender']);
+
+            $itemData['genderName'] = $gender->value;
+            $itemData['sorting'] = match (true) {
+                $gender->isFemale() => 1,
+                $gender->isMale() => 2,
+                default => 3,
+            };
+
+            return $itemData;
+        }, $items);
+
+        uasort($items, fn(array $a, array $b) => $a['sorting'] <=> $b['sorting']);
+
+        return $items;
     }
 }

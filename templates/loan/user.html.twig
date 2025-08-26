@@ -31,6 +31,7 @@
                                         <h4 class="badge text-bg-success">
                                             Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
                                     {% endif %}
+                                    <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
                                 </div>
                                 <table class="table table-hover">
                                     {% for row in item.rows %}
@@ -54,6 +55,7 @@
                                         <h4 class="badge text-bg-warning">
                                             Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
                                     {% endif %}
+                                    <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover">

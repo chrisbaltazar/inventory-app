@@ -1,63 +1,62 @@
-{% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+{% embed 'partials/_form-wrapper.html.twig' %}
 
-<div class="form-wrapper mt-4">
-    {{ form_start(form, {'attr': {'class': formClass}}) }}
-    {{ form_errors(form) }}
+    {% block form_fields %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.gender, 'label': 'Género'} %}
 
-    {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Pieza'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Pieza'} %}
 
-    <div class="w-100 my-3 me-2 d-flex justify-content-between">
-        <h4 class="me-2">Inventario</h4>
-        <button type="button" class="btn btn-info btn-sm js-add-inventory">
-            <i class="fas fa-plus"></i> Agregar
-        </button>
-    </div>
+        <div class="w-100 my-3 me-2 d-flex justify-content-between">
+            <h4 class="me-2">Inventario</h4>
+            <button type="button" class="btn btn-info btn-sm js-add-inventory">
+                <i class="fas fa-plus"></i> Agregar
+            </button>
+        </div>
 
-    <div class="table-responsive">
-        <table class="table table-sm" id="tableInventory">
-            {% for row in form.inventory %}
-                <tr>
-                    <td style="width: 150px">
-                        {% include 'partials/_form-field.html.twig' with {'field': row.quantity, 'label': 'Total'} %}
-                    </td>
-                    <td>
-                        {% include 'partials/_form-field.html.twig' with {'field': row.size, 'label': 'Talla'} %}
-                    </td>
-                    <td>
-                        {% include 'partials/_form-field.html.twig' with {'field': row.description, 'label': 'Descripción'} %}
-                    </td>
-                    <td>
-                        <button type="button" class="float-end mt-3 btn btn-danger js-remove-inventory">
-                            <i class="fa-solid fa-times"></i>
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
+        <div class="table-responsive">
+            <table class="table table-sm" id="tableInventory">
+                {% for row in form.inventory %}
+                    <tr>
+                        <td style="width: 150px">
+                            {% include 'partials/_form-field.html.twig' with {'field': row.quantity, 'label': 'Total'} %}
+                        </td>
+                        <td>
+                            {% include 'partials/_form-field.html.twig' with {'field': row.size, 'label': 'Talla'} %}
+                        </td>
+                        <td>
+                            {% include 'partials/_form-field.html.twig' with {'field': row.description, 'label': 'Descripción'} %}
+                        </td>
+                        <td>
+                            <button type="button" class="float-end mt-3 btn btn-danger js-remove-inventory">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
 
-    <template data-form-collection-target="template" id="inventoryTemplate">
-        <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.quantity, 'label': 'Cantidad'} %}</td>
-        <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.size, 'label': 'Talla'} %}</td>
-        <td>{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.description, 'label': 'Descripción'} %}</td>
-    </template>
+        <template data-form-collection-target="template" id="inventoryTemplate">
+            <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.quantity, 'label': 'Cantidad'} %}</td>
+            <td class="w-25">{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.size, 'label': 'Talla'} %}</td>
+            <td>{% include 'partials/_form-field.html.twig' with {'field': form.inventory.vars.prototype.description, 'label': 'Descripción'} %}</td>
+        </template>
+    {% endblock %}
 
-    {{ form_rest(form) }}
+    {% block form_actions %}
+        <div class="d-flex justify-content-between mt-4">
+            <a class="btn btn-light" href="{{ path('app_item_index') }}">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+            {% block form_buttons %}{% endblock %}
+            <button class="btn btn-success">
+                <i class="fa-solid fa-check"></i> Guardar
+            </button>
+        </div>
+    {% endblock %}
 
-    <div class="d-flex justify-content-between mt-4">
-        <a class="btn btn-light" href="{{ path('app_item_index') }}">
-            <i class="fa-solid fa-arrow-left"></i> Volver
-        </a>
-        {% block form_buttons %}{% endblock %}
-        <button class="btn btn-success">
-            <i class="fa-solid fa-check"></i> Guardar
-        </button>
-    </div>
-
-    {{ form_end(form) }}
-</div>
+{% endembed %}
 
 <script>
     document.addEventListener('turbo:load', () => {

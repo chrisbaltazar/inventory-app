@@ -1,0 +1,18 @@
+<div class="form-wrapper mt-4">
+    {% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
+    {{ form_start(form, {'attr': {'class': formClass}}) }}
+
+    {% if form_errors(form) %}
+        <div class="alert alert-danger" role="alert">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+
+    {% block form_fields %}{% endblock %}
+
+    {{ form_rest(form) }}
+
+    {% block form_actions %}{% endblock %}
+
+    {{ form_end(form) }}
+</div>

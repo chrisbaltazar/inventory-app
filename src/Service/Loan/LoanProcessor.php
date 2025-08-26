@@ -48,7 +48,7 @@ class LoanProcessor
         }
 
         foreach ($items as $item) {
-            if (count(explode('|', $item)) !== 3) {
+            if (count(explode('|', $item)) < 2) {
                 throw new \UnexpectedValueException('Invalid item format: ' . $item);
             }
         }

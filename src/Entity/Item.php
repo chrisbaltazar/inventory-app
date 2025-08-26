@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Contract\SoftDeleteInterface;
 use App\Entity\Contract\UpdatedStampInterface;
 use App\Entity\Contract\UserAwareInterface;
+use App\Enum\GenderEnum;
 use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -40,8 +41,12 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\OneToMany(targetEntity: Metadata::class, mappedBy: 'item')]
     private Collection $metadata;
 
-    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: [
+        'persist',
+        'remove',
+    ], orphanRemoval: true)]
     #[Assert\Valid]
+    #[Assert\Count(min: 1)]
     private Collection $inventory;
 
     #[ORM\ManyToOne]
@@ -49,6 +54,10 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
 
     #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'item')]
     private Collection $loans;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    #[Assert\NotBlank()]
+    private ?string $gender = null;
 
     public function __construct()
     {
@@ -222,5 +231,22 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         }
 
         return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?string $gender): static
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getGenderName(): ?string
+    {
+        return GenderEnum::fromName($this->getGender())?->value;
     }
 }
