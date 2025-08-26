@@ -26,6 +26,7 @@ class ItemRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('i')
             ->orderBy('i.region', 'ASC')
+            ->addOrderBy('i.gender', 'ASC')
             ->addOrderBy('i.name', 'ASC')
             ->getQuery()
             ->getResult();
