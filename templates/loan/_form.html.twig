@@ -25,7 +25,7 @@
                                     </label>
                                 </td>
                                 <td>
-                                    <select class="form-control" name="loan[item][]">
+                                    <select class="form-control loan-item" name="loan[item][]">
                                         <option value="">Seleccione...</option>
                                         {% for key,value in item.values %}
                                             <option value="{{ key }}">{{ value }}</option>
@@ -41,8 +41,11 @@
                          id="errorPanel">
                         <span></span>
                     </div>
-                    <button type="button" class="btn btn-success" id="btnSave">
-                        <i class="fas fa-check"></i> Guardar todo
+
+                    <button type="button" class="btn btn-success position-relative" id="btnSave">
+                        <i class="fas fa-check"></i> Asignar todo
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                              id="countPieces">0</span>
                     </button>
                 </div>
             </div>
@@ -75,6 +78,16 @@
                 button.removeAttribute('disabled')
             })
         )
+
+        document.querySelectorAll('select.loan-item').forEach(function (el) {
+            if (el.dataset.boundChange) {
+                return
+            }
+
+            el.addEventListener('change', () => countTotalPieces())
+
+            el.dataset.boundChange = 'true'
+        })
     })
 
     const saveForm = async (formData) => {
@@ -117,5 +130,11 @@
         const errorMessage = panel.querySelector('span')
         errorMessage.textContent = error
         panel.style.display = error ? 'block' : 'none'
+    }
+
+    const countTotalPieces = () => {
+        const items = Array.from(document.querySelectorAll('select.loan-item'))
+        const total = items.filter(el => el.value.trim() !== '');
+        document.getElementById('countPieces').textContent = total.length
     }
 </script>
