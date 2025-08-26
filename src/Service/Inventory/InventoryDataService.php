@@ -3,6 +3,7 @@
 namespace App\Service\Inventory;
 
 use App\Entity\Inventory;
+use App\Enum\GenderEnum;
 use App\Enum\RegionEnum;
 use App\Repository\InventoryRepository;
 
@@ -16,13 +17,17 @@ class InventoryDataService
     {
         $items = [];
         $inventory = $this->inventoryRepository->findByRegion($region);
-        $inventory = array_filter($inventory, fn(Inventory $i) => $i->getQuantity() > 0);
         /** @var Inventory $inventoryItem */
         foreach ($inventory as $inventoryItem) {
-            $name = $this->getItemName($inventoryItem);
+            if ($inventoryItem->getQuantity() <= 0) {
+                continue;
+            }
+
+            $name = $inventoryItem->getItem()->getName();
             $key = $this->formatKey($inventoryItem);
             $description = $this->formatItem($inventoryItem);
-            $items[$name][$key] = $description;
+            $items[$name]['values'][$key] = $description;
+            $items[$name]['gender'] = $inventoryItem->getItem()->getGender();
         }
 
         return $this->sortItemsByGender($items);
@@ -44,13 +49,23 @@ class InventoryDataService
         return trim(implode('|', $data), '|');
     }
 
-    private function getItemName(Inventory $inventoryItem): string
+    private function sortItemsByGender(array $items): array
     {
-        return sprintf('%s|%s', $inventoryItem->getItem()->getName(), $inventoryItem->getItem()->getGenderName());
-    }
+        $items = array_map(function (array $itemData) {
+            $gender = GenderEnum::fromName($itemData['gender']);
 
-    private function sortItemsByGender(array $items):array
-    {
+            $itemData['genderName'] = $gender->value;
+            $itemData['sorting'] = match (true) {
+                $gender->isFemale() => 1,
+                $gender->isMale() => 2,
+                default => 3,
+            };
 
+            return $itemData;
+        }, $items);
+
+        uasort($items, fn(array $a, array $b) => $a['sorting'] <=> $b['sorting']);
+
+        return $items;
     }
 }
