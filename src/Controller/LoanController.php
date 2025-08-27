@@ -141,11 +141,11 @@ class LoanController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 /** @var \DateTime $endDate */
                 $endDate = $form->get('endDate')->getData();
-                $eventClose = $loan->getEvent()->getReturnDate();
-                if ($endDate->getTimestamp() < $eventClose->getTimestamp()) {
-                    throw new BadRequestHttpException('Invalid end date before event closing');
+                $startDate = $loan->getStartDate();
+                // Considered a mistake and remove it
+                if ($endDate->format('Y-m-d') === $startDate->format('Y-m-d')) {
+                    $entityManager->remove($loan);
                 }
-
                 $entityManager->flush();
 
                 return $this->json('OK');
