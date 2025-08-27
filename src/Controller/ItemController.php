@@ -35,7 +35,9 @@ class ItemController extends AbstractController
             $entityManager->persist($item);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_item_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Pieza creada correctamente');
+
+            return $this->redirectToRoute('app_item_new', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('item/new.html.twig', [
