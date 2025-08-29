@@ -25,7 +25,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Volver
             </a>
             {% if not form.plainPassword %}
-            <a class="btn btn-warning" href="{{ path('app_user_password', {'id': form.vars.data.id}) }}">
+            <a class="btn btn-warning" href="{{ path('app_user_password', {'id': form.vars.data.id, 'route_back': 'app_user_index'}) }}">
                 <i class="fa-solid fa-lock"></i> Password
             </a>
             {% endif %}

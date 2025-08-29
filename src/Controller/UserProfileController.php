@@ -8,21 +8,21 @@ use App\Service\User\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/user')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 class UserProfileController extends AbstractController
 {
-
     #[Route('/profile', name: 'app_user_profile')]
     public function index(): Response
     {
         return $this->render('user_profile/index.html.twig', [
-            'controller_name' => 'UserProfileController',
+            'user' => $this->getUser(),
         ]);
     }
 
@@ -33,8 +33,11 @@ class UserProfileController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordService $userPassword
     ): Response {
+        $this->validateAccess($user);
+
+        $routeBack = $request->get('route_back', 'app_user_profile');
         $form = $this->createForm(UserPasswordType::class, $user, [
-            'routeBack' => 'app_user_profile',
+            'routeBack' => $routeBack,
         ]);
 
         $form->handleRequest($request);
@@ -45,7 +48,7 @@ class UserProfileController extends AbstractController
                 $entityManager->flush();
                 $this->addFlash('success', 'Password actualizado correctamente');
 
-                return $this->redirectToRoute('app_user_profile', [], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute($routeBack, [], Response::HTTP_SEE_OTHER);
             } catch (\Exception $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
@@ -55,5 +58,14 @@ class UserProfileController extends AbstractController
             'user' => $user,
             'form' => $form,
         ]);
+    }
+
+    private function validateAccess(User $user): void
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        if (!$currentUser->isAdmin() && $currentUser->getId() !== $user->getId()) {
+            throw new AccessDeniedHttpException();
+        }
     }
 }
