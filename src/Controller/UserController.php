@@ -5,12 +5,13 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\User\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -18,12 +19,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class UserController extends AbstractController
 {
-
-    public function __construct(
-        private UserPasswordHasherInterface $hasher
-    ) {
-    }
-
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
@@ -35,7 +30,8 @@ class UserController extends AbstractController
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserPasswordService $userPassword
     ): Response {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -43,14 +39,17 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->handleUserRoles($form, $user);
-            $this->handleUserPassword($form, $user);
+            try {
+                $user->setPassword($userPassword($user, $form->get('plainPassword')->getData()));
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $this->addFlash('success', 'Usuario creado correctamente');
 
-            $this->addFlash('success', 'Usuario creado correctamente');
-
-            return $this->redirectToRoute('app_user_new', [], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_user_new', [], Response::HTTP_SEE_OTHER);
+            } catch (\Exception $e) {
+                $form->addError(new FormError($e->getMessage()));
+            }
         }
 
         return $this->render('user/new.html.twig', [
@@ -102,21 +101,12 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
 
-
     private function handleUserRoles(FormInterface $form, User $user): void
     {
         $user->setRoles([]);
         $isAdmin = $form->get('isAdmin')->getData();
         if ($isAdmin) {
             $user->setRoles(['ROLE_ADMIN']);
-        }
-    }
-
-    private function handleUserPassword(FormInterface $form, User $user): void
-    {
-        $pwd = $form->get('plainPassword')?->getData();
-        if ($pwd) {
-            $user->setPassword($this->hasher->hashPassword($user, $pwd));
         }
     }
 }

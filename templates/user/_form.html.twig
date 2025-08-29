@@ -9,10 +9,10 @@
         {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
 
         {% if form.plainPassword %}
-        <div class="user-pwd">
-            {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
-            {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
-        </div>
+            <div class="user-pwd">
+                {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
+                {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
+            </div>
         {% endif %}
 
         {% include 'partials/_form-radio.html.twig' with {'field': form.isAdmin, 'label': 'Tipo de usuario'} %}
@@ -24,7 +24,11 @@
             <a class="btn btn-light" href="{{ path('app_user_index') }}">
                 <i class="fa-solid fa-arrow-left"></i> Volver
             </a>
-            {% block form_buttons %}{% endblock %}
+            {% if not form.plainPassword %}
+            <a class="btn btn-warning" href="{{ path('app_user_password', {'id': form.vars.data.id}) }}">
+                <i class="fa-solid fa-lock"></i> Password
+            </a>
+            {% endif %}
             <button class="btn btn-success" type="submit">
                 <i class="fa-solid fa-check"></i> Guardar
             </button>
