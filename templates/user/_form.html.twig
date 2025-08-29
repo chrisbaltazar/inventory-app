@@ -2,16 +2,18 @@
 
     {% block form_fields %}
 
-        {% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
-
         {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
 
+        {% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
+
+        {% if form.plainPassword %}
         <div class="user-pwd">
             {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.first, 'label': 'Password'} %}
             {% include 'partials/_form-field.html.twig' with {'field': form.plainPassword.second, 'label': 'Confirma'} %}
         </div>
-
-        {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
+        {% endif %}
 
         {% include 'partials/_form-radio.html.twig' with {'field': form.isAdmin, 'label': 'Tipo de usuario'} %}
 

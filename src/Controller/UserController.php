@@ -42,7 +42,8 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->handleUserData($form, $user);
+            $this->handleUserRoles($form, $user);
+            $this->handleUserPassword($form, $user);
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -69,11 +70,15 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserType::class, $user, ['isAdmin' => (int) $user->isAdmin()]);
+        $form = $this->createForm(UserType::class, $user, [
+            'isAdmin' => (int) $user->isAdmin(),
+            'showPassword' => false,
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->handleUserData($form, $user);
+            $this->handleUserRoles($form, $user);
 
             $entityManager->flush();
 
@@ -98,16 +103,18 @@ class UserController extends AbstractController
     }
 
 
-    private function handleUserData(FormInterface $form, User $user): void
+    private function handleUserRoles(FormInterface $form, User $user): void
     {
         $user->setRoles([]);
-
         $isAdmin = $form->get('isAdmin')->getData();
         if ($isAdmin) {
             $user->setRoles(['ROLE_ADMIN']);
         }
+    }
 
-        $pwd = $form->get('plainPassword')->getData();
+    private function handleUserPassword(FormInterface $form, User $user): void
+    {
+        $pwd = $form->get('plainPassword')?->getData();
         if ($pwd) {
             $user->setPassword($this->hasher->hashPassword($user, $pwd));
         }

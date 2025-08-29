@@ -19,23 +19,27 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class)
             ->add('name', TextType::class)
-            ->add('plainPassword', RepeatedType::class, [
-                'mapped' => false,
-                'type' => PasswordType::class,
-                'attr' => ['autocomplete' => 'new-password'],
-            ])
+            ->add('email', EmailType::class)
             ->add('phone', TextType::class, [
                 'required' => false,
                 'empty_data' => null,
-            ])
-            ->add('isAdmin', ChoiceType::class, [
-                'choices' => ['Integrante' => 0, 'Administrador' => 1],
-                'data' => $options['isAdmin'],
-                'mapped' => false,
-                'required' => false,
             ]);
+
+        if ($options['showPassword']) {
+            $builder->add('plainPassword', RepeatedType::class, [
+                'mapped' => false,
+                'type' => PasswordType::class,
+                'attr' => ['autocomplete' => 'new-password'],
+            ]);
+        }
+
+        $builder->add('isAdmin', ChoiceType::class, [
+            'choices' => ['Integrante' => 0, 'Administrador' => 1],
+            'data' => $options['isAdmin'],
+            'mapped' => false,
+            'required' => false,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -43,6 +47,7 @@ class UserType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'isAdmin' => 0,
+            'showPassword' => true,
         ]);
     }
 }
