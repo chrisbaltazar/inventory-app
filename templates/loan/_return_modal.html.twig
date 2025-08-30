@@ -4,21 +4,19 @@
 
 {% block modalBody %}
 
-    {% set formClass = form.vars.submitted ? 'was-validated' : 'needs-validation' %}
-    <div class="form-wrapper mt-4">
-        {{ form_start(form, {'attr': {'class': formClass}}) }}
-        {{ form_errors(form) }}
+    {% embed 'partials/_form-wrapper.html.twig' %}
+        {% block form_fields %}
+            {% include 'partials/_form-field.html.twig' with {'field': form.endDate, 'label': 'Fecha'} %}
+            {% include 'partials/_form-field.html.twig' with {'field': form.status, 'label': 'Estado'} %}
+            {% include 'partials/_form-field.html.twig' with {'field': form.comments, 'label': 'Comentarios'} %}
+        {% endblock %}
 
-        {% include 'partials/_form-field.html.twig' with {'field': form.endDate, 'label': 'Fecha'} %}
-        {% include 'partials/_form-field.html.twig' with {'field': form.status, 'label': 'Estado'} %}
-        {% include 'partials/_form-field.html.twig' with {'field': form.comments, 'label': 'Comentarios'} %}
-
-        {{ form_rest(form) }}
-
-        <button type="submit" class="btn btn-warning">
-            <i class="fa-solid fa-clipboard"></i> Entregar
-        </button>
-    </div>
+        {% block form_actions %}
+            <button type="submit" class="btn btn-warning">
+                <i class="fa-solid fa-clipboard"></i> Entregar
+            </button>
+        {% endblock %}
+    {% endembed %}
 
 {% endblock %}
 

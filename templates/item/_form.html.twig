@@ -82,14 +82,10 @@
 
         const addInventoryRow = () => {
             const table = document.getElementById('tableInventory')
-            // console.log('table', table)
             const template = document.getElementById('inventoryTemplate')
-            // console.log('template', template)
             const index = document.querySelectorAll('#tableInventory tr').length
-            // console.log('index', index)
             const row = document.createElement('tr')
             row.innerHTML = template.innerHTML.replace(/__name__/g, index.toString())
-            // console.log('content', row)
             table.appendChild(row)
         }
 

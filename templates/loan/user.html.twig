@@ -20,7 +20,7 @@
 
             <div class="mb-3">
                 {% if openLoans|length %}
-                    <h3 class="mb-3">Eventos abiertos</h3>
+                    <h3 class="mb-4">Eventos abiertos</h3>
                     {% for event,item in openLoans %}
                         <div class="card border-warning mb-3 shadow">
                             <div class="card-header">{{ event }}</div>
@@ -40,13 +40,14 @@
                                         {% endfor %}
                                     </table>
                                 </div>
+                                {% include 'loan/_transfer_form.html.twig' %}
                             </div>
                         </div>
                     {% endfor %}
                 {% endif %}
 
                 {% if closedLoans|length %}
-                    <h3 class="mb-3">Eventos cerrados</h3>
+                    <h3 class="mb-4">Eventos cerrados</h3>
                     {% for event,item in closedLoans %}
                         <div class="card border-info mb-3 shadow">
                             <div class="card-header">{{ event }}</div>
@@ -66,11 +67,11 @@
                                         {% endfor %}
                                     </table>
                                 </div>
+                                {% include 'loan/_transfer_form.html.twig' %}
                             </div>
                         </div>
                     {% endfor %}
                 {% endif %}
-
             </div>
         </div>
     </div>
@@ -149,6 +150,26 @@
                 }
 
                 el.addEventListener('click', (e) => reOpenLoan(e.currentTarget.dataset.loanEndpoint))
+
+                el.dataset.bound = 'true'
+            })
+
+            document.querySelectorAll('select.js-transfer-event').forEach(function (el) {
+                if (el.dataset.bound) {
+                    return
+                }
+
+                el.addEventListener('change', (e) => {
+                    const el = e.currentTarget
+                    console.log(el)
+                    console.log(el.closest('form'))
+
+                    if (e.currentTarget.value && confirm('Transferir piezas todas las restantes?')) {
+                        e.currentTarget.closest('form').submit()
+                    } else {
+                        e.currentTarget.value = ""
+                    }
+                })
 
                 el.dataset.bound = 'true'
             })

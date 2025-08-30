@@ -32,17 +32,22 @@ class LoanType extends AbstractType
                 },
                 'query_builder' => function (EntityRepository $repository): QueryBuilder {
                     return $repository->createQueryBuilder('e')
-                        ->where('e.returnDate IS NULL')
-                        ->orWhere('e.returnDate >= :now')
+                        ->where('e.date >= :now')
                         ->setParameter('now', now()->format('Y-m-d'))
                         ->orderBy('e.date', 'ASC');
                 },
                 'data' => $options['event'] ?? null,
+                'placeholder' => 'Seleccione...',
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'name',
+                'query_builder' => function (EntityRepository $repository): QueryBuilder {
+                    return $repository->createQueryBuilder('u')
+                        ->orderBy('u.name', 'ASC');
+                },
                 'data' => $options['user'] ?? null,
+                'placeholder' => 'Seleccione...',
             ])
             ->add('region', ChoiceType::class, [
                 'choices' => $regions,

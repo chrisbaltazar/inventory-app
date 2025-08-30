@@ -44,4 +44,17 @@ class EventRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return Event[]
+     */
+    public function findAllFuture(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.date >= :now')
+            ->setParameter('now', new \DateTime('now'))
+            ->orderBy('e.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
