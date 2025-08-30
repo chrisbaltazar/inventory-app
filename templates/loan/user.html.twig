@@ -164,7 +164,7 @@
                     console.log(el)
                     console.log(el.closest('form'))
 
-                    if (e.currentTarget.value && confirm('Transferir piezas todas las restantes?')) {
+                    if (e.currentTarget.value && confirm('Transferir todas las piezas restantes?')) {
                         e.currentTarget.closest('form').submit()
                     } else {
                         e.currentTarget.value = ""

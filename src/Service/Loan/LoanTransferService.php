@@ -19,7 +19,7 @@ class LoanTransferService
     public function __invoke(User $user, Event $sourceEvent, Event $targetEvent): void
     {
         if ($sourceEvent->getId() === $targetEvent->getId()) {
-            throw new \UnexpectedValueException('Event source and target must be different');
+            throw new \UnexpectedValueException('Source and target events must be different');
         }
 
         if ($targetEvent->getDate()->getTimestamp() < $sourceEvent->getDate()->getTimestamp()) {
@@ -27,7 +27,7 @@ class LoanTransferService
         }
 
         $now = new \DateTimeImmutable();
-        if ($targetEvent->getReturnDate() && $targetEvent->getReturnDate()->getTimestamp() > $now->getTimestamp()) {
+        if ($targetEvent->getReturnDate() && $targetEvent->getReturnDate()->getTimestamp() < $now->getTimestamp()) {
             throw new \UnexpectedValueException('Target event must be open');
         }
 
