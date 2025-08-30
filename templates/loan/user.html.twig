@@ -5,211 +5,220 @@
 {% block body %}
     {% include 'loan/_return_modal.html.twig' %}
 
-    <div class="row">
-        <h1>Asignación por persona</h1>
-        <div class="col-sm-12 my-3">
-            <div class="mb-3">
-                <h4>Nombre</h4>
-                <select class="form-control" id="cmbPerson">
-                    <option value="">Seleccione...</option>
-                    {% for person in users %}
-                        <option value="{{ person.id }}" {{ user and person.id is same as user.id ? 'selected' : '' }}>{{ person.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+<div class="row">
+    <h1>Asignación por persona</h1>
+    <div class="col-sm-12 my-3">
+        <div class="mb-3">
+            <h4>Nombre</h4>
+            <select class="form-control" id="cmbPerson">
+                <option value="">Seleccione...</option>
+                {% for person in users %}
+                    <option value="{{ person.id }}" {{ user and person.id is same as user.id ? 'selected' : '' }}>{{ person.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-            <div class="mb-3">
-                {% if openLoans|length %}
-                    <h3 class="mb-3">Eventos abiertos</h3>
-                    {% for event,item in openLoans %}
-                        <div class="card border-warning mb-3 shadow">
-                            <div class="card-header">{{ event }}</div>
-                            <div class="card-body">
-                                <div class="card-title mb-2">
-                                    <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
-                                    {% if item.data.returnDate %}
-                                        <h4 class="badge text-bg-success">
-                                            Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
-                                    {% endif %}
-                                    <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        {% for row in item.rows %}
-                                            {% include 'loan/_loan_user_row.html.twig' %}
-                                        {% endfor %}
-                                    </table>
-                                </div>
+        <div class="mb-3">
+            {% if openLoans|length %}
+            <h3 class="mb-4">Eventos abiertos</h3>
+            {% for event,item in openLoans %}
+            <div class="card border-warning mb-3 shadow">
+                <div class="card-header">{{ event }}</div>
+                <div class="card-body">
+                    <div class="card-title mb-2">
+                        <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
+                        {% if item.data.returnDate %}
+                            <h4 class="badge text-bg-success">
+                                Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
+                        {% endif %}
+                        <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            {% for row in item.rows %}
+                                {% include 'loan/_loan_user_row.html.twig' %}
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="mt-3 d-flex">
+                        <label class="w-25">Transferir a</label>
+                        <select class="form-control">
+                            <option value="">Seleccione...</option>
+                            {% for event in futureEvents %}
+                            <option value="{{ event.id }}">{{ event.name }} ({{ event.date|date('d/m/Y') }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if closedLoans|length %}
+                <h3 class="mb-4">Eventos cerrados</h3>
+                {% for event,item in closedLoans %}
+                    <div class="card border-info mb-3 shadow">
+                        <div class="card-header">{{ event }}</div>
+                        <div class="card-body">
+                            <div class="card-title mb-2">
+                                <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
+                                {% if item.data.returnDate %}
+                                    <h4 class="badge text-bg-warning">
+                                        Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
+                                {% endif %}
+                                <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    {% for row in item.rows %}
+                                        {% include 'loan/_loan_user_row.html.twig' with {'rowClass': row.endDate is empty ? 'table-danger' : ''} %}
+                                    {% endfor %}
+                                </table>
                             </div>
                         </div>
-                    {% endfor %}
-                {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-                {% if closedLoans|length %}
-                    <h3 class="mb-3">Eventos cerrados</h3>
-                    {% for event,item in closedLoans %}
-                        <div class="card border-info mb-3 shadow">
-                            <div class="card-header">{{ event }}</div>
-                            <div class="card-body">
-                                <div class="card-title mb-2">
-                                    <h4 class="badge text-bg-primary">Fecha {{ item.data.date|date('d/m/Y') }}</h4>
-                                    {% if item.data.returnDate %}
-                                        <h4 class="badge text-bg-warning">
-                                            Cierre {{ item.data.returnDate|date('d/m/Y') }}</h4>
-                                    {% endif %}
-                                    <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        {% for row in item.rows %}
-                                            {% include 'loan/_loan_user_row.html.twig' with {'rowClass': row.endDate is empty ? 'table-danger' : ''} %}
-                                        {% endfor %}
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        let loan = null
-        const modal = new bootstrap.Modal('#modal')
+<script>
+    let loan = null
+    const modal = new bootstrap.Modal('#modal')
 
-        document.addEventListener('turbo:load', () => {
-            document.querySelectorAll('select#cmbPerson').forEach(function (el) {
-                if (el.dataset.bound) {
-                    return
-                }
+    document.addEventListener('turbo:load', () => {
+        document.querySelectorAll('select#cmbPerson').forEach(function (el) {
+            if (el.dataset.bound) {
+                return
+            }
 
-                el.addEventListener('change', (e) => refreshUserPage(e.currentTarget.value))
+            el.addEventListener('change', (e) => refreshUserPage(e.currentTarget.value))
 
-                el.dataset.bound = 'true'
-            })
-
-            document.querySelectorAll('form[name="loan_return"]').forEach(function (el) {
-                if (el.dataset.bound) {
-                    return
-                }
-
-                el.addEventListener('submit', async (e) => {
-                    e.preventDefault()
-                    const button = e.currentTarget.querySelector('button[type="submit"]')
-                    button.disabled = 'disabled'
-                    const data = new FormData(e.currentTarget)
-                    await closeLoan(data)
-                    modal.hide()
-                    button.removeAttribute('disabled')
-                })
-
-                el.dataset.bound = 'true'
-            })
-
-            document.querySelectorAll('.js-close-loan-more').forEach(function (el) {
-                if (el.dataset.bound) {
-                    return
-                }
-
-                el.addEventListener('click', (e) => {
-                    loan = e.currentTarget.dataset.loanId
-                    const row = e.currentTarget.closest('tr.loan-user-row')
-
-                    document.getElementById('loan_return_endDate').value = row.dataset.loanEndDate
-                    document.getElementById('loan_return_comments').value = row.dataset.loanComments
-                    document.getElementById('loan_return_status').value = row.dataset.loanStatus
-
-                    modal.show()
-                })
-
-                el.dataset.bound = 'true'
-            })
-
-            document.querySelectorAll('.js-close-loan-ok').forEach(function (el) {
-                if (el.dataset.bound) {
-                    return
-                }
-
-                el.addEventListener('click', async (e) => {
-                    loan = e.currentTarget.dataset.loanId
-                    const formData = new FormData()
-                    formData.append('loan_return[endDate]', '{{ "now"|date("Y-m-d") }}')
-                    formData.append('loan_return[status]', '{{ closedStatus }}')
-                    await closeLoan(formData)
-                })
-
-                el.dataset.bound = 'true'
-            })
-
-            document.querySelectorAll('.js-loan-reopen').forEach(function (el) {
-                if (el.dataset.bound) {
-                    return
-                }
-
-                el.addEventListener('click', (e) => reOpenLoan(e.currentTarget.dataset.loanEndpoint))
-
-                el.dataset.bound = 'true'
-            })
+            el.dataset.bound = 'true'
         })
 
-        const refreshUserPage = (userId) => {
-            if (!userId) {
-                return
-            }
-            const url = '{{ path('app_loan_user') }}'
-            location.href = url + '/' + userId
-        }
-
-        const closeLoan = async (formData) => {
-            try {
-                formData.append('id', loan)
-                const response = await fetch('{{ path('app_loan_update') }}', {
-                    method: 'POST',
-                    body: formData,
-                })
-
-                if (!response.ok) {
-                    throw await response.json();
-                }
-
-                const data = await response.json();
-
-                toggleLoanButton(loan)
-            } catch (e) {
-                alert(e.message || e.error || e.errors)
-                console.error('Fetch error:', e);
-            }
-        }
-
-        const toggleLoanButton = (id) => {
-            const selector = 'button.close-loan-action[data-loan-id="' + id + '"]'
-            const button = document.querySelector(selector)
-            button.classList.remove('btn-outline-dark')
-            button.classList.add('btn-outline-success')
-            button.innerHTML = '<i class="fa-solid fa-check-circle"></i>'
-        }
-
-        const reOpenLoan = async (endpoint) => {
-            if (!confirm('Re-abrir asignación?')) {
+        document.querySelectorAll('form[name="loan_return"]').forEach(function (el) {
+            if (el.dataset.bound) {
                 return
             }
 
-            try {
-                const response = await fetch(endpoint)
+            el.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const button = e.currentTarget.querySelector('button[type="submit"]')
+                button.disabled = 'disabled'
+                const data = new FormData(e.currentTarget)
+                await closeLoan(data)
+                modal.hide()
+                button.removeAttribute('disabled')
+            })
 
-                if (!response.ok) {
-                    throw await response.json();
-                }
+            el.dataset.bound = 'true'
+        })
 
-                const data = await response.json();
-
-                location.reload()
-            } catch (e) {
-                alert(e.message || e.error || e.errors)
-                console.error('Fetch error:', e);
+        document.querySelectorAll('.js-close-loan-more').forEach(function (el) {
+            if (el.dataset.bound) {
+                return
             }
+
+            el.addEventListener('click', (e) => {
+                loan = e.currentTarget.dataset.loanId
+                const row = e.currentTarget.closest('tr.loan-user-row')
+
+                document.getElementById('loan_return_endDate').value = row.dataset.loanEndDate
+                document.getElementById('loan_return_comments').value = row.dataset.loanComments
+                document.getElementById('loan_return_status').value = row.dataset.loanStatus
+
+                modal.show()
+            })
+
+            el.dataset.bound = 'true'
+        })
+
+        document.querySelectorAll('.js-close-loan-ok').forEach(function (el) {
+            if (el.dataset.bound) {
+                return
+            }
+
+            el.addEventListener('click', async (e) => {
+                loan = e.currentTarget.dataset.loanId
+                const formData = new FormData()
+                formData.append('loan_return[endDate]', '{{ "now"|date("Y-m-d") }}')
+                formData.append('loan_return[status]', '{{ closedStatus }}')
+                await closeLoan(formData)
+            })
+
+            el.dataset.bound = 'true'
+        })
+
+        document.querySelectorAll('.js-loan-reopen').forEach(function (el) {
+            if (el.dataset.bound) {
+                return
+            }
+
+            el.addEventListener('click', (e) => reOpenLoan(e.currentTarget.dataset.loanEndpoint))
+
+            el.dataset.bound = 'true'
+        })
+    })
+
+    const refreshUserPage = (userId) => {
+        if (!userId) {
+            return
         }
-    </script>
+        const url = '{{ path('app_loan_user') }}'
+        location.href = url + '/' + userId
+    }
+
+    const closeLoan = async (formData) => {
+        try {
+            formData.append('id', loan)
+            const response = await fetch('{{ path('app_loan_update') }}', {
+                method: 'POST',
+                body: formData,
+            })
+
+            if (!response.ok) {
+                throw await response.json();
+            }
+
+            const data = await response.json();
+
+            toggleLoanButton(loan)
+        } catch (e) {
+            alert(e.message || e.error || e.errors)
+            console.error('Fetch error:', e);
+        }
+    }
+
+    const toggleLoanButton = (id) => {
+        const selector = 'button.close-loan-action[data-loan-id="' + id + '"]'
+        const button = document.querySelector(selector)
+        button.classList.remove('btn-outline-dark')
+        button.classList.add('btn-outline-success')
+        button.innerHTML = '<i class="fa-solid fa-check-circle"></i>'
+    }
+
+    const reOpenLoan = async (endpoint) => {
+        if (!confirm('Re-abrir asignación?')) {
+            return
+        }
+
+        try {
+            const response = await fetch(endpoint)
+
+            if (!response.ok) {
+                throw await response.json();
+            }
+
+            const data = await response.json();
+
+            location.reload()
+        } catch (e) {
+            alert(e.message || e.error || e.errors)
+            console.error('Fetch error:', e);
+        }
+    }
+</script>
 {% endblock %}

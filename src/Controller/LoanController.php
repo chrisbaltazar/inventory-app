@@ -11,6 +11,7 @@ use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
 use App\Form\LoanReturnType;
 use App\Form\LoanType;
+use App\Repository\EventRepository;
 use App\Repository\ItemRepository;
 use App\Repository\LoanRepository;
 use App\Repository\UserRepository;
@@ -21,7 +22,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -78,11 +78,13 @@ class LoanController extends AbstractController
     #[Route('/user/{id?}', name: 'app_loan_user', methods: ['GET'])]
     public function showUser(
         UserRepository $userRepository,
+        EventRepository $eventRepository,
         LoanDataService $loanDataService,
         ?User $user = null
     ): Response {
         $openLoans = [];
         $closedLoans = [];
+        $futureEvents = [];
         if ($user) {
             $allLoans = $loanDataService->getUserLoansByEvent($user);
             $openLoans = array_filter($allLoans, function (array $loan) {
@@ -91,6 +93,7 @@ class LoanController extends AbstractController
             $closedLoans = array_filter($allLoans, function (array $loan) {
                 return !$loan['data']['isOpen'];
             });
+            $futureEvents = $eventRepository->findAllFuture();
         }
 
         $loan = new Loan();
@@ -101,6 +104,7 @@ class LoanController extends AbstractController
             'user' => $user,
             'users' => $userRepository->findAll(),
             'form' => $returnForm,
+            'futureEvents' => $futureEvents,
             'openLoans' => $openLoans,
             'closedLoans' => $closedLoans,
             'closedStatus' => LoanStatusEnum::CLOSED->value,

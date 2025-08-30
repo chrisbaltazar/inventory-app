@@ -42,6 +42,10 @@ class LoanType extends AbstractType
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'name',
+                'query_builder' => function (EntityRepository $repository): QueryBuilder {
+                    return $repository->createQueryBuilder('u')
+                        ->orderBy('u.name', 'ASC');
+                },
                 'data' => $options['user'] ?? null,
             ])
             ->add('region', ChoiceType::class, [
