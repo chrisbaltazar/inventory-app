@@ -31,7 +31,10 @@
             </tr>
             <tr>
                 <th>Actualizado</th>
-                <td>{{ event.updatedAt ? event.updatedAt|date('d/m/Y H:i:s') : '' }}</td>
+                <td>
+                    {{ event.updatedAt ? event.updatedAt|date('d/m/Y H:i:s') : '' }}
+                    ({{ item.updatedBy.name }})
+                </td>
             </tr>
             </tbody>
         </table>
