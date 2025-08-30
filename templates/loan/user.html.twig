@@ -160,10 +160,6 @@
                 }
 
                 el.addEventListener('change', (e) => {
-                    const el = e.currentTarget
-                    console.log(el)
-                    console.log(el.closest('form'))
-
                     if (e.currentTarget.value && confirm('Transferir todas las piezas restantes?')) {
                         e.currentTarget.closest('form').submit()
                     } else {
