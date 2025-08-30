@@ -33,11 +33,13 @@
                                     {% endif %}
                                     <h4 class="badge text-bg-dark">Total piezas: {{ item.rows|length }}</h4>
                                 </div>
-                                <table class="table table-hover">
-                                    {% for row in item.rows %}
-                                        {% include 'loan/_loan_user_row.html.twig' %}
-                                    {% endfor %}
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        {% for row in item.rows %}
+                                            {% include 'loan/_loan_user_row.html.twig' %}
+                                        {% endfor %}
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     {% endfor %}
