@@ -18,10 +18,12 @@ use App\Repository\UserRepository;
 use App\Service\Inventory\InventoryDataService;
 use App\Service\Loan\LoanDataService;
 use App\Service\Loan\LoanProcessor;
+use App\Service\Loan\LoanTransferService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -170,5 +172,29 @@ class LoanController extends AbstractController
         $entityManager->flush();
 
         return $this->json('OK');
+    }
+
+    #[Route('/transfer', name: 'app_loan_transfer', methods: ['GET'])]
+    public function transferLoan(
+        #[MapQueryParameter] int $source,
+        #[MapQueryParameter] int $target,
+        #[MapQueryParameter] int $user,
+        EventRepository $eventRepository,
+        UserRepository $userRepository,
+        LoanTransferService $loanTransfer
+    ): Response {
+        try {
+            $user = $userRepository->find($user) ?? throw new NotFoundHttpException();
+            $sourceEvent = $eventRepository->find($source) ?? throw new NotFoundHttpException();
+            $targetEvent = $eventRepository->find($target) ?? throw new NotFoundHttpException();
+
+            $loanTransfer($user, $sourceEvent, $targetEvent);
+
+            $this->addFlash('success', 'Transferencia completa');
+        } catch (\UnexpectedValueException $ex) {
+            $this->addFlash('error', $ex->getMessage());
+        }
+
+        return $this->redirectToRoute('app_loan_user', ['id' => $user->getId()], Response::HTTP_SEE_OTHER);
     }
 }

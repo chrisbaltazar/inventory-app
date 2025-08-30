@@ -1,0 +1,15 @@
+<form action="{{ path('app_loan_transfer') }}" class="mt-3 form-transfer">
+    <div class="mt-3 d-flex">
+        <input type="hidden" name="user" value="{{ user.id }}">
+        <input type="hidden" name="source" value="{{ item.data.id }}">
+        <h6 class="w-25 pt-2">Transferir a evento:</h6>
+        <select class="form-control js-transfer-event" name="target">
+            <option value="">Seleccione...</option>
+            {% for evt in futureEvents %}
+                <option value="{{ evt.id }}">{{ evt.name }}
+                    ({{ evt.date|date('d/m/Y') }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>

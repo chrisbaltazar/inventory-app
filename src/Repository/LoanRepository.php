@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Event;
 use App\Entity\Inventory;
 use App\Entity\Item;
 use App\Entity\Loan;
@@ -66,6 +67,24 @@ class LoanRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->orderBy('l.startDate', 'ASC')
             ->addOrderBy('i.region', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Loan[]
+     */
+    public function findOpenByEvent(Event $event, User $user): array
+    {
+        return $this->createQueryBuilder('l')
+            ->select('l', 'i', 'e')
+            ->join('l.item', 'i')
+            ->join('l.event', 'e')
+            ->where('l.user = :user')
+            ->andWhere('l.event = :event')
+            ->andWhere('l.endDate IS NULL')
+            ->setParameter('user', $user)
+            ->setParameter('event', $event)
             ->getQuery()
             ->getResult();
     }

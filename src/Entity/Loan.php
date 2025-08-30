@@ -170,4 +170,13 @@ class Loan
 
         return $this;
     }
+
+    public function __clone()
+    {
+        $this->id = null;
+        $this->startDate = null;
+        $this->endDate = null;
+        $this->comments = null;
+        $this->status = null;
+    }
 }

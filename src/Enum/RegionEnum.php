@@ -11,7 +11,7 @@ enum RegionEnum: string
     case JALISCO = 'JALISCO';
     case HIDALGO = 'HIDALGO';
     case OAXACA = 'OAXACA';
-    case VERACRUZ = 'VERACRÚZ';
+    case VERACRUZ = 'VERACRUZ';
     case NAYARIT = 'NAYARIT';
     case YUCATAN = 'YUCATÁN';
     case CHIAPAS = 'CHIAPAS';
