@@ -2,23 +2,26 @@
 
 namespace App\Tests\Application\Controller;
 
-use App\Tests\Trait\WithUser;
+use App\DataFixtures\Factory\EventFactory;
+use App\Tests\Trait\WithUserSession;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class EventControllerTest extends WebTestCase
 {
-    use WithUser;
+    use WithUserSession;
 
-    public function testSomething(): void
+    public function testListEvents(): void
     {
         $client = static::createClient();
+        $entityManager = $client->getContainer()->get(EntityManagerInterface::class);
+        $event = EventFactory::create();
+        $entityManager->persist($event);
+        $entityManager->flush();
 
-        $this->withUser($client, 'admin@test.com');
-
-        $client->request('GET', '/event/');
+        $this->withUser($client, 'admin@test.com')->request('GET', '/event/');
 
         self::assertResponseIsSuccessful();
-
-        self::assertSelectorTextContains('h1', 'Eventos');
+        self::assertSelectorCount(1, 'table tbody tr');
     }
 }
