@@ -79,6 +79,6 @@ class LoanControllerTest extends AbstractWebTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this>$this->assertDatabaseCount(2, Loan::class);
+        $this->assertDatabaseCount(2, Loan::class);
     }
 }
