@@ -11,8 +11,7 @@ class UserFactory extends AbstractFactory
         string $email = null,
         string $password = null,
         array $roles = null,
-    ): User
-    {
+    ): User {
         $user = new User();
         $user->setName($name ?? self::faker()->name);
         $user->setEmail($email ?? self::faker()->email);
@@ -20,5 +19,13 @@ class UserFactory extends AbstractFactory
         $user->setRoles($roles ?? []);
 
         return $user;
+    }
+
+    public static function admin(string $email = null): User
+    {
+        return self::create(
+            email: $email,
+            roles: ['ROLE_ADMIN']
+        );
     }
 }
