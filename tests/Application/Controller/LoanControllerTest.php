@@ -6,6 +6,7 @@ use App\DataFixtures\Factory\EventFactory;
 use App\DataFixtures\Factory\InventoryFactory;
 use App\DataFixtures\Factory\ItemFactory;
 use App\DataFixtures\Factory\UserFactory;
+use App\Entity\Loan;
 use App\Enum\RegionEnum;
 use App\Tests\AbstractWebTestCase;
 use App\Tests\Trait\WithUserSession;
@@ -78,5 +79,6 @@ class LoanControllerTest extends AbstractWebTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
+        $this>$this->assertDatabaseCount(2, Loan::class);
     }
 }
