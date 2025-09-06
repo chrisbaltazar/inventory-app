@@ -43,7 +43,7 @@
                         <td>{{ loan.event.name }}</td>
                         <td>{{ loan.user.name }}</td>
                         <td>{{ loan.startDate|date('d/m/Y') }}</td>
-                        <td>{{ loan.endDate|date('d/m/Y') }}</td>
+                        <td>{{  loan.endDate ? loan.endDate|date('d/m/Y') : '' }}</td>
                         <td>
                             <button type="button" class="btn btn-sm btn-link js-loan-comment"
                                     data-loan-comments="{{ loan.comments }}">

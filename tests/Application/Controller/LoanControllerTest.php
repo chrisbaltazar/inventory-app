@@ -266,4 +266,53 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertSelectorCount(0, 'div.event-open_wrapper table tr.table-danger');
         $this->assertSelectorCount(1, 'div.event-closed_wrapper table tr.table-danger');
     }
+
+    public function testShowLoanItem(): void
+    {
+        $user = UserFactory::admin();
+        $item = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item->addInventory(InventoryFactory::create(quantity: 1));
+        $event1 = EventFactory::create(
+            returnDate: new \DateTimeImmutable('-1 day'),
+            date: new \DateTimeImmutable('-3 days'),
+        );
+        $event2 = EventFactory::create(
+            returnDate: null,
+            date: new \DateTimeImmutable('now')
+        );
+        $loan1 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-5 days'),
+            endDate: new \DateTimeImmutable('-1 day'),
+            user: $user,
+            event: $event1,
+            item: $item,
+            quantity: 1,
+            status: LoanStatusEnum::CLOSED,
+        );
+        $loan2 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('now'),
+            endDate: null,
+            user: $user,
+            event: $event2,
+            item: $item,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($item);
+        $this->entityManager->persist($event1);
+        $this->entityManager->persist($event2);
+        $this->entityManager->persist($loan1);
+        $this->entityManager->persist($loan2);
+        $this->entityManager->flush();
+
+        $crawler = $this->asUser($this->client, $user)->request('GET', '/loan/item/' . $item->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorCount(2, 'table.table tbody tr');
+        $buttons = $crawler->filter('button.js-loan-comment');
+        $this->assertStringContainsString('ABIERTO', $buttons->first()->text());
+        $this->assertStringContainsString('CORRECTO', $buttons->last()->text());
+    }
 }
