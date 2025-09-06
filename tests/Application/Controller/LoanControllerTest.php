@@ -484,7 +484,7 @@ class LoanControllerTest extends AbstractWebTestCase
         ]);
     }
 
-    public function testLoanTransferErrorDates(): void
+    public function testLoanTransferErrorEventDates(): void
     {
         $user = UserFactory::admin();
         $event1 = EventFactory::create(
@@ -537,8 +537,64 @@ class LoanControllerTest extends AbstractWebTestCase
 
         $this->assertResponseRedirects("/loan/user/{$user->getId()}");
         $this->assertDatabaseCount(2, Loan::class);
-
         $this->client->followRedirect();
         $this->assertSelectorTextContains('div.alert-danger', 'Target event date must be greater then source event');
+    }
+
+    public function testLoanTransferErrorEventClosed(): void
+    {
+        $user = UserFactory::admin();
+        $event1 = EventFactory::create(
+            returnDate: null,
+            date: new \DateTimeImmutable('-3 day'),
+        );
+        $event2 = EventFactory::create(
+            returnDate: new \DateTimeImmutable('-1 day'),
+            date: new \DateTimeImmutable('-3 day')
+        );
+        $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item1->addInventory(InventoryFactory::create(quantity: 1));
+        $item2 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item2->addInventory(InventoryFactory::create(quantity: 1));
+        $loan1 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-3 days'),
+            endDate: new \DateTimeImmutable('now'),
+            user: $user,
+            event: $event1,
+            item: $item1,
+            quantity: 1,
+            status: LoanStatusEnum::CLOSED,
+        );
+        $loan2 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-3 days'),
+            endDate: null,
+            user: $user,
+            event: $event1,
+            item: $item2,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($event1);
+        $this->entityManager->persist($event2);
+        $this->entityManager->persist($item1);
+        $this->entityManager->persist($item2);
+        $this->entityManager->persist($loan1);
+        $this->entityManager->persist($loan2);
+        $this->entityManager->flush();
+
+        $query = http_build_query([
+            'source' => $event1->getId(),
+            'target' => $event2->getId(),
+            'user' => $user->getId(),
+        ]);
+
+        $this->asUser($this->client, $user)->request('GET', "/loan/transfer?$query");
+
+        $this->assertResponseRedirects("/loan/user/{$user->getId()}");
+        $this->assertDatabaseCount(2, Loan::class);
+        $this->client->followRedirect();
+        $this->assertSelectorTextContains('div.alert-danger', 'Target event must be open');
     }
 }
