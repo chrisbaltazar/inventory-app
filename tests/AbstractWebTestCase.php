@@ -43,4 +43,9 @@ abstract class AbstractWebTestCase extends WebTestCase
 
         self::assertNotNull($result);
     }
+
+    protected function assertResponseContains(string $text): void
+    {
+        $this->assertStringContainsString($text, $this->client->getResponse()->getContent());
+    }
 }
