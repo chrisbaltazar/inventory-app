@@ -386,4 +386,36 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertDatabaseCount(0, Loan::class);
     }
+
+    public function testReOpenLoan(): void
+    {
+        $user = UserFactory::admin();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
+        $item = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item->addInventory(InventoryFactory::create(quantity: 1));
+        $loan = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-3 day'),
+            endDate: new \DateTimeImmutable('-1 day'),
+            user: $user,
+            event: $event,
+            item: $item,
+            quantity: 1,
+            status: LoanStatusEnum::CLOSED,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($event);
+        $this->entityManager->persist($item);
+        $this->entityManager->persist($loan);
+        $this->entityManager->flush();
+
+        $this->asUser($this->client, $user)->request('GET', "/loan/{$loan->getId()}/reopen");
+
+        $this->assertResponseIsSuccessful();
+        $this->assertDatabaseEntity(Loan::class, [
+            'id' => $loan->getId(),
+            'status' => LoanStatusEnum::OPEN->value,
+            'endDate' => null,
+        ]);
+    }
 }
