@@ -7,7 +7,6 @@ use App\DataFixtures\Factory\InventoryFactory;
 use App\DataFixtures\Factory\ItemFactory;
 use App\DataFixtures\Factory\LoanFactory;
 use App\DataFixtures\Factory\UserFactory;
-use App\Entity\Item;
 use App\Entity\Loan;
 use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
@@ -27,7 +26,7 @@ class LoanControllerTest extends AbstractWebTestCase
     public function testNewLoanPage(): void
     {
         $user = UserFactory::admin();
-        $event = EventFactory::create();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
         $inventory = InventoryFactory::create();
         $item = ItemFactory::create(RegionEnum::ACCESORIOS->value);
         $item->addInventory($inventory);
@@ -50,7 +49,7 @@ class LoanControllerTest extends AbstractWebTestCase
     public function testStoreLoanOK(): void
     {
         $user = UserFactory::admin();
-        $event = EventFactory::create();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
         $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
         $item1->addInventory(InventoryFactory::create(quantity: 1));
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
@@ -88,7 +87,7 @@ class LoanControllerTest extends AbstractWebTestCase
     public function testStoreLoanErrorNoItems(): void
     {
         $user = UserFactory::admin();
-        $event = EventFactory::create();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
         $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
         $item1->addInventory(InventoryFactory::create(quantity: 1));
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
@@ -115,7 +114,7 @@ class LoanControllerTest extends AbstractWebTestCase
     public function testStoreLoanErrorNoInventory(): void
     {
         $user = UserFactory::admin();
-        $event = EventFactory::create();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
         $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
         $item1->addInventory(InventoryFactory::create(quantity: 1));
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
@@ -166,7 +165,7 @@ class LoanControllerTest extends AbstractWebTestCase
     public function testStoreLoanErrorOpenLoanSameItem(): void
     {
         $user = UserFactory::admin();
-        $event = EventFactory::create();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
         $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
         $item1->addInventory(InventoryFactory::create(quantity: 2));
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
@@ -212,5 +211,59 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertResponseContains('User with open loan');
         // Previously exising loan
         $this->assertDatabaseCount(1, Loan::class);
+    }
+
+    public function testShowLoanUser(): void
+    {
+        $user = UserFactory::admin();
+        $event1 = EventFactory::create(
+            returnDate: new \DateTimeImmutable('-1 day'),
+            date: new \DateTimeImmutable('-3 days'),
+        );
+        $event2 = EventFactory::create(
+            returnDate: null,
+            date: new \DateTimeImmutable('now')
+        );
+        $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item1->addInventory(InventoryFactory::create(quantity: 1));
+        $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
+        $item2->addInventory(InventoryFactory::create(quantity: 1));
+        $loan1 = LoanFactory::create(
+            startDate: new \DateTimeImmutable(),
+            endDate: null,
+            user: $user,
+            event: $event1,
+            item: $item1,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+        $loan2 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('now'),
+            endDate: null,
+            user: $user,
+            event: $event2,
+            item: $item2,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($event1);
+        $this->entityManager->persist($event2);
+        $this->entityManager->persist($item1);
+        $this->entityManager->persist($item2);
+        $this->entityManager->persist($loan1);
+        $this->entityManager->persist($loan2);
+        $this->entityManager->flush();
+
+        $this->asUser($this->client, $user)->request('GET', '/loan/user/' . $user->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h3.event-open_title', 'Eventos abiertos');
+        $this->assertSelectorTextContains('h3.event-closed_title', 'Eventos cerrados');
+        $this->assertSelectorCount(1, 'div.event-open_wrapper');
+        $this->assertSelectorCount(1, 'div.event-closed_wrapper');
+        $this->assertSelectorCount(0, 'div.event-open_wrapper table tr.table-danger');
+        $this->assertSelectorCount(1, 'div.event-closed_wrapper table tr.table-danger');
     }
 }

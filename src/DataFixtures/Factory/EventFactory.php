@@ -7,17 +7,17 @@ use App\Entity\Event;
 class EventFactory extends AbstractFactory
 {
     public static function create(
-        string $name = null,
+        ?\DateTimeInterface $returnDate,
         \DateTimeInterface $date = null,
         \DateTimeInterface $deliveryDate = null,
-        \DateTimeInterface $returnDate = null,
+        string $name = null,
         bool $public = null,
     ): Event {
         $event = new Event();
-        $event->setName($name ?? self::faker()->name);
+        $event->setReturnDate($returnDate);
         $event->setDate($date ?? self::faker()->dateTime);
         $event->setDeliveryDate($deliveryDate ?? self::faker()->dateTime);
-        $event->setReturnDate($returnDate ?? self::faker()->dateTime);
+        $event->setName($name ?? self::faker()->name);
         $event->setPublic($public ?? self::faker()->boolean);
 
         return $event;

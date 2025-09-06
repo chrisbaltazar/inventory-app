@@ -23,6 +23,7 @@ abstract class AbstractWebTestCase extends WebTestCase
     protected function refreshDatabase(): void
     {
         $purger = new ORMPurger($this->entityManager);
+        $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
         $purger->purge();
     }
 

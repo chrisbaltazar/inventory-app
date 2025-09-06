@@ -20,7 +20,7 @@ class EventControllerTest extends AbstractWebTestCase
 
     public function testListEvents(): void
     {
-        $event = EventFactory::create();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
         $this->entityManager->persist($event);
         $this->entityManager->flush();
 
