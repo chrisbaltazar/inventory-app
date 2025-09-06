@@ -352,4 +352,38 @@ class LoanControllerTest extends AbstractWebTestCase
             'status' => LoanStatusEnum::CLOSED->value,
         ]);
     }
+
+    public function testUpdateLoanDelete(): void
+    {
+        $user = UserFactory::admin();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
+        $item = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item->addInventory(InventoryFactory::create(quantity: 1));
+        $loan = LoanFactory::create(
+            startDate: new \DateTimeImmutable('now'),
+            endDate: null,
+            user: $user,
+            event: $event,
+            item: $item,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($event);
+        $this->entityManager->persist($item);
+        $this->entityManager->persist($loan);
+        $this->entityManager->flush();
+
+        $this->asUser($this->client, $user)->request('POST', '/loan/update', [
+            'id' => $loan->getId(),
+            'loan_return' => [
+                'endDate' => (new \DateTimeImmutable('now'))->format('Y-m-d'),
+                'status' => LoanStatusEnum::CLOSED->value,
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertDatabaseCount(0, Loan::class);
+    }
 }
