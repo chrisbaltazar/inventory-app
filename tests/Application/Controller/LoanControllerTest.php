@@ -315,4 +315,41 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertStringContainsString('ABIERTO', $buttons->first()->text());
         $this->assertStringContainsString('CORRECTO', $buttons->last()->text());
     }
+
+    public function testUpdateLoanOK(): void
+    {
+        $user = UserFactory::admin();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
+        $item = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item->addInventory(InventoryFactory::create(quantity: 1));
+        $loan = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-1 day'),
+            endDate: null,
+            user: $user,
+            event: $event,
+            item: $item,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($event);
+        $this->entityManager->persist($item);
+        $this->entityManager->persist($loan);
+        $this->entityManager->flush();
+
+        $this->asUser($this->client, $user)->request('POST', '/loan/update', [
+            'id' => $loan->getId(),
+            'loan_return' => [
+                'endDate' => (new \DateTimeImmutable('now'))->format('Y-m-d'),
+                'status' => LoanStatusEnum::CLOSED->value,
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertDatabaseEntity(Loan::class, [
+            'id' => $loan->getId(),
+            'status' => LoanStatusEnum::CLOSED->value,
+        ]);
+    }
 }

@@ -138,9 +138,7 @@ class LoanController extends AbstractController
         $id = $request->get('id');
         $loan = $loanRepository->find($id) ?? throw new NotFoundHttpException();
         try {
-            $form = $this->createForm(LoanReturnType::class, $loan, [
-                'csrf_protection' => false,
-            ]);
+            $form = $this->createForm(LoanReturnType::class, $loan);
 
             $form->handleRequest($request);
 
