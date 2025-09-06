@@ -162,7 +162,7 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertDatabaseCount(1, Loan::class);
     }
 
-    public function testStoreLoanErrorOpenLoanSameItem(): void
+    public function testStoreLoanErrorSameItem(): void
     {
         $user = UserFactory::admin();
         $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
@@ -416,6 +416,71 @@ class LoanControllerTest extends AbstractWebTestCase
             'id' => $loan->getId(),
             'status' => LoanStatusEnum::OPEN->value,
             'endDate' => null,
+        ]);
+    }
+
+    public function testLoanTransferOK(): void
+    {
+        $user = UserFactory::admin();
+        $event1 = EventFactory::create(
+            returnDate: new \DateTimeImmutable('now'),
+            date: new \DateTimeImmutable('-3 days'),
+        );
+        $event2 = EventFactory::create(
+            returnDate: null,
+            date: new \DateTimeImmutable('+3 days')
+        );
+        $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item1->addInventory(InventoryFactory::create(quantity: 1));
+        $item2 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item2->addInventory(InventoryFactory::create(quantity: 1));
+        $loan1 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-3 days'),
+            endDate: new \DateTimeImmutable('now'),
+            user: $user,
+            event: $event1,
+            item: $item1,
+            quantity: 1,
+            status: LoanStatusEnum::CLOSED,
+        );
+        $loan2 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-3 days'),
+            endDate: null,
+            user: $user,
+            event: $event1,
+            item: $item2,
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($event1);
+        $this->entityManager->persist($event2);
+        $this->entityManager->persist($item1);
+        $this->entityManager->persist($item2);
+        $this->entityManager->persist($loan1);
+        $this->entityManager->persist($loan2);
+        $this->entityManager->flush();
+
+        $query = http_build_query([
+            'source' => $event1->getId(),
+            'target' => $event2->getId(),
+            'user' => $user->getId(),
+        ]);
+
+        $this->asUser($this->client, $user)->request('GET', "/loan/transfer?$query");
+
+        $this->assertResponseRedirects("/loan/user/{$user->getId()}");
+        $this->assertDatabaseCount(3, Loan::class);
+        $this->assertDatabaseEntity(Loan::class, [
+            'event' => $event1,
+            'item' => $item2,
+            'status' => LoanStatusEnum::CLOSED->value,
+        ]);
+        $this->assertDatabaseEntity(Loan::class, [
+            'event' => $event2,
+            'item' => $item2,
+            'status' => LoanStatusEnum::OPEN->value,
         ]);
     }
 }
