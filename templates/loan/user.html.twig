@@ -20,9 +20,9 @@
 
             <div class="mb-3">
                 {% if openLoans|length %}
-                    <h3 class="mb-4">Eventos abiertos</h3>
+                    <h3 class="mb-4 event-open_title">Eventos abiertos</h3>
                     {% for event,item in openLoans %}
-                        <div class="card border-warning mb-3 shadow">
+                        <div class="card border-warning mb-3 shadow event-open_wrapper">
                             <div class="card-header">{{ event }}</div>
                             <div class="card-body">
                                 <div class="card-title mb-2">
@@ -47,9 +47,9 @@
                 {% endif %}
 
                 {% if closedLoans|length %}
-                    <h3 class="mb-4">Eventos cerrados</h3>
+                    <h3 class="mb-4 event-closed_title">Eventos cerrados</h3>
                     {% for event,item in closedLoans %}
-                        <div class="card border-info mb-3 shadow">
+                        <div class="card border-info mb-3 shadow event-closed_wrapper">
                             <div class="card-header">{{ event }}</div>
                             <div class="card-body">
                                 <div class="card-title mb-2">

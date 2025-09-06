@@ -2,23 +2,44 @@
 
 namespace App\Tests\Application\Controller;
 
-use App\Tests\Trait\WithUser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\DataFixtures\Factory\EventFactory;
+use App\DataFixtures\Factory\UserFactory;
+use App\Entity\Event;
+use App\Tests\AbstractWebTestCase;
+use App\Tests\Trait\WithUserSession;
 
-class EventControllerTest extends WebTestCase
+class EventControllerTest extends AbstractWebTestCase
 {
-    use WithUser;
+    use WithUserSession;
 
-    public function testSomething(): void
+    protected function setUp(): void
     {
-        $client = static::createClient();
+        parent::setUp();
+        $this->refreshDatabase();
+    }
 
-        $this->withUser($client, 'admin@test.com');
+    public function testListEvents(): void
+    {
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
+        $this->entityManager->persist($event);
+        $this->entityManager->flush();
 
-        $client->request('GET', '/event/');
+        $this->forNewUser($this->client, ['roles' => ['ROLE_ADMIN']])->request('GET', '/event/');
 
         self::assertResponseIsSuccessful();
+        self::assertSelectorCount(1, 'table tbody tr');
+    }
 
-        self::assertSelectorTextContains('h1', 'Eventos');
+    public function testSaveNewEvent(): void
+    {
+        $this->forNewUser($this->client, ['roles' => ['ROLE_ADMIN']])->request('GET', '/event/new');
+
+        $this->client->submitForm('Guardar', [
+            'event[name]' => 'Event Foo',
+            'event[date]' => '2025-01-01',
+        ]);
+
+        self::assertResponseRedirects('/event/new');
+        $this->assertDatabaseCount(1, Event::class);
     }
 }

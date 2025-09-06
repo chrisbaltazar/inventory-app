@@ -40,6 +40,7 @@ class LoanReturnType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Loan::class,
             'allow_extra_fields' => true,
+            'csrf_protection' => false,
         ]);
     }
 }
