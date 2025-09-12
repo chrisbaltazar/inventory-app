@@ -25,9 +25,11 @@ class InventoryDataService
 
             $name = $inventoryItem->getItem()->getName();
             $key = $this->formatKey($inventoryItem);
+            $gender = $inventoryItem->getItem()->getGender();
             $description = $this->formatItem($inventoryItem);
-            $items[$name]['values'][$key] = $description;
-            $items[$name]['gender'] = $inventoryItem->getItem()->getGender();
+            $items[$gender][$inventoryItem->getId()]['name'] = $name;
+            $items[$gender][$inventoryItem->getId()]['gender'] = $gender;
+            $items[$gender][$inventoryItem->getId()]['values'][$key] = $description;
         }
 
         return $this->sortItemsByGender($items);
@@ -51,21 +53,15 @@ class InventoryDataService
 
     private function sortItemsByGender(array $items): array
     {
-        $items = array_map(function (array $itemData) {
-            $gender = GenderEnum::fromName($itemData['gender']);
+        return array_map(function (array $data) {
+            $data['genderName'] = GenderEnum::fromName($data['gender'])->value;
 
-            $itemData['genderName'] = $gender->value;
-            $itemData['sorting'] = match (true) {
-                $gender->isFemale() => 1,
-                $gender->isMale() => 2,
-                default => 3,
-            };
-
-            return $itemData;
-        }, $items);
-
-        uasort($items, fn(array $a, array $b) => $a['sorting'] <=> $b['sorting']);
-
-        return $items;
+            return $data;
+        },
+            array_merge(
+                $items[GenderEnum::W->name] ?? [],
+                $items[GenderEnum::M->name] ?? [],
+                $items[GenderEnum::U->name] ?? []
+            ));
     }
 }
