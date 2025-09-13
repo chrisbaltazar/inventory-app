@@ -8,6 +8,7 @@ use App\DataFixtures\Factory\ItemFactory;
 use App\DataFixtures\Factory\LoanFactory;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Loan;
+use App\Enum\GenderEnum;
 use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
 use App\Tests\AbstractWebTestCase;
@@ -27,23 +28,36 @@ class LoanControllerTest extends AbstractWebTestCase
     {
         $user = UserFactory::admin();
         $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
-        $inventory = InventoryFactory::create();
-        $item = ItemFactory::create(RegionEnum::ACCESORIOS->value);
-        $item->addInventory($inventory);
+        $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value, name: 'Foo', gender: GenderEnum::M->name);;
+        $item1->addInventory(InventoryFactory::create());
+        $item1->addInventory(InventoryFactory::create());
+        $item2 = ItemFactory::create(RegionEnum::ACCESORIOS->value, name: 'Foo', gender: GenderEnum::W->name);;
+        $item2->addInventory(InventoryFactory::create());
+        $item3 = ItemFactory::create(RegionEnum::ACCESORIOS->value, name: 'Bar', gender: GenderEnum::U->name);;
+        $item3->addInventory(InventoryFactory::create());
 
         $this->entityManager->persist($user);
         $this->entityManager->persist($event);
-        $this->entityManager->persist($item);
+        $this->entityManager->persist($item1);
+        $this->entityManager->persist($item2);
+        $this->entityManager->persist($item3);
         $this->entityManager->flush();
 
-        $this->asUser($this->client, $user)->request(
+        $crawler = $this->asUser($this->client, $user)->request(
             'GET',
             '/loan/new/1/1?region=' . RegionEnum::ACCESORIOS->value
         );
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorCount(1, 'table.table tr');
-        $this->assertSelectorCount(2, 'table.table select option');
+        $this->assertSelectorCount(3, 'table.table tr');
+        $rows = $crawler->filter('table.table tr');
+
+        $this->assertStringContainsString(GenderEnum::W->value, $rows->eq(0)->text());
+        $this->assertCount(2, $rows->eq(0)->filter('select option'));
+        $this->assertStringContainsString(GenderEnum::M->value, $rows->eq(1)->text());
+        $this->assertCount(3, $rows->eq(1)->filter('select option'));
+        $this->assertStringContainsString(GenderEnum::U->value, $rows->eq(2)->text());
+        $this->assertCount(2, $rows->eq(2)->filter('select option'));
     }
 
     public function testStoreLoanOK(): void
