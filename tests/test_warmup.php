@@ -15,6 +15,14 @@ $application->setAutoExit(false);
 $fs = new Filesystem();
 $databasePath = $container->getParameter('kernel.project_dir') . '/var/data_test.db';
 if (!$fs->exists($databasePath)) {
+    // Drop database if exists
+    $application->run(new ArrayInput([
+        'command' => 'doctrine:database:drop',
+        '--env' => 'test',
+        '--force' => true,
+        '--if-exists' => true,
+    ]), new NullOutput());
+
     // Create database
     $application->run(new ArrayInput([
         'command' => 'doctrine:database:create',
