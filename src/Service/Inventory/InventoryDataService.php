@@ -66,15 +66,5 @@ class InventoryDataService
         }
 
         return $data;
-//        return array_map(function (array $data) {
-//            $data['genderName'] = GenderEnum::fromName($data['gender'])->value;
-//
-//            return $data;
-//        },
-//            array_merge(
-//                $items[GenderEnum::W->name] ?? [],
-//                $items[GenderEnum::M->name] ?? [],
-//                $items[GenderEnum::U->name] ?? []
-//            ));
     }
 }
