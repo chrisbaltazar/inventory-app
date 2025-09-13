@@ -26,6 +26,7 @@ class InventoryDataService
             $name = $inventoryItem->getItem()->getName();
             $gender = $inventoryItem->getItem()->getGender();
             $key = $this->formatKey($inventoryItem);
+            $gender = $inventoryItem->getItem()->getGender();
             $description = $this->formatItem($inventoryItem);
             $items[$gender][$name]['name'] = $name;
             $items[$gender][$name]['gender'] = $gender;
