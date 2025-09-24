@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Contract\SoftDeleteInterface;
 use App\Entity\Contract\UpdatedStampInterface;
+use App\Entity\Contract\UserAwareInterface;
 use App\Repository\SuitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SuitRepository::class)]
-class Suit implements UpdatedStampInterface, SoftDeleteInterface
+class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -41,7 +42,7 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface
     private ?User $deletedBy = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
@@ -124,7 +125,7 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

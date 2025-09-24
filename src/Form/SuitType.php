@@ -2,11 +2,11 @@
 
 namespace App\Form;
 
-use App\Entity\Item;
 use App\Entity\Suit;
-use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Enum\GenderEnum;
+use App\Enum\RegionEnum;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,26 +14,18 @@ class SuitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $regions = array_combine(RegionEnum::values(), RegionEnum::values());
+        asort($regions);
+        $genders = array_combine(GenderEnum::values(), GenderEnum::names());
+
         $builder
             ->add('name')
-            ->add('region')
-            ->add('gender')
-            ->add('updatedAt')
-            ->add('deletedAt')
-            ->add('updatedBy', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
+            ->add('region', ChoiceType::class, [
+                'choices' => $regions
             ])
-            ->add('deletedBy', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
-            ])
-            ->add('items', EntityType::class, [
-                'class' => Item::class,
-'choice_label' => 'id',
-'multiple' => true,
-            ])
-        ;
+            ->add('gender', ChoiceType::class, [
+                'choices' => $genders
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

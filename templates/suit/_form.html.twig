@@ -1,4 +1,23 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+{% embed 'partials/_form-wrapper.html.twig' %}
+
+    {% block form_fields %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.region, 'label': 'Región'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.gender, 'label': 'Género'} %}
+
+    {% endblock %}
+
+    {% block form_actions %}
+        <div class="d-flex justify-content-between mt-4">
+            <a class="btn btn-light" href="{{ path('app_suit_index') }}">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+            <button class="btn btn-success">
+                <i class="fa-solid fa-check"></i> Guardar
+            </button>
+        </div>
+    {% endblock %}
+
+{% endembed %}

@@ -10,15 +10,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/suit')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 class SuitController extends AbstractController
 {
     #[Route('/', name: 'app_suit_index', methods: ['GET'])]
-    public function index(SuitRepository $suitRepository): Response
+    public function index(SuitRepository $repository): Response
     {
         return $this->render('suit/index.html.twig', [
-            'suits' => $suitRepository->findAll(),
+            'suits' => $repository->findAll(),
         ]);
     }
 

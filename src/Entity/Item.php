@@ -41,10 +41,7 @@ class Item implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\OneToMany(targetEntity: Metadata::class, mappedBy: 'item')]
     private Collection $metadata;
 
-    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: [
-        'persist',
-        'remove',
-    ], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'item', cascade: ['persist', 'remove',], orphanRemoval: true)]
     #[Assert\Valid]
     #[Assert\Count(min: 1)]
     private Collection $inventory;
