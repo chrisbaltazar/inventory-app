@@ -1,9 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Suit{% endblock %}
+{% block title %}Traje {{ suit.name }}{% endblock %}
 
 {% block body %}
-    <h1>Suit</h1>
+    <div class="row">
+
+    </div>
+    <h1>Traje {{ suit.name }}</h1>
 
     <table class="table">
         <tbody>
@@ -12,7 +15,7 @@
                 <td>{{ suit.id }}</td>
             </tr>
             <tr>
-                <th>Name</th>
+                <th>Nombre</th>
                 <td>{{ suit.name }}</td>
             </tr>
             <tr>
@@ -24,19 +27,21 @@
                 <td>{{ suit.gender }}</td>
             </tr>
             <tr>
-                <th>UpdatedAt</th>
-                <td>{{ suit.updatedAt ? suit.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>DeletedAt</th>
-                <td>{{ suit.deletedAt ? suit.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Actualizado</th>
+                <td>{{ suit.updatedAt ? suit.updatedAt|date('Y-m-d H:i:s') : '' }} ({{ suit.updatedBy.name }})</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_suit_index') }}">back to list</a>
+    <div class="d-flex justify-content-between mt-4">
+        <a class="btn btn-light" href="{{ path('app_suit_index') }}">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+        </a>
 
-    <a href="{{ path('app_suit_edit', {'id': suit.id}) }}">edit</a>
+        {{ include('suit/_delete_form.html.twig') }}
 
-    {{ include('suit/_delete_form.html.twig') }}
+        <a class="btn btn-warning" href="{{ path('app_suit_edit', {'id': suit.id}) }}">
+            <i class="fa-solid fa-pencil"></i> Editar
+        </a>
+    </div>
 {% endblock %}

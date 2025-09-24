@@ -92,7 +92,7 @@ class SuitController extends AbstractController
     public function delete(Request $request, Suit $suit, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $suit->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($suit);
+            $suit->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
         }
 

@@ -41,8 +41,8 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\ManyToOne]
     private ?User $deletedBy = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
@@ -125,7 +125,7 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 
