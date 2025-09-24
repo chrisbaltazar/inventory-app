@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Trajes{% endblock %}
+
+{% block body %}
+    <div class="row px-1">
+        <h1>Lista de Trajes</h1>
+
+        <a type="button" class="btn btn-primary my-3" href="{{ path('app_suit_new') }}">
+            <i class="fa-regular fa-plus"></i> Nuevo traje
+        </a>
+
+        <table class="table table-striped table-hover table-dark js-datatable" id="suitTable">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Región</th>
+                <th>Nombre</th>
+                <th>Género</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for suit in suits %}
+                <tr>
+                    <td>{{ suit.id }}</td>
+                    <td>{{ suit.region }}</td>
+                    <td>{{ suit.name }}</td>
+                    <td>{{ suit.genderName }}</td>
+                    <td>
+                        <a class="float-end mx-1 btn btn-warning btn-sm"
+                           href="{{ path('app_suit_edit', {'id': suit.id}) }}">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <a class="float-end mx-1 btn btn-success btn-sm"
+                           href="{{ path('app_suit_edit', {'id': suit.id}) }}">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </a>
+                        <a class="float-end mx-1 btn btn-info btn-sm"
+                           href="{{ path('app_suit_show', {'id': suit.id}) }}">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
