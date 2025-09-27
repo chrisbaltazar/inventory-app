@@ -7,8 +7,10 @@ use App\Enum\GenderEnum;
 use App\Enum\RegionEnum;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class SuitType extends AbstractType
 {
@@ -21,10 +23,23 @@ class SuitType extends AbstractType
         $builder
             ->add('name')
             ->add('region', ChoiceType::class, [
-                'choices' => $regions
+                'choices' => $regions,
             ])
             ->add('gender', ChoiceType::class, [
-                'choices' => $genders
+                'choices' => $genders,
+            ])
+            ->add('file', FileType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2048k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                        ],
+                    ]),
+                ],
             ]);
     }
 
