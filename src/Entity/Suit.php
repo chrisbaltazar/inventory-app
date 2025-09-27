@@ -35,10 +35,10 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[Assert\Length(max: 1)]
     private ?string $gender = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $updatedBy = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $deletedBy = null;
 
     #[ORM\Column]
