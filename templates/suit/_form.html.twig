@@ -7,7 +7,21 @@
 
         {% include 'partials/_form-field.html.twig' with {'field': form.gender, 'label': 'Género'} %}
 
-        {% include 'partials/_form-field.html.twig' with {'field': form.file, 'label': 'Foto'} %}
+        {% set fileInputClass = 'd-block' %}
+        {% if form.vars.data.picture %}
+            {% set fileInputClass = 'd-none' %}
+            <div class="main-suit-picture-container w-auto">
+                <img src="{{ asset(form.vars.data.picture) }}" alt="{{ form.vars.data.name }}"
+                     class="img-fluid mb-3"/>
+                <div class="w-100 text-center">
+                    <button type="button" class="btn btn-danger mx-auto js-picture-remove">Quitar foto</button>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="file-input-wrapper {{ fileInputClass }}">
+            {% include 'partials/_form-field.html.twig' with {'field': form.file, 'label': 'Foto'} %}
+        </div>
 
     {% endblock %}
 
@@ -23,3 +37,24 @@
     {% endblock %}
 
 {% endembed %}
+
+<script>
+    document.addEventListener('turbo:load', () => {
+        document.querySelectorAll('.js-picture-remove').forEach(function (el) {
+            if (el.dataset.bound) {
+                return
+            }
+
+            el.addEventListener('click', () => {
+                document.querySelectorAll('.file-input-wrapper').forEach(w => {
+                    w.classList.remove('d-none')
+                    w.classList.add('d-block')
+                })
+
+                document.querySelectorAll('.main-suit-picture-container').forEach(c => c.remove())
+            })
+
+            el.dataset.bound = 'true'
+        })
+    })
+</script>

@@ -30,6 +30,7 @@ class SuitType extends AbstractType
             ])
             ->add('file', FileType::class, [
                 'mapped' => false,
+                'required' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '2048k',
