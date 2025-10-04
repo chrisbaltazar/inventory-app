@@ -26,5 +26,6 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Service\File\FileUploader:
         arguments:
+            $kernelProjectDir: '%kernel.project_dir%'
             $targetDirectory: '%uploads_dir%'
             $fileName: '@App\Service\File\FileNameSlugger'

@@ -22,6 +22,7 @@ class SuitFileUploaderResolver implements ValueResolverInterface
 
         return [
             new SuitFileUploader(
+                kernelProjectDir: $this->params->get('kernel.project_dir'),
                 targetDirectory: $this->params->get('suit_pictures_dir'),
                 fileName: new FileNameHash(),
             ),
