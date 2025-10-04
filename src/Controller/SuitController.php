@@ -10,6 +10,7 @@ use App\Service\File\SuitFileUploaderResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -119,8 +120,17 @@ class SuitController extends AbstractController
     }
 
     #[Route('/{id}/remove-picture', name: 'app_suit_remove_picture', methods: ['PATCH'])]
-    public function removePicture(Suit $suit, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function removePicture(
+        Suit $suit,
+        EntityManagerInterface $entityManager,
+        ParameterBagInterface $params,
+    ): JsonResponse {
+        $file = $suit->getPicture();
+        $filePath = sprintf('%s/public/%s', $params->get('kernel.project_dir'), $file);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
         $suit->setPicture(null);
         $entityManager->flush();
 
