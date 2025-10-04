@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Contract\SoftDeleteInterface;
 use App\Entity\Contract\UpdatedStampInterface;
 use App\Entity\Contract\UserAwareInterface;
+use App\Enum\GenderEnum;
 use App\Repository\SuitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -181,5 +182,10 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         $this->picture = $picture;
 
         return $this;
+    }
+
+    public function getGenderName(): ?string
+    {
+        return GenderEnum::fromName($this->getGender())?->value;
     }
 }

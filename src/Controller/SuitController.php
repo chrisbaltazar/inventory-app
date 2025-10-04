@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Suit;
+use App\Enum\GenderEnum;
 use App\Form\SuitType;
+use App\Repository\ItemRepository;
 use App\Repository\SuitRepository;
 use App\Service\File\SuitFileUploader;
 use App\Service\File\SuitFileUploaderResolver;
@@ -91,20 +93,15 @@ class SuitController extends AbstractController
     }
 
     #[Route('/{id}/manage', name: 'app_suit_manage', methods: ['GET', 'POST'])]
-    public function manage(Request $request, Suit $suit, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(SuitType::class, $suit);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('suit/edit.html.twig', [
+    public function manage(
+        Request $request,
+        Suit $suit,
+        ItemRepository $repository,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        return $this->render('suit/manage.html.twig', [
             'suit' => $suit,
-            'form' => $form,
+            'items' => $repository->findAllByGender(GenderEnum::fromName($suit->getGender())),
         ]);
     }
 

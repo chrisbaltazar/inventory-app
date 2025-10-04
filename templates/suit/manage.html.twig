@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestión de traje: {{ suit.name }}{% endblock %}
+
+{% block body %}
+    <div class="row text-center mb-3">
+        <h1>{{ suit.region }} - {{ suit.name }} ({{ suit.genderName }})</h1>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <img src="{{ asset(suit.picture) }}" alt="{{ suit.name }}" class="img-fluid mb-3"/>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="card text-bg-light mb-4 shadow rounded">
+                <div class="card-header">Selección de vestuario</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover table-striped">
+                            {% set region = null %}
+                            <tbody>
+                            {% for item in items %}
+                                {% if region != item.region %}
+                                    {% set region = item.region %}
+                                    <tr class="table-secondary text-center">
+                                        <td colspan="2"><strong>{{ region }}</strong></td>
+                                    </tr>
+                                {% endif %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td style="width: 100px">
+                                        ADD
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
