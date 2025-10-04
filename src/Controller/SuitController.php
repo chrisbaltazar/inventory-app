@@ -5,10 +5,15 @@ namespace App\Controller;
 use App\Entity\Suit;
 use App\Form\SuitType;
 use App\Repository\SuitRepository;
+use App\Service\File\SuitFileUploader;
+use App\Service\File\SuitFileUploaderResolver;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -25,13 +30,17 @@ class SuitController extends AbstractController
     }
 
     #[Route('/new', name: 'app_suit_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[ValueResolver(SuitFileUploaderResolver::class)] SuitFileUploader $uploader,
+    ): Response {
         $suit = new Suit();
         $form = $this->createForm(SuitType::class, $suit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handlePictureUpload($form, $suit, $uploader);
             $entityManager->persist($suit);
             $entityManager->flush();
 
@@ -53,12 +62,17 @@ class SuitController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_suit_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Suit $suit, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        Suit $suit,
+        EntityManagerInterface $entityManager,
+        #[ValueResolver(SuitFileUploaderResolver::class)] SuitFileUploader $uploader,
+    ): Response {
         $form = $this->createForm(SuitType::class, $suit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handlePictureUpload($form, $suit, $uploader);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
@@ -92,10 +106,27 @@ class SuitController extends AbstractController
     public function delete(Request $request, Suit $suit, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $suit->getId(), $request->request->get('_token'))) {
-            $suit->setDeletedAt(new \DateTimeImmutable());
+            $suit->setDeletedAt(new DateTimeImmutable());
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    private function handlePictureUpload(FormInterface $form, Suit $suit, SuitFileUploader $uploader): void
+    {
+        $file = $form->get('file')->getData();
+        if (!$file) {
+            $suit->setPicture(null);
+            return;
+        }
+
+        try {
+            $newFilename = $uploader->upload($file);
+            $suit->setPicture($newFilename);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to upload picture: ' . $e->getMessage());
+        }
+    }
+
 }
