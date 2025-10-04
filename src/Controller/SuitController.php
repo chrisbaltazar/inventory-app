@@ -11,6 +11,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
@@ -44,7 +45,9 @@ class SuitController extends AbstractController
             $entityManager->persist($suit);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Traje creado correctamente');
+
+            return $this->redirectToRoute('app_suit_edit', ['id' => $suit->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('suit/new.html.twig', [
@@ -75,7 +78,9 @@ class SuitController extends AbstractController
             $this->handlePictureUpload($form, $suit, $uploader);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Traje modificado correctamente');
+
+            return $this->redirectToRoute('app_suit_edit', ['id' => $suit->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('suit/edit.html.twig', [
@@ -113,11 +118,19 @@ class SuitController extends AbstractController
         return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/{id}/remove-picture', name: 'app_suit_remove_picture', methods: ['PATCH'])]
+    public function removePicture(Suit $suit, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $suit->setPicture(null);
+        $entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
     private function handlePictureUpload(FormInterface $form, Suit $suit, SuitFileUploader $uploader): void
     {
         $file = $form->get('file')->getData();
         if (!$file) {
-            $suit->setPicture(null);
             return;
         }
 
