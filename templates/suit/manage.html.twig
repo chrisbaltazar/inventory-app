@@ -35,13 +35,13 @@
                                                     <input type="radio" class="btn-check" name="item[{{ item.id }}]"
                                                            id="item_yes_{{ item.id }}"
                                                            value="1"
-                                                           autocomplete="off" {{ item.id is same as value ? 'checked' : '' }}>
+                                                           autocomplete="off" {{ item.id in selected ? 'checked' : '' }}>
                                                     <label class="btn btn-outline-primary"
                                                            for="item_yes_{{ item.id }}">SI</label>
                                                     <input type="radio" class="btn-check" name="item[{{ item.id }}]"
                                                            id="item_no_{{ item.id }}"
                                                            value="0"
-                                                           autocomplete="off" {{ value is empty or item.id is same as value ? 'checked' : '' }}>
+                                                           autocomplete="off" {{ item.id not in selected ? 'checked' : '' }}>
                                                     <label class="btn btn-outline-primary"
                                                            for="item_no_{{ item.id }}">NO</label>
                                                 </div>

@@ -117,6 +117,7 @@ class SuitController extends AbstractController
         return $this->render('suit/manage.html.twig', [
             'suit' => $suit,
             'items' => $items,
+            'selected' => array_map(fn($item) => $item->getId(), $suit->getItems()->toArray()),
         ]);
     }
 
