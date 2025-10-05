@@ -9,14 +9,15 @@
 
         {% if form.vars.data.picture %}
             {% do form.file.setRendered %}
-            <div class="main-suit-picture-container w-auto text-center">
+            <div class="main-suit-picture-container w-auto text-center mb-5">
                 <img src="{{ asset(form.vars.data.picture) }}" alt="{{ form.vars.data.name }}"
                        class="img-fluid mb-3"/>
                 <div class="w-100 text-center">
                     <button type="button"
                             data-endpoint="{{ path('app_suit_remove_picture', {'id': form.vars.data.id}) }}"
                             onclick="removePicture(this)"
-                            class="btn btn-danger mx-auto js-picture-remove">Quitar foto
+                            class="btn btn-warning mx-auto js-picture-remove">
+                        <i class="fas fa-camera"></i> Remover foto
                     </button>
                 </div>
             </div>
@@ -31,6 +32,7 @@
             <a class="btn btn-light" href="{{ path('app_suit_index') }}">
                 <i class="fa-solid fa-arrow-left"></i> Volver
             </a>
+
             <button class="btn btn-success">
                 <i class="fa-solid fa-check"></i> Guardar
             </button>

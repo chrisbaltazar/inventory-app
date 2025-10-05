@@ -1,6 +1,6 @@
 <form method="post" action="{{ path('app_suit_delete', {'id': suit.id}) }}" onsubmit="return confirm('Eliminar traje?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ suit.id) }}">
-    <button class="btn btn-danger">
+    <button class="btn btn-danger float-end">
         <i class="fa-solid fa-trash-can"></i> Eliminar
     </button>
 </form>

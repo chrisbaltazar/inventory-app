@@ -3,45 +3,42 @@
 {% block title %}Traje {{ suit.name }}{% endblock %}
 
 {% block body %}
-    <div class="row">
-
+    <div class="row mb-3">
+        <h1>TRAJE: {{ suit.region }} - {{ suit.name }} ({{ suit.genderName }})</h1>
     </div>
-    <h1>Traje {{ suit.name }}</h1>
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            {% if suit.picture %}
+                <div class="suit-picture-container w-auto text-center rounded shadow">
+                    <img src="{{ asset(suit.picture) }}" alt="{{ suit.name }}" class="img-fluid mb-3"/>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="card text-bg-dark mb-4 shadow rounded">
+                <div class="card-header">Piezas de vestuario</div>
+                <div class="card-body px-1">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <tbody>
+                            {% for item in suit.items %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ suit.id }}</td>
-            </tr>
-            <tr>
-                <th>Nombre</th>
-                <td>{{ suit.name }}</td>
-            </tr>
-            <tr>
-                <th>Region</th>
-                <td>{{ suit.region }}</td>
-            </tr>
-            <tr>
-                <th>Gender</th>
-                <td>{{ suit.gender }}</td>
-            </tr>
-            <tr>
-                <th>Actualizado</th>
-                <td>{{ suit.updatedAt ? suit.updatedAt|date('Y-m-d H:i:s') : '' }} ({{ suit.updatedBy.name }})</td>
-            </tr>
-        </tbody>
-    </table>
+        </div>
+    </div>
+
 
     <div class="d-flex justify-content-between mt-4">
         <a class="btn btn-light" href="{{ path('app_suit_index') }}">
             <i class="fa-solid fa-arrow-left"></i> Volver
-        </a>
-
-        {{ include('suit/_delete_form.html.twig') }}
-
-        <a class="btn btn-warning" href="{{ path('app_suit_edit', {'id': suit.id}) }}">
-            <i class="fa-solid fa-pencil"></i> Editar
         </a>
     </div>
 {% endblock %}

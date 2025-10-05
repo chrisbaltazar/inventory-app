@@ -8,15 +8,26 @@
     </div>
     <div class="row">
         <div class="col-sm-12 col-md-6">
-            <img src="{{ asset(suit.picture|default('img/image-placeholder.png')) }}" alt="{{ suit.name }}" class="img-fluid mb-3"/>
-            <a class="btn btn-light" href="{{ path('app_suit_index') }}">
-                <i class="fa-solid fa-arrow-left"></i> Volver
-            </a>
+            <div class="row">
+                <img src="{{ asset(suit.picture|default('img/image-placeholder.png')) }}" alt="{{ suit.name }}"
+                     class="img-fluid mb-3"/>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-light" href="{{ path('app_suit_index') }}">
+                        <i class="fa-solid fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+                <div class="col">
+                    {{ include('suit/_delete_form.html.twig') }}
+                </div>
+            </div>
+
         </div>
         <div class="col-sm-12 col-md-6">
             <div class="card text-bg-light mb-4 shadow rounded">
                 <div class="card-header">Selección de vestuario</div>
-                <div class="card-body">
+                <div class="card-body px-1">
                     <form method="POST" action="{{ path('app_suit_manage', {'id': suit.id} ) }}">
                         <div class="table-responsive">
                             <table class="table table-sm table-hover table-striped">
