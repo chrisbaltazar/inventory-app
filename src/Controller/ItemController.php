@@ -78,6 +78,7 @@ class ItemController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$item->getId(), $request->request->get('_token'))) {
             $item->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
+            $this->addFlash('success', 'Pieza borrada correctamente');
         }
 
         return $this->redirectToRoute('app_item_index', [], Response::HTTP_SEE_OTHER);

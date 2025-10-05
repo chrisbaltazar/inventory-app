@@ -13,7 +13,7 @@ $application = new Application($kernel);
 $application->setAutoExit(false);
 
 $fs = new Filesystem();
-$databasePath = $container->getParameter('kernel.project_dir') . '/var/data_test.db';
+$databasePath = $container->getParameter('kernel.project_dir') . '/var/test.db';
 if (!$fs->exists($databasePath)) {
     // Drop database if exists
     $application->run(new ArrayInput([

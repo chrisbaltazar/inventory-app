@@ -96,6 +96,7 @@ class UserController extends AbstractController
         if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
             $user->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
+            $this->addFlash('success', 'Usuario borrado correctamente');
         }
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);

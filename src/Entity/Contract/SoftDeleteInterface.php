@@ -6,5 +6,5 @@ interface SoftDeleteInterface
 {
     public function setDeletedAt(\DateTimeImmutable $deletedAt);
 
-    public function getDeletedAt(): ?\DateTimeImmutable;
+    public function getDeletedAt(): ?\DateTimeInterface;
 }

@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestión de traje: {{ suit.name }}{% endblock %}
+
+{% block body %}
+    <div class="row text-center mb-3">
+        <h1>{{ suit.region }} - {{ suit.name }} ({{ suit.genderName }})</h1>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="row">
+                <img src="{{ asset(suit.picture|default('img/image-placeholder.png')) }}" alt="{{ suit.name }}"
+                     class="img-fluid mb-3"/>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-light" href="{{ path('app_suit_index') }}">
+                        <i class="fa-solid fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+                <div class="col">
+                    {{ include('suit/_delete_form.html.twig') }}
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="card text-bg-light mb-4 shadow rounded">
+                <div class="card-header">Selección de vestuario</div>
+                <div class="card-body px-1">
+                    <form method="POST" action="{{ path('app_suit_manage', {'id': suit.id} ) }}">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover table-striped">
+                                <tbody>
+                                {% for region,items in items %}
+                                    <tr class="table-secondary text-center">
+                                        <td colspan="2"><strong>{{ region }}</strong></td>
+                                    </tr>
+                                    {% for item in items %}
+                                        <tr>
+                                            <td>{{ item.name }}</td>
+                                            <td style="width: 100px">
+                                                <div class="btn-group mb-2" role="group">
+                                                    <input type="radio" class="btn-check" name="item[{{ item.id }}]"
+                                                           id="item_yes_{{ item.id }}"
+                                                           value="1"
+                                                           autocomplete="off" {{ item.id in selected ? 'checked' : '' }}>
+                                                    <label class="btn btn-outline-primary"
+                                                           for="item_yes_{{ item.id }}">SI</label>
+                                                    <input type="radio" class="btn-check" name="item[{{ item.id }}]"
+                                                           id="item_no_{{ item.id }}"
+                                                           value="0"
+                                                           autocomplete="off" {{ item.id not in selected ? 'checked' : '' }}>
+                                                    <label class="btn btn-outline-primary"
+                                                           for="item_no_{{ item.id }}">NO</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-check"></i> Guardar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
