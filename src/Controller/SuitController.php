@@ -127,6 +127,7 @@ class SuitController extends AbstractController
         if ($this->isCsrfTokenValid('delete' . $suit->getId(), $request->request->get('_token'))) {
             $suit->setDeletedAt(new DateTimeImmutable());
             $entityManager->flush();
+            $this->addFlash('success', 'Traje borrado correctamente');
         }
 
         return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);

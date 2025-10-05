@@ -79,6 +79,7 @@ class EventController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
             $event->setDeletedAt(new \DateTimeImmutable());
             $entityManager->flush();
+            $this->addFlash('success', 'Evento borrado correctamente');
         }
 
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
