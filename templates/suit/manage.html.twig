@@ -8,31 +8,54 @@
     </div>
     <div class="row">
         <div class="col-sm-12 col-md-6">
+            {% if suit.picture %}
             <img src="{{ asset(suit.picture) }}" alt="{{ suit.name }}" class="img-fluid mb-3"/>
+            {% endif %}
+            <a class="btn btn-light" href="{{ path('app_suit_index') }}">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
         </div>
         <div class="col-sm-12 col-md-6">
             <div class="card text-bg-light mb-4 shadow rounded">
                 <div class="card-header">Selección de vestuario</div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover table-striped">
-                            <tbody>
-                            {% for region,items in items %}
-                                <tr class="table-secondary text-center">
-                                    <td colspan="2"><strong>{{ region }}</strong></td>
-                                </tr>
-                                {% for item in items %}
-                                    <tr>
-                                        <td>{{ item.name }}</td>
-                                        <td style="width: 100px">
-                                            ADD
-                                        </td>
+                    <form method="POST" action="{{ path('app_suit_manage', {'id': suit.id} ) }}">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover table-striped">
+                                <tbody>
+                                {% for region,items in items %}
+                                    <tr class="table-secondary text-center">
+                                        <td colspan="2"><strong>{{ region }}</strong></td>
                                     </tr>
+                                    {% for item in items %}
+                                        <tr>
+                                            <td>{{ item.name }}</td>
+                                            <td style="width: 100px">
+                                                <div class="btn-group mb-2" role="group">
+                                                    <input type="radio" class="btn-check" name="item[{{ item.id }}]"
+                                                           id="item_yes_{{ item.id }}"
+                                                           value="1"
+                                                           autocomplete="off" {{ item.id is same as value ? 'checked' : '' }}>
+                                                    <label class="btn btn-outline-primary"
+                                                           for="item_yes_{{ item.id }}">SI</label>
+                                                    <input type="radio" class="btn-check" name="item[{{ item.id }}]"
+                                                           id="item_no_{{ item.id }}"
+                                                           value="0"
+                                                           autocomplete="off" {{ value is empty or item.id is same as value ? 'checked' : '' }}>
+                                                    <label class="btn btn-outline-primary"
+                                                           for="item_no_{{ item.id }}">NO</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-check"></i> Guardar
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

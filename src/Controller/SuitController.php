@@ -163,11 +163,9 @@ class SuitController extends AbstractController
             $items[$item->getRegion()][] = $item;
         }
 
-        $regionItems = $items[$region];
+        $regionItems = $items[$region] ?? [];
         unset($items[$region]);
 
         return array_merge([$region => $regionItems], $items);
     }
-
-
 }

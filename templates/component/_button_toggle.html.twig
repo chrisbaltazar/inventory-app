@@ -1,0 +1,10 @@
+<div class="mb-2"><label>{{ label }}</label></div>
+<div class="btn-group mb-2" role="group">
+    {% for key,choice in options %}
+        {% set id = id ~ '_' ~ key %}
+        <input type="radio" class="btn-check" name="{{ name }}" id="{{ id }}"
+               value="{{ choice.value }}"
+               autocomplete="off" {{ choice.value is same as value ? 'checked' : '' }}>
+        <label class="btn btn-outline-primary" for="{{ id }}">{{ choice.label }}</label>
+    {% endfor %}
+</div>
