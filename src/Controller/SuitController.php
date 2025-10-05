@@ -62,7 +62,7 @@ class SuitController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_suit_show', methods: ['GET'])]
+    #[Route('/{id<\d+>}', name: 'app_suit_show', methods: ['GET'])]
     public function show(Suit $suit): Response
     {
         return $this->render('suit/show.html.twig', [
@@ -154,6 +154,14 @@ class SuitController extends AbstractController
         $entityManager->flush();
 
         return $this->json(['success' => true]);
+    }
+
+    #[Route('/list', name: 'app_suit_list', methods: ['GET'])]
+    public function list(SuitRepository $repository): Response
+    {
+        return $this->render('suit/list.html.twig', [
+            'suits' => $repository->findAll(),
+        ]);
     }
 
     private function handlePictureUpload(FormInterface $form, Suit $suit, SuitFileUploader $uploader): void
