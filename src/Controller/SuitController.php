@@ -26,6 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class SuitController extends AbstractController
 {
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/', name: 'app_suit_index', methods: ['GET'])]
     public function index(SuitRepository $repository): Response
     {
@@ -34,6 +35,7 @@ class SuitController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_suit_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
@@ -68,6 +70,7 @@ class SuitController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/edit', name: 'app_suit_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
@@ -121,6 +124,7 @@ class SuitController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_suit_delete', methods: ['POST'])]
     public function delete(Request $request, Suit $suit, EntityManagerInterface $entityManager): Response
     {
@@ -133,6 +137,7 @@ class SuitController extends AbstractController
         return $this->redirectToRoute('app_suit_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/remove-picture', name: 'app_suit_remove_picture', methods: ['PATCH'])]
     public function removePicture(
         Suit $suit,
