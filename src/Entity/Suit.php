@@ -172,6 +172,13 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
         return $this;
     }
 
+    public function setItems(array $items): static
+    {
+        $this->items = new ArrayCollection($items);
+
+        return $this;
+    }
+
     public function getPicture(): ?string
     {
         return $this->picture;
