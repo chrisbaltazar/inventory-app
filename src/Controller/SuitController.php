@@ -26,10 +26,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class SuitController extends AbstractController
 {
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/', name: 'app_suit_index', methods: ['GET'])]
     public function index(SuitRepository $repository): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_suit_list');
+        }
+
         return $this->render('suit/index.html.twig', [
             'suits' => $repository->findAll(),
         ]);
