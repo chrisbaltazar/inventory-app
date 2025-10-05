@@ -22,13 +22,11 @@ final class Version20250927095327 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE suit ADD picture VARCHAR(255) DEFAULT NULL');
         $this->addSql('ALTER TABLE suit ADD CONSTRAINT FK_E9A31F1E896DBBDE FOREIGN KEY (updated_by_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE user RENAME INDEX fk_8d93d649896dbbde TO IDX_8D93D649896DBBDE');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE user RENAME INDEX idx_8d93d649896dbbde TO FK_8D93D649896DBBDE');
         $this->addSql('ALTER TABLE suit DROP FOREIGN KEY FK_E9A31F1E896DBBDE');
         $this->addSql('ALTER TABLE suit DROP picture');
     }
