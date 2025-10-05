@@ -100,9 +100,6 @@ class SuitController extends AbstractController
         ItemRepository $repository,
         EntityManagerInterface $entityManager,
     ): Response {
-        $items = $repository->findAllByGender(GenderEnum::fromName($suit->getGender()));
-        $items = $this->arrangeItemsByRegion($items, $suit->getRegion());
-
         if ($request->isMethod('POST')) {
             $items = array_filter($request->get('item', []));
             $items = array_map(fn($itemId) => $repository->find($itemId), array_keys($items));
@@ -113,6 +110,9 @@ class SuitController extends AbstractController
 
             return $this->redirectToRoute('app_suit_manage', ['id' => $suit->getId()], Response::HTTP_SEE_OTHER);
         }
+
+        $items = $repository->findAllByGender(GenderEnum::fromName($suit->getGender()));
+        $items = $this->arrangeItemsByRegion($items, $suit->getRegion());
 
         return $this->render('suit/manage.html.twig', [
             'suit' => $suit,
