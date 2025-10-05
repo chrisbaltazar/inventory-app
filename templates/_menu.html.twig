@@ -15,6 +15,12 @@
                         Inicio
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ route starts with 'app_suit' ? 'active':'' }}" aria-current="page"
+                       href="{{ path('app_suit_index') }}">
+                        Trajes
+                    </a>
+                </li>
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="nav-item">
                         <a class="nav-link {{ route starts with 'app_user' ? 'active':'' }}" aria-current="page"
@@ -26,12 +32,6 @@
                         <a class="nav-link {{ route starts with 'app_event' ? 'active':'' }}" aria-current="page"
                            href="{{ path('app_event_index') }}">
                             Eventos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ route starts with 'app_suit' ? 'active':'' }}" aria-current="page"
-                           href="{{ path('app_suit_index') }}">
-                            Trajes
                         </a>
                     </li>
                     <li class="nav-item">
