@@ -9,7 +9,7 @@
 
         {% if form.vars.data.picture %}
             {% do form.file.setRendered %}
-            <div class="main-suit-picture-container w-auto">
+            <div class="main-suit-picture-container w-auto text-center">
                 <img src="{{ asset(form.vars.data.picture) }}" alt="{{ form.vars.data.name }}"
                        class="img-fluid mb-3"/>
                 <div class="w-100 text-center">

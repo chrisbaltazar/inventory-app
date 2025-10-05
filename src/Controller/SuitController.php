@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Item;
 use App\Entity\Suit;
 use App\Enum\GenderEnum;
 use App\Form\SuitType;
@@ -99,9 +100,12 @@ class SuitController extends AbstractController
         ItemRepository $repository,
         EntityManagerInterface $entityManager,
     ): Response {
+        $items = $repository->findAllByGender(GenderEnum::fromName($suit->getGender()));
+        $items = $this->arrangeItemsByRegion($items, $suit->getRegion());
+
         return $this->render('suit/manage.html.twig', [
             'suit' => $suit,
-            'items' => $repository->findAllByGender(GenderEnum::fromName($suit->getGender())),
+            'items' => $items,
         ]);
     }
 
@@ -148,5 +152,22 @@ class SuitController extends AbstractController
             throw new \RuntimeException('Failed to upload picture: ' . $e->getMessage());
         }
     }
+
+    /**
+     * @param Item[] $allItems
+     */
+    private function arrangeItemsByRegion(array $allItems, string $region): array
+    {
+        $items = [];
+        foreach ($allItems as $item) {
+            $items[$item->getRegion()][] = $item;
+        }
+
+        $regionItems = $items[$region];
+        unset($items[$region]);
+
+        return array_merge([$region => $regionItems], $items);
+    }
+
 
 }

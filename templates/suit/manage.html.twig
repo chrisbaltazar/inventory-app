@@ -16,21 +16,19 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-sm table-hover table-striped">
-                            {% set region = null %}
                             <tbody>
-                            {% for item in items %}
-                                {% if region != item.region %}
-                                    {% set region = item.region %}
-                                    <tr class="table-secondary text-center">
-                                        <td colspan="2"><strong>{{ region }}</strong></td>
-                                    </tr>
-                                {% endif %}
-                                <tr>
-                                    <td>{{ item.name }}</td>
-                                    <td style="width: 100px">
-                                        ADD
-                                    </td>
+                            {% for region,items in items %}
+                                <tr class="table-secondary text-center">
+                                    <td colspan="2"><strong>{{ region }}</strong></td>
                                 </tr>
+                                {% for item in items %}
+                                    <tr>
+                                        <td>{{ item.name }}</td>
+                                        <td style="width: 100px">
+                                            ADD
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
                             </tbody>
                         </table>
