@@ -62,6 +62,12 @@ php bin/console doctrine:migrations:migrate
 symfony serve
 ```
 
+#### 7. Testing 
+Run the tests with:
+```php 
+php bin/phpunit
+```
+
 The app will be available at: http://localhost:8000
 
 ## 🔑 Default Users (Demo Data)
@@ -75,4 +81,5 @@ This will create:
 Admin – admin@test.com / 123456 
 User – user@test.com / 123456
 ```
+
 ### _Docker installation WIP_

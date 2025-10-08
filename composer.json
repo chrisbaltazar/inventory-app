@@ -83,6 +83,14 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "migrate": "php bin/console doctrine:migrations:migrate --no-interaction",
+        "assets": "php bin/console asset-map:compile",
+        "cache": "php bin/console cache:clear",
+        "build": [
+            "@migrate",
+            "@assets",
+            "@cache"
         ]
     },
     "conflict": {
