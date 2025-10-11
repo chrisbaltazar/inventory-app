@@ -1,28 +1,50 @@
-{%  extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Lista de trajes{% endblock %}
 
 {% block body %}
-<div class="row">
-    <div class="card text-bg-dark mb-4 shadow rounded">
-        <div class="card-header">Lista de trajes</div>
-        <div class="card-body px-0">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <tbody>
-                    {% for suit in suits %}
-                    <tr>
-                        <td>
-                            <a href="{{ path('app_suit_show', {'id': suit.id}) }}">
-                                {{ suit.region }} - {{ suit.name }} ({{ suit.genderName }})
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <div class="row">
+        <h1 class="mb-3">Catálogo de trajes</h1>
+
+        {% for suit in suits %}
+            <div class="col-12 col-md-4 suit-container mb-3">
+                <a href="{{ path('app_suit_show', {id: suit.id}) }}">
+                    <div class="card text-bg-light shadow rounded h-100">
+                        <img src="{{ asset(suit.picture|default('img/image-placeholder.png')) }}"
+                             class="suit-thumbnail card-img-top " alt="{{ suit.name }}">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ suit.region }} {{ suit.name }}</h5>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
+        {% endfor %}
     </div>
-</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .suit-container {
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        .suit-container:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        .suit-container .suit-thumbnail {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .suit-container a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
 {% endblock %}

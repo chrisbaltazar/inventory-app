@@ -55,6 +55,10 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $picture = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
+    private ?string $note = null;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -195,5 +199,17 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     public function getGenderName(): ?string
     {
         return GenderEnum::fromName($this->getGender())?->value;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): static
+    {
+        $this->note = $note;
+
+        return $this;
     }
 }

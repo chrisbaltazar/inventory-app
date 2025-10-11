@@ -27,7 +27,7 @@ class FileUploader
         return $this->targetDirectory;
     }
 
-    private function buildFilePath(string $fileName): string
+    protected function buildFilePath(string $fileName): string
     {
         $cleanPath = [$this->kernelProjectDir, 'public'];
         $filePath = sprintf('%s/%s', $this->targetDirectory, $fileName);

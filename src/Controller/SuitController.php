@@ -9,7 +9,6 @@ use App\Form\SuitType;
 use App\Repository\ItemRepository;
 use App\Repository\SuitRepository;
 use App\Service\File\SuitFileUploader;
-use App\Service\File\SuitFileUploaderResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,7 +42,7 @@ class SuitController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        #[ValueResolver(SuitFileUploaderResolver::class)] SuitFileUploader $uploader,
+        SuitFileUploader $uploader,
     ): Response {
         $suit = new Suit();
         $form = $this->createForm(SuitType::class, $suit);
@@ -79,7 +78,7 @@ class SuitController extends AbstractController
         Request $request,
         Suit $suit,
         EntityManagerInterface $entityManager,
-        #[ValueResolver(SuitFileUploaderResolver::class)] SuitFileUploader $uploader,
+        SuitFileUploader $uploader,
     ): Response {
         $form = $this->createForm(SuitType::class, $suit);
         $form->handleRequest($request);
@@ -99,6 +98,7 @@ class SuitController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/manage', name: 'app_suit_manage', methods: ['GET', 'POST'])]
     public function manage(
         Request $request,
@@ -110,6 +110,7 @@ class SuitController extends AbstractController
             $items = array_filter($request->get('item', []));
             $items = array_map(fn($itemId) => $repository->find($itemId), array_keys($items));
             $suit->setItems($items);
+            $suit->setNote($request->get('note'));
             $entityManager->flush();
 
             $this->addFlash('success', 'Vestuario asignado correctamente');

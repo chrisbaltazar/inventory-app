@@ -12,7 +12,7 @@
                 <img src="{{ asset(suit.picture|default('img/image-placeholder.png')) }}" alt="{{ suit.name }}"
                      class="img-fluid mb-3"/>
             </div>
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col">
                     <a class="btn btn-light" href="{{ path('app_suit_index') }}">
                         <i class="fa-solid fa-arrow-left"></i> Volver
@@ -58,6 +58,14 @@
                                         </tr>
                                     {% endfor %}
                                 {% endfor %}
+                                <tr class="table-warning text-center">
+                                    <td colspan="2"><strong>Nota adicional</strong></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <textarea class="form-control" rows="4" placeholder="Nota" name="note">{{ suit.note }}</textarea>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
