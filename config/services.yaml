@@ -29,3 +29,9 @@ services:
             $kernelProjectDir: '%kernel.project_dir%'
             $targetDirectory: '%uploads_dir%'
             $fileName: '@App\Service\File\FileNameSlugger'
+
+    App\Service\File\SuitFileUploader:
+      arguments:
+        $kernelProjectDir: '%kernel.project_dir%'
+        $targetDirectory: '%suit_pictures_dir%'
+        $fileName: '@App\Service\File\FileNameHash'

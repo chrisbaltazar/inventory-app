@@ -9,7 +9,6 @@ use App\Form\SuitType;
 use App\Repository\ItemRepository;
 use App\Repository\SuitRepository;
 use App\Service\File\SuitFileUploader;
-use App\Service\File\SuitFileUploaderResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,7 +42,7 @@ class SuitController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        #[ValueResolver(SuitFileUploaderResolver::class)] SuitFileUploader $uploader,
+        SuitFileUploader $uploader,
     ): Response {
         $suit = new Suit();
         $form = $this->createForm(SuitType::class, $suit);
@@ -79,7 +78,7 @@ class SuitController extends AbstractController
         Request $request,
         Suit $suit,
         EntityManagerInterface $entityManager,
-        #[ValueResolver(SuitFileUploaderResolver::class)] SuitFileUploader $uploader,
+        SuitFileUploader $uploader,
     ): Response {
         $form = $this->createForm(SuitType::class, $suit);
         $form->handleRequest($request);
