@@ -7,8 +7,10 @@ use App\Form\UserPasswordType;
 use App\Form\UserProfileType;
 use App\Service\User\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -20,9 +22,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UserProfileController extends AbstractController
 {
     #[Route('/profile', name: 'app_user_profile', methods: ['GET', 'POST'])]
-    public function index(Request $request): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserProfileType::class);
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->getUserForm($user);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $form->handleRequest($request);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Perfil actualizado correctamente');
+
+            return $this->redirectToRoute('app_user_profile', [], Response::HTTP_SEE_OTHER);
+        }
 
         return $this->render('user_profile/index.html.twig', [
             'user' => $this->getUser(),
@@ -53,7 +66,7 @@ class UserProfileController extends AbstractController
                 $this->addFlash('success', 'Password actualizado correctamente');
 
                 return $this->redirectToRoute($routeBack, [], Response::HTTP_SEE_OTHER);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -72,4 +85,18 @@ class UserProfileController extends AbstractController
             throw new AccessDeniedHttpException();
         }
     }
+
+    private function getUserForm(User $user): FormInterface
+    {
+        $form = $this->createForm(UserProfileType::class, $user);
+        $form->get('name')->setData($user->getName());
+        $form->get('email')->setData($user->getEmail());
+        $form->get('fullName')->setData($user->getFullName());
+        $form->get('officialId')->setData($user->getOfficialId());
+        $form->get('phone')->setData($user->getPhone());
+        $form->get('birthday')->setData($user->getBirthday());
+
+        return $form;
+    }
+
 }
