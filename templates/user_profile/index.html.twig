@@ -3,26 +3,10 @@
 {% block title %}Mi perfil{% endblock %}
 
 {% block body %}
-
     <div class="row">
         <h1 class="mb-3">Perfil personal</h1>
 
-        <table class="table">
-            <tbody>
-            <tr>
-                <th>Nombre</th>
-                <td>{{ user.name }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ user.email }}</td>
-            </tr>
-            <tr>
-                <th>Teléfono</th>
-                <td>{{ user.phone }}</td>
-            </tr>
-            </tbody>
-        </table>
+        {{ include('user_profile/_form.html.twig') }}
     </div>
 
 {% endblock %}

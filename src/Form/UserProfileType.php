@@ -28,7 +28,6 @@ class UserProfileType extends AbstractType
             ->add('phone', TelType::class, [
                 'required' => false,
                 'empty_data' => null,
-                'regexp' => '/^\+?[\d]{11,12}/',
             ])
             ->add('birthday', DateType::class, [
                 'widget' => 'single_text',

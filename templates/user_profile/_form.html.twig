@@ -1,0 +1,21 @@
+{% embed 'partials/_form-wrapper.html.twig' %}
+
+    {% block form_fields %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.email.first, 'label': 'Email'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.email.second, 'label': 'Confirma email'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nickname (nombre corto)'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.fullName, 'label': 'Nombre completo'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.officialId, 'label': 'No. documento (dni, nie, pasaporte)'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.birthday, 'label': 'Fecha de nacimiento'} %}
+
+    {% endblock %}
+
+{% endembed %}

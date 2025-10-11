@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserPasswordType;
+use App\Form\UserProfileType;
 use App\Service\User\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +19,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class UserProfileController extends AbstractController
 {
-    #[Route('/profile', name: 'app_user_profile')]
-    public function index(): Response
+    #[Route('/profile', name: 'app_user_profile', methods: ['GET', 'POST'])]
+    public function index(Request $request): Response
     {
+        $form = $this->createForm(UserProfileType::class);
+
         return $this->render('user_profile/index.html.twig', [
             'user' => $this->getUser(),
+            'form' => $form,
         ]);
     }
 
@@ -31,7 +35,7 @@ class UserProfileController extends AbstractController
         Request $request,
         User $user,
         EntityManagerInterface $entityManager,
-        UserPasswordService $userPassword
+        UserPasswordService $userPassword,
     ): Response {
         $this->validateAccess($user);
 

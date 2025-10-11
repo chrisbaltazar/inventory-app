@@ -40,6 +40,7 @@ class User implements
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Assert\Length(min: 9, max: 20)]
+    #[Assert\Regex(pattern: '/^\+?[\d]{11,12}/')]
     private ?string $phone = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
