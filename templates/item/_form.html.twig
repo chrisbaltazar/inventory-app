@@ -18,7 +18,7 @@
             <table class="table table-sm" id="tableInventory">
                 {% for row in form.inventory %}
                     <tr>
-                        <td style="width: 150px">
+                        <td style="max-width: 100px">
                             {% include 'partials/_form-field.html.twig' with {'field': row.quantity, 'label': 'Total'} %}
                         </td>
                         <td>
