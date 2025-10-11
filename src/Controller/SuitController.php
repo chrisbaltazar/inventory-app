@@ -98,6 +98,7 @@ class SuitController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/manage', name: 'app_suit_manage', methods: ['GET', 'POST'])]
     public function manage(
         Request $request,
