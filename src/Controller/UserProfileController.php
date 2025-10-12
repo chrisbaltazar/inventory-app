@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserPasswordType;
 use App\Form\UserProfileType;
+use App\Repository\UserRepository;
 use App\Service\User\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -22,16 +23,24 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UserProfileController extends AbstractController
 {
     #[Route('/profile', name: 'app_user_profile', methods: ['GET', 'POST'])]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, EntityManagerInterface $entityManager, UserRepository $repository): Response
     {
         /** @var User $user */
         $user = $this->getUser();
         $form = $this->createForm(UserProfileType::class, $user);
         $form->handleRequest($request);
 
+        try {
+            $this->validateUserData($form, $user, $repository);
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->redirectToRoute('app_user_profile');
+        }
+
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             $this->addFlash('success', 'Perfil actualizado correctamente');
 
             return $this->redirectToRoute('app_user_profile', [], Response::HTTP_SEE_OTHER);
@@ -86,17 +95,14 @@ class UserProfileController extends AbstractController
         }
     }
 
-    private function getUserForm(User $user): FormInterface
+    private function validateUserData(FormInterface $form, User $user, UserRepository $repository): void
     {
-        $form = $this->createForm(UserProfileType::class, $user);
-//        $form->get('name')->setData($user->getName());
-//        $form->get('email')->setData($user->getEmail());
-//        $form->get('fullName')->setData($user->getFullName());
-//        $form->get('officialId')->setData($user->getOfficialId());
-//        $form->get('phone')->setData($user->getPhone());
-//        $form->get('birthday')->setData($user->getBirthday());
-
-        return $form;
+        $email = $form->get('email')->getData();
+        $existingUser = $repository->findOneBy(['email' => $email]);
+        if ($existingUser && $existingUser->getId() !== $user->getId()) {
+            throw new \UnexpectedValueException('The email is already in use by another user');
+        }
     }
+
 
 }
