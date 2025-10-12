@@ -2,11 +2,9 @@
 
     {% block form_fields %}
 
-        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre'} %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nombre (alias)'} %}
 
         {% include 'partials/_form-field.html.twig' with {'field': form.email, 'label': 'Email'} %}
-
-        {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono'} %}
 
         {% if form.plainPassword %}
             <div class="user-pwd">
