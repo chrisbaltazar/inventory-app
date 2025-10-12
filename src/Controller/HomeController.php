@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\User\UserHomeDataInterface;
 use App\Service\User\UserHomeDataResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +17,10 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home_index')]
     public function index(#[ValueResolver(UserHomeDataResolver::class)] ?UserHomeDataInterface $dataService): Response
     {
+        if (!$this->getUser()->isProfileComplete()) {
+            return $this->redirectToRoute('app_user_profile');
+        }
+
         return $this->render('home/index.html.twig', [... $dataService?->getData()]);
     }
 }

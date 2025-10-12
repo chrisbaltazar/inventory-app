@@ -49,7 +49,11 @@ class UserProfileController extends AbstractController
             $entityManager->flush();
             $this->addFlash('success', 'Perfil actualizado correctamente');
 
-            return $this->redirectToRoute('app_user_profile', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute(
+                $user->isAdmin() ? 'app_user_profile' : 'app_home_index',
+                [],
+                Response::HTTP_SEE_OTHER,
+            );
         }
 
         return $this->render('user_profile/index.html.twig', [
