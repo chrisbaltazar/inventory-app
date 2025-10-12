@@ -50,7 +50,7 @@ class UserProfileController extends AbstractController
             $this->addFlash('success', 'Perfil actualizado correctamente');
 
             return $this->redirectToRoute(
-                $user->isAdmin() ? 'app_user_profile' : 'app_home_index',
+                'app_home_index',
                 [],
                 Response::HTTP_SEE_OTHER,
             );
