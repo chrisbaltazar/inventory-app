@@ -24,14 +24,9 @@ class UserProfileType extends AbstractType
             ])
             ->add('fullName', TextType::class)
             ->add('officialId', TextType::class)
-            ->add('phone', TelType::class, [
-                'required' => false,
-                'empty_data' => null,
-            ])
+            ->add('phone', TelType::class)
             ->add('birthday', DateType::class, [
                 'widget' => 'single_text',
-                'required' => false,
-                'empty_data' => null,
             ]);
     }
 
