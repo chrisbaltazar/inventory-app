@@ -8,6 +8,7 @@ use App\Entity\Contract\UserAwareInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -38,7 +39,7 @@ class User implements
     private ?string $name = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Length(min: 9, max: 20)]
+    #[Assert\Regex(pattern: '/^\+?[\d]{11,12}/')]
     private ?string $phone = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
@@ -52,6 +53,17 @@ class User implements
 
     #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $loans;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
+    private ?string $fullName = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $birthday = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(max: 50)]
+    private ?string $officialId = null;
 
     public function __construct()
     {
@@ -221,5 +233,62 @@ class User implements
     public function isAdmin(): bool
     {
         return in_array('ROLE_ADMIN', $this->getRoles());
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(?string $fullName): static
+    {
+        $this->fullName = $fullName;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?\DateTime
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(?\DateTime $birthday): static
+    {
+        $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    public function getOfficialId(): ?string
+    {
+        return $this->officialId;
+    }
+
+    public function setOfficialId(?string $officialId): static
+    {
+        $this->officialId = $officialId;
+
+        return $this;
+    }
+
+    public function isProfileComplete(): bool
+    {
+        foreach ($this->getRequiredData() as $field) {
+            if (empty($field)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function getRequiredData(): array
+    {
+        return [
+            $this->getFullName(),
+            $this->getPhone(),
+            $this->getBirthday(),
+            $this->getOfficialId(),
+        ];
     }
 }

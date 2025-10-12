@@ -87,6 +87,7 @@
         "migrate": "php bin/console doctrine:migrations:migrate --no-interaction",
         "assets": "php bin/console asset-map:compile",
         "cache": "php bin/console cache:clear",
+        "test": "php bin/console c:c -e test && php bin/phpunit",
         "build": [
             "@migrate",
             "@assets",

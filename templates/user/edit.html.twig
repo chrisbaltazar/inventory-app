@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar {{ user.name }}{% endblock %}
+{% block title %}Usuario {{ user.name }}{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -25,7 +25,7 @@
 {% block body %}
 
     <div class="row">
-        <h1>Editar usuario</h1>
+        <h1>Editar Usuario</h1>
 
         {% embed 'user/_form.html.twig' %}
 

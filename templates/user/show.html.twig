@@ -14,8 +14,12 @@
                 <td>{{ user.id }}</td>
             </tr>
             <tr>
-                <th>Nombre</th>
+                <th>Nickname (alias)</th>
                 <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+                <th>Nombre completo</th>
+                <td>{{ user.fullName }}</td>
             </tr>
             <tr>
                 <th>Email</th>
@@ -26,6 +30,14 @@
                 <td>{{ user.phone }}</td>
             </tr>
             <tr>
+                <th>No. Documento</th>
+                <td>{{ user.officialId }}</td>
+            </tr>
+            <tr>
+                <th>Nacimiento</th>
+                <td>{{ user.birthday|date('d/m/Y') }}</td>
+            </tr>
+            <tr>
                 <th>Admin</th>
                 <td>{{ 'ROLE_ADMIN' in user.roles ? 'SI' : 'NO' }}</td>
             </tr>
@@ -33,7 +45,7 @@
                 <th>Actualizado</th>
                 <td>
                     {{ user.updatedAt ? user.updatedAt|date('d/m/Y H:i:s') : '' }}
-                    ({{ item.updatedBy.name }})
+                    ({{ user.updatedBy.name }})
                 </td>
             </tr>
             </tbody>

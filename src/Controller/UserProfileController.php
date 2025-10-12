@@ -4,10 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserPasswordType;
+use App\Form\UserProfileType;
+use App\Repository\UserRepository;
 use App\Service\User\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -18,11 +22,43 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class UserProfileController extends AbstractController
 {
-    #[Route('/profile', name: 'app_user_profile')]
-    public function index(): Response
-    {
+    #[Route('/profile/{id?<\d>}', name: 'app_user_profile', methods: ['GET', 'POST'])]
+    public function index(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserRepository $repository,
+        ?User $user = null,
+    ): Response {
+        /** @var User $user */
+        $user ??= $this->getUser();
+        $this->validateAccess($user);
+
+        $form = $this->createForm(UserProfileType::class, $user);
+        $form->handleRequest($request);
+
+        try {
+            $this->validateUserData($form, $user, $repository);
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->redirectToRoute('app_user_profile');
+        }
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            $this->addFlash('success', 'Perfil actualizado correctamente');
+
+            return $this->redirectToRoute(
+                'app_home_index',
+                [],
+                Response::HTTP_SEE_OTHER,
+            );
+        }
+
         return $this->render('user_profile/index.html.twig', [
             'user' => $this->getUser(),
+            'form' => $form,
         ]);
     }
 
@@ -31,7 +67,7 @@ class UserProfileController extends AbstractController
         Request $request,
         User $user,
         EntityManagerInterface $entityManager,
-        UserPasswordService $userPassword
+        UserPasswordService $userPassword,
     ): Response {
         $this->validateAccess($user);
 
@@ -49,7 +85,7 @@ class UserProfileController extends AbstractController
                 $this->addFlash('success', 'Password actualizado correctamente');
 
                 return $this->redirectToRoute($routeBack, [], Response::HTTP_SEE_OTHER);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -68,4 +104,15 @@ class UserProfileController extends AbstractController
             throw new AccessDeniedHttpException();
         }
     }
+
+    private function validateUserData(FormInterface $form, User $user, UserRepository $repository): void
+    {
+        $email = $form->get('email')->getData();
+        $existingUser = $repository->findOneBy(['email' => $email]);
+        if ($existingUser && $existingUser->getId() !== $user->getId()) {
+            throw new \UnexpectedValueException('The email is already in use by another user');
+        }
+    }
+
+
 }

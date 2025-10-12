@@ -1,0 +1,35 @@
+{% embed 'partials/_form-wrapper.html.twig' %}
+
+    {% block form_fields %}
+        {% include 'partials/_form-field.html.twig' with {'field': form.name, 'label': 'Nickname (nombre corto)'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.email.first, 'label': 'Email'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.email.second, 'label': 'Confirma email'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.fullName, 'label': 'Nombre completo'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.officialId, 'label': 'No. documento (dni, nie, pasaporte)'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.phone, 'label': 'Teléfono (+34111222333)'} %}
+
+        {% include 'partials/_form-field.html.twig' with {'field': form.birthday, 'label': 'Fecha de nacimiento'} %}
+
+    {% endblock %}
+
+    {% block form_actions %}
+
+        <div class="d-flex justify-content-between mt-4">
+            {% if is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-light" href="{{ path('app_user_index') }}">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+            {% endif %}
+            <button class="btn btn-success" type="submit">
+                <i class="fa-solid fa-check"></i> Guardar
+            </button>
+        </div>
+
+    {% endblock %}
+
+{% endembed %}
