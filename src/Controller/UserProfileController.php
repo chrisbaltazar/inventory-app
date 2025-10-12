@@ -22,11 +22,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class UserProfileController extends AbstractController
 {
-    #[Route('/profile', name: 'app_user_profile', methods: ['GET', 'POST'])]
-    public function index(Request $request, EntityManagerInterface $entityManager, UserRepository $repository): Response
-    {
+    #[Route('/profile/{id?<\d>}', name: 'app_user_profile', methods: ['GET', 'POST'])]
+    public function index(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserRepository $repository,
+        ?User $user = null,
+    ): Response {
         /** @var User $user */
-        $user = $this->getUser();
+        $user ??= $this->getUser();
+        $this->validateAccess($user);
+
         $form = $this->createForm(UserProfileType::class, $user);
         $form->handleRequest($request);
 
