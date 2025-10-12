@@ -26,10 +26,10 @@ class UserProfileController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $form = $this->getUserForm($user);
+        $form = $this->createForm(UserProfileType::class, $user);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $form->handleRequest($request);
             $entityManager->flush();
 
             $this->addFlash('success', 'Perfil actualizado correctamente');
@@ -89,12 +89,12 @@ class UserProfileController extends AbstractController
     private function getUserForm(User $user): FormInterface
     {
         $form = $this->createForm(UserProfileType::class, $user);
-        $form->get('name')->setData($user->getName());
-        $form->get('email')->setData($user->getEmail());
-        $form->get('fullName')->setData($user->getFullName());
-        $form->get('officialId')->setData($user->getOfficialId());
-        $form->get('phone')->setData($user->getPhone());
-        $form->get('birthday')->setData($user->getBirthday());
+//        $form->get('name')->setData($user->getName());
+//        $form->get('email')->setData($user->getEmail());
+//        $form->get('fullName')->setData($user->getFullName());
+//        $form->get('officialId')->setData($user->getOfficialId());
+//        $form->get('phone')->setData($user->getPhone());
+//        $form->get('birthday')->setData($user->getBirthday());
 
         return $form;
     }

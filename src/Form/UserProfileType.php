@@ -21,7 +21,6 @@ class UserProfileType extends AbstractType
             ->add('email', RepeatedType::class, [
                 'type' => EmailType::class,
                 'required' => true,
-                'mapped' => false,
             ])
             ->add('fullName', TextType::class)
             ->add('officialId', TextType::class)

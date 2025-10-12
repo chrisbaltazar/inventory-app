@@ -39,7 +39,6 @@ class User implements
     private ?string $name = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Length(min: 9, max: 20)]
     #[Assert\Regex(pattern: '/^\+?[\d]{11,12}/')]
     private ?string $phone = null;
 
@@ -56,12 +55,14 @@ class User implements
     private Collection $loans;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $fullName = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $birthday = null;
+    private ?\DateTime $birthday = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(max: 50)]
     private ?string $officialId = null;
 
     public function __construct()
@@ -246,12 +247,12 @@ class User implements
         return $this;
     }
 
-    public function getBirthday(): ?\DateTimeInterface
+    public function getBirthday(): ?\DateTime
     {
         return $this->birthday;
     }
 
-    public function setBirthday(?\DateTimeInterface $birthday): static
+    public function setBirthday(?\DateTime $birthday): static
     {
         $this->birthday = $birthday;
 
