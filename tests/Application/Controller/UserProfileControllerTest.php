@@ -41,4 +41,19 @@ class UserProfileControllerTest extends AbstractWebTestCase
 
         self::assertResponseRedirects('/');
     }
+
+    public function testOtherProfileUpdateDenied(): void
+    {
+        $lamb = UserFactory::create();
+        $wolf = UserFactory::create();
+        $this->entityManager->persist($lamb);
+        $this->entityManager->persist($wolf);
+        $this->entityManager->flush();
+
+        $this->asUser($this->client, $wolf)->request('GET', "/user/profile/{$lamb->getId()}");
+
+        self::assertFalse($wolf->isAdmin());
+
+        self::assertResponseStatusCodeSame(403);
+    }
 }
