@@ -270,4 +270,25 @@ class User implements
 
         return $this;
     }
+
+    public function isProfileComplete(): bool
+    {
+        foreach ($this->getRequiredData() as $field) {
+            if (empty($field)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function getRequiredData(): array
+    {
+        return [
+            $this->getFullName(),
+            $this->getPhone(),
+            $this->getBirthday(),
+            $this->getOfficialId(),
+        ];
+    }
 }

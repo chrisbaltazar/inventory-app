@@ -11,16 +11,22 @@
         .fa-square-check {
             color: greenyellow;
         }
+        .fa-user-gear {
+            color: deepskyblue;
+        }
+        .fa-user-check {
+            color: lawngreen;
+        }
     </style>
 {% endblock %}
 
 {% block body %}
 
     <div class="row px-1">
-        <h1>Lista de usuarios</h1>
+        <h1>Lista de Usuarios</h1>
 
         <a type="button" class="btn btn-primary mx-auto" href="{{ path('app_user_new') }}">
-            <i class="fa-regular fa-plus"></i> Nuevo Usuario
+            <i class="fa-regular fa-plus"></i> Nuevo usuario
         </a>
 
         <table class="table table-dark table-striped table-hover js-datatable" id="userTable">
@@ -30,6 +36,7 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th class="text-center">Admin</th>
+                <th class="text-center">Perfil completo</th>
                 <th></th>
             </tr>
             </thead>
@@ -39,7 +46,8 @@
                     <td>{{ user.id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.email }}</td>
-                    <td class="text-center">{{ ADMIN in user.roles ? '<i class="fa-solid fa-square-check fa-2x"></i>' : '' }}</td>
+                    <td class="text-center">{{ ADMIN in user.roles ? '<i class="fa-solid fa-user-gear"></i>' : '' }}</td>
+                    <td class="text-center">{{ user.isProfileComplete ? '<i class="fa-solid fa-user-check"></i>' : '' }}</td>
                     <td>
                         <a class="float-end mx-1 btn btn-warning btn-sm"
                            href="{{ path('app_user_edit', {'id': user.id}) }}">
