@@ -2,6 +2,7 @@
 
 namespace App\Service\Auth;
 
+use App\Service\Environment\Environment;
 use Google\Client;
 use Google\Service\Oauth2;
 use Symfony\Component\Routing\RouterInterface;
@@ -13,6 +14,7 @@ class GoogleOAuthService
     public function __construct(
         private readonly Client $client,
         private readonly RouterInterface $router,
+        private readonly Environment $environment,
     ) {
         $this->configureClient();
     }
@@ -31,7 +33,12 @@ class GoogleOAuthService
 
     public function getRedirectUrl(): string
     {
-        return $this->router->generate(name: 'app_login_auth', referenceType: RouterInterface::ABSOLUTE_URL);
+        $route = $this->router->generate(name: 'app_login_auth', referenceType: RouterInterface::ABSOLUTE_URL);
+        if ($this->environment->isDevelopment()) {
+            return $route;
+        }
+
+        return preg_replace('/^(https?:\/\/)(.+)/', 'https://$2', $route);
     }
 
     public function setResponseCode(string $code): void

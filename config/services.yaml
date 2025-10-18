@@ -35,3 +35,7 @@ services:
         $kernelProjectDir: '%kernel.project_dir%'
         $targetDirectory: '%suit_pictures_dir%'
         $fileName: '@App\Service\File\FileNameHash'
+
+    App\Service\Environment\Environment:
+        arguments:
+            $envName: '%kernel.environment%'
