@@ -2,14 +2,16 @@
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
+use App\Service\Auth\SSOAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginController extends AbstractController
 {
@@ -36,25 +38,29 @@ class LoginController extends AbstractController
 
     #[Route('/auth', name: 'app_login_auth', methods: ['GET'])]
     public function auth(
-        #[MapQueryParameter] string $code,
-        GoogleOAuthService $googleAuth,
-        UserRepository $repository,
+        Request $request,
+        SSOAuthenticatorInterface $auth,
         Security $security,
     ): Response {
         try {
-            if (!$code) {
-                throw new \UnexpectedValueException('Missing auth data');
-            }
-            $googleAuth->setResponseCode($code);
-            $authUser = $googleAuth->getOAuthUser();
-            $user = $repository->findOneBy(['email' => $authUser->getEmail()]);
-            if (!$user) {
-                throw new \RuntimeException('User not found');
-            }
+            $user = $auth->authenticate($request);
 
             return $security->login($user);
+        } catch (\RuntimeException $e) {
+            return $this->redirectWithAuthError($request, $e);
         } catch (\Throwable $t) {
             throw $this->createAccessDeniedException($t->getMessage(), $t);
         }
+    }
+
+    private function redirectWithAuthError(Request $request, \Exception $e): Response
+    {
+        $session = $request->getSession();
+        $session->set(
+            SecurityRequestAttributes::AUTHENTICATION_ERROR,
+            new AuthenticationException($e->getMessage(), 0, $e),
+        );
+
+        return $this->redirectToRoute('app_login');
     }
 }
