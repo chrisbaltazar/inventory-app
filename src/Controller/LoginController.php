@@ -6,7 +6,6 @@ use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,7 +43,7 @@ class LoginController extends AbstractController
     ): Response {
         try {
             if (!$code) {
-                throw new \UnexpectedValueException('No code provided');
+                throw new \UnexpectedValueException('Missing auth data');
             }
             $googleAuth->setResponseCode($code);
             $authUser = $googleAuth->getOAuthUser();
@@ -55,7 +54,7 @@ class LoginController extends AbstractController
 
             return $security->login($user);
         } catch (\Throwable $t) {
-            throw $this->createAccessDeniedException();
+            throw $this->createAccessDeniedException($t->getMessage(), $t);
         }
     }
 }
