@@ -9,7 +9,9 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginController extends AbstractController
 {
@@ -44,8 +46,21 @@ class LoginController extends AbstractController
             $user = $auth->authenticate($request);
 
             return $security->login($user);
+        } catch (\RuntimeException $e) {
+            return $this->redirectWithAuthError($request, $e);
         } catch (\Throwable $t) {
             throw $this->createAccessDeniedException($t->getMessage(), $t);
         }
+    }
+
+    private function redirectWithAuthError(Request $request, \Exception $e): Response
+    {
+        $session = $request->getSession();
+        $session->set(
+            SecurityRequestAttributes::AUTHENTICATION_ERROR,
+            new AuthenticationException($e->getMessage(), 0, $e),
+        );
+
+        return $this->redirectToRoute('app_login');
     }
 }

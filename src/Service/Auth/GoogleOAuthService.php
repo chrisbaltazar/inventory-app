@@ -56,7 +56,7 @@ class GoogleOAuthService implements SSOAuthenticatorInterface
     public function getOAuthUser(): Oauth2\Userinfo
     {
         if (!isset($this->accessToken)) {
-            throw new \BadMethodCallException('Access token is not set');
+            throw new \RuntimeException('Access token is not set');
         }
 
         $auth = new Oauth2($this->client);
@@ -75,6 +75,6 @@ class GoogleOAuthService implements SSOAuthenticatorInterface
         $authUser = $this->getOAuthUser();
 
         return $this->repository->findOneBy(['email' => $authUser->getEmail()]) ??
-            throw new \RuntimeException('User not found');
+            throw new \RuntimeException('Auth user not found');
     }
 }

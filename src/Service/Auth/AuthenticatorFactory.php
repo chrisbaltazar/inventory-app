@@ -15,7 +15,9 @@ class AuthenticatorFactory
 
     public function __invoke(): SSOAuthenticatorInterface
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest() ?? throw new \RuntimeException(
+            'No current request available for auth',
+        );
 
         return $this->build(
             match (true) {
