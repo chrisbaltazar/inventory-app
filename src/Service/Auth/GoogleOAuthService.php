@@ -14,7 +14,7 @@ class GoogleOAuthService
         private readonly Client $client,
         private readonly RouterInterface $router,
     ) {
-        $this->configureClient($router);
+        $this->configureClient();
     }
 
     private function configureClient(): void
