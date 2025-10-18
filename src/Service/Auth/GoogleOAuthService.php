@@ -2,12 +2,15 @@
 
 namespace App\Service\Auth;
 
+use App\Repository\UserRepository;
 use App\Service\Environment\Environment;
 use Google\Client;
 use Google\Service\Oauth2;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-class GoogleOAuthService
+class GoogleOAuthService implements SSOAuthenticatorInterface
 {
     private string $accessToken;
 
@@ -15,6 +18,7 @@ class GoogleOAuthService
         private readonly Client $client,
         private readonly RouterInterface $router,
         private readonly Environment $environment,
+        private readonly UserRepository $repository,
     ) {
         $this->configureClient();
     }
@@ -58,5 +62,19 @@ class GoogleOAuthService
         $auth = new Oauth2($this->client);
 
         return $auth->userinfo->get();
+    }
+
+    public function authenticate(Request $request): UserInterface
+    {
+        $code = $request->query->get('code');
+        if (!$code) {
+            throw new \RuntimeException('Missing auth data');
+        }
+
+        $this->setResponseCode($code);
+        $authUser = $this->getOAuthUser();
+
+        return $this->repository->findOneBy(['email' => $authUser->getEmail()]) ??
+            throw new \RuntimeException('User not found');
     }
 }

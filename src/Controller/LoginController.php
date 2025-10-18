@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
+use App\Service\Auth\SSOAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -36,21 +36,12 @@ class LoginController extends AbstractController
 
     #[Route('/auth', name: 'app_login_auth', methods: ['GET'])]
     public function auth(
-        #[MapQueryParameter] string $code,
-        GoogleOAuthService $googleAuth,
-        UserRepository $repository,
+        Request $request,
+        SSOAuthenticatorInterface $auth,
         Security $security,
     ): Response {
         try {
-            if (!$code) {
-                throw new \UnexpectedValueException('Missing auth data');
-            }
-            $googleAuth->setResponseCode($code);
-            $authUser = $googleAuth->getOAuthUser();
-            $user = $repository->findOneBy(['email' => $authUser->getEmail()]);
-            if (!$user) {
-                throw new \RuntimeException('User not found');
-            }
+            $user = $auth->authenticate($request);
 
             return $security->login($user);
         } catch (\Throwable $t) {
