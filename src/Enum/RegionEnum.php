@@ -21,4 +21,5 @@ enum RegionEnum: string
     case GUERRERO = 'GUERRERO';
     case PREHISPANICO = 'PREHISPÁNICO';
     case BAJA_CALIFORNIA = 'BAJA CALIFORNIA';
+    case TAMAULIPAS = 'TAMAULIPAS';
 }
