@@ -35,7 +35,7 @@ class MessageHandlerCommand extends Command
 
         try {
             $this->messageHandler->processAllPending();
-            $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+            $io->success('All pending messages have been processed.');
 
             return Command::SUCCESS;
         } catch (\Throwable $t) {
