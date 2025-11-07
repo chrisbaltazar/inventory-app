@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\Message\MessageHandlerService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,12 +12,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'app:message:send',
+    name: 'app:message:process',
     description: 'Manual message dispatching',
 )]
 class MessageHandlerCommand extends Command
 {
-    public function __construct()
+    public function __construct(private MessageHandlerService $messageHandler)
     {
         parent::__construct();
     }
@@ -25,25 +26,22 @@ class MessageHandlerCommand extends Command
     {
         $this
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
 
-        if ($arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
+        try {
+            $this->messageHandler->processAllPending();
+            $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+
+            return Command::SUCCESS;
+        } catch (\Throwable $t) {
+            $io->error($t->getMessage());
+
+            return Command::FAILURE;
         }
-
-        if ($input->getOption('option1')) {
-            // ...
-        }
-
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
-
-        return Command::SUCCESS;
     }
 }
