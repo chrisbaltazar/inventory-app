@@ -6,5 +6,7 @@ use App\Entity\Message;
 
 class SMSMessageAdapter implements MessageAdapterInterface
 {
+    public function __construct() {}
+
     public function handle(Message $message): void {}
 }
