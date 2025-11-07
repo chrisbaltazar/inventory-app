@@ -17,7 +17,8 @@ class MessageHandlerService
     public function processAllPending(): void
     {
         foreach ($this->messageRepository->findAllPending() as $message) {
-            $this->eventDispatcher->dispatch(new MessageProcessedEvent($message));
+            $messageType = MessageTypeEnum::from($message->getType());
+            $this->eventDispatcher->dispatch(new MessageProcessedEvent($messageType, $message));
         }
     }
 
