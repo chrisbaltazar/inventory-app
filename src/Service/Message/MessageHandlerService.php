@@ -3,21 +3,21 @@
 namespace App\Service\Message;
 
 use App\Repository\MessageRepository;
-use App\Service\Event\MessageProcessed;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use App\Service\Event\MessageProcessedEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MessageHandlerService
 {
 
     public function __construct(
         private MessageRepository $messageRepository,
-        private EventDispatcher $eventDispatcher,
+        private EventDispatcherInterface $eventDispatcher,
     ) {}
 
-    public function sendAllPending(): void
+    public function processAllPending(): void
     {
         foreach ($this->messageRepository->findAllPending() as $message) {
-            $this->eventDispatcher->dispatch(new MessageProcessed($message));
+            $this->eventDispatcher->dispatch(new MessageProcessedEvent($message));
         }
     }
 

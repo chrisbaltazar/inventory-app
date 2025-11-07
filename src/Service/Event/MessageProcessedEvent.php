@@ -4,7 +4,8 @@ namespace App\Service\Event;
 
 use App\Entity\Message;
 
-final class MessageProcessed
+
+final class MessageProcessedEvent
 {
 
     public function __construct(
