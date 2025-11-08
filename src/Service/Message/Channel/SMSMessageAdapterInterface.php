@@ -4,7 +4,7 @@ namespace App\Service\Message\Channel;
 
 use App\Entity\Message;
 
-interface MessageAdapterInterface {
+interface SMSMessageAdapterInterface {
 
     public function handle(Message $message): void;
 }

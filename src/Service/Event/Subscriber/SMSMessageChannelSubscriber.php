@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Service\Subscriber;
+namespace App\Service\Event\Subscriber;
 
 use App\Service\Event\MessageProcessedEvent;
-use App\Service\Message\Channel\SMSMessageAdapter;
+use App\Service\Message\Channel\SMSMessageAdapterInterface;
 use App\Service\Message\MessageTypeEnum;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SMSMessageChannelSubscriber implements EventSubscriberInterface
 {
 
     public function __construct(
-        private SMSMessageAdapter $sms,
-        private EntityManagerInterface $entityManager,
+        private SMSMessageAdapterInterface $sms,
     ) {}
 
     public static function getSubscribedEvents(): array
