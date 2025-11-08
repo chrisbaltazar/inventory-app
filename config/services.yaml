@@ -21,7 +21,7 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
-            - '../src/Service/Event/'
+            - '../src/Event/'
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
@@ -48,3 +48,13 @@ services:
 
     App\Service\Auth\SSOAuthenticatorInterface:
       factory: '@App\Service\Auth\AuthenticatorFactory'
+
+    App\Service\Message\Channel\TwilioSMSAdapter:
+      arguments:
+        $senderNumber: '%env(string:TWILIO_FROM_NUMBER)%'
+        $appName: '%env(string:APP_NAME)%'
+
+    Twilio\Rest\Client:
+      arguments:
+        $username: '%env(string:TWILIO_ACCOUNT_SID)%'
+        $password: '%env(string:TWILIO_AUTH_TOKEN)%'

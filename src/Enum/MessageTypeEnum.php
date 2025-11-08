@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Message;
+namespace App\Enum;
 
 enum MessageTypeEnum: string
 {

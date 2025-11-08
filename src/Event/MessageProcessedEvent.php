@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Service\Event;
+namespace App\Event;
 
 use App\Entity\Message;
-use App\Service\Message\MessageTypeEnum;
+use App\Enum\MessageTypeEnum;
 
 
 final class MessageProcessedEvent

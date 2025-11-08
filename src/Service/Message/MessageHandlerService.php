@@ -2,8 +2,9 @@
 
 namespace App\Service\Message;
 
+use App\Enum\MessageTypeEnum;
+use App\Event\MessageProcessedEvent;
 use App\Repository\MessageRepository;
-use App\Service\Event\MessageProcessedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MessageHandlerService

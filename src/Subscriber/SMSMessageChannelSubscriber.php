@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service\Event\Subscriber;
+namespace App\Subscriber;
 
-use App\Service\Event\MessageProcessedEvent;
+use App\Enum\MessageTypeEnum;
+use App\Event\MessageProcessedEvent;
 use App\Service\Message\Channel\SMSMessageAdapterInterface;
-use App\Service\Message\MessageTypeEnum;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SMSMessageChannelSubscriber implements EventSubscriberInterface
