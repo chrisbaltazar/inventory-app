@@ -3,6 +3,7 @@
 namespace App\Service\Message\Channel;
 
 use App\Entity\Message;
+use App\Enum\MessageStatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Twilio\Rest\Client;
@@ -25,9 +26,10 @@ class TwilioSMSAdapter implements SMSMessageAdapterInterface
             $recipient = $this->getMessageRecipient($message);
             $messageBody = $this->getMessageBody($message);
             $this->sendMessage($recipient, $messageBody);
-            $this->markAsSent($message);
+            $this->markMessageAs(MessageStatusEnum::SENT, $message);
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error('Error sending SMS: ' . $e->getMessage());
+            $this->markMessageAs(MessageStatusEnum::ERROR, $message);
 
             throw $e;
         }
@@ -44,9 +46,21 @@ class TwilioSMSAdapter implements SMSMessageAdapterInterface
 
     private function getMessageRecipient(Message $message): string
     {
-        return $message->getRecipient() ?? $message->getUser()?->getPhone() ?? throw new \UnexpectedValueException(
+        $recipientNumber = $message->getRecipient() ?? $message->getUser()?->getPhone(
+        ) ?? throw new \UnexpectedValueException(
             'No recipient or user phone to send SMS message: ' . $message->getId(),
         );
+
+        if (!preg_match('/^\+\d{11,12}$/', $recipientNumber)) {
+            throw new \UnexpectedValueException('Invalid recipient phone number for SMS: ' . $recipientNumber);
+        }
+
+        if (str_starts_with($recipientNumber, '+1')) {
+            // Special case due to costs of sending SMS to US numbers
+            throw new \UnexpectedValueException('Invalid phone number country for SMS: ' . $recipientNumber);
+        }
+
+        return $recipientNumber;
     }
 
     private function sendMessage(string $recipient, string $body): void
@@ -60,8 +74,9 @@ class TwilioSMSAdapter implements SMSMessageAdapterInterface
         );
     }
 
-    private function markAsSent(Message $message): void
+    private function markMessageAs(MessageStatusEnum $status, Message $message): void
     {
+        $message->setStatus($status->value);
         $message->setProcessedAt(new \DateTimeImmutable());
         $this->entityManager->flush();
     }
