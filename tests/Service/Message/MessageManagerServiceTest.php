@@ -46,12 +46,4 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $test->processAllPending();
     }
 
-    protected function assertDatabaseCount(int $count, string $entityClass): void
-    {
-        $repository = $this->entityManager->getRepository($entityClass);
-
-        $result = $repository->findAll();
-
-        self::assertCount($count, $result);
-    }
 }
