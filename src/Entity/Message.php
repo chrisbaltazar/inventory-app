@@ -7,6 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Index(name: 'message_scheduled_idx', columns: ['scheduled_at'])]
+#[ORM\Index(name: 'message_processed_idx', columns: ['processed_at'])]
+#[ORM\Index(name: 'message_status_idx', columns: ['status'])]
 class Message
 {
     #[ORM\Id]
