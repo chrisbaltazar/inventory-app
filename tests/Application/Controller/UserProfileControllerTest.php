@@ -11,6 +11,12 @@ class UserProfileControllerTest extends AbstractWebTestCase
 {
     use WithUserSession;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->refreshDatabase();
+    }
+
     public function testOwnProfileUpdate(): void
     {
         $user = UserFactory::create();
@@ -60,7 +66,6 @@ class UserProfileControllerTest extends AbstractWebTestCase
         $user = UserFactory::create();
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-
 
         $this->asUser($this->client, $user)->request('GET', "/user/{$user->getId()}/password");
 

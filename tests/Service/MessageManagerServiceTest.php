@@ -3,6 +3,7 @@
 namespace App\Tests\Service;
 
 use App\DataFixtures\Factory\MessageFactory;
+use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -22,8 +23,11 @@ class MessageManagerServiceTest extends KernelTestCase
     public function testSomething(): void
     {
 //        $this->assertSame('test', $kernel->getEnvironment());
-        $message = MessageFactory::create();
-        $message->setUser(null);
+        $user = UserFactory::create(phoneNumber: '+34234567890');
+        $message = MessageFactory::create(user: $user);
+        $message->setRecipient(null);
+
+        $this->entityManager->persist($user);
         $this->entityManager->persist($message);
         $this->entityManager->flush();
         $this->assertDatabaseCount(1, Message::class);

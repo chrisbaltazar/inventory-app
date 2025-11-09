@@ -100,7 +100,7 @@ class Message
         return $this->recipient;
     }
 
-    public function setRecipient(string $recipient): static
+    public function setRecipient(?string $recipient): static
     {
         $this->recipient = $recipient;
 
