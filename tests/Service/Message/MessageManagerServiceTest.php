@@ -14,6 +14,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MessageManagerServiceTest extends AbstractKernelTestCase
 {
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->refreshDatabase();
+    }
+
     public function testProcessAllPendingMessages(): void
     {
         $user = UserFactory::create(phoneNumber: '+34111111111');
