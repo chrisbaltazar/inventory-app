@@ -11,12 +11,14 @@ class UserFactory extends AbstractFactory
         string $email = null,
         string $password = null,
         array $roles = null,
+        string $phoneNumber = null,
     ): User {
         $user = new User();
         $user->setName($name ?? self::faker()->name);
         $user->setEmail($email ?? self::faker()->email);
         $user->setPassword($password ?? self::faker()->password);
         $user->setRoles($roles ?? []);
+        $user->setPhone($phoneNumber ?? sprintf('+34%d', self::faker()->randomNumber(9)));
 
         return $user;
     }

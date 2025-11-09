@@ -2,13 +2,15 @@
 
 namespace App\Tests;
 
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use App\Tests\Trait\WithDatabase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractWebTestCase extends WebTestCase
 {
+    use WithDatabase;
+
     protected KernelBrowser $client;
     protected EntityManagerInterface $entityManager;
 
@@ -20,33 +22,9 @@ abstract class AbstractWebTestCase extends WebTestCase
         $this->entityManager = $this->client->getContainer()->get(EntityManagerInterface::class);
     }
 
-    protected function refreshDatabase(): void
-    {
-        $purger = new ORMPurger($this->entityManager);
-        $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
-        $purger->purge();
-    }
-
-    protected function assertDatabaseCount(int $count, string $entityClass): void
-    {
-        $repository = $this->entityManager->getRepository($entityClass);
-
-        $result = $repository->findAll();
-
-        self::assertCount($count, $result);
-    }
-
-    protected function assertDatabaseEntity(string $entityClass, array $data): void
-    {
-        $repository = $this->entityManager->getRepository($entityClass);
-
-        $result = $repository->findOneBy($data);
-
-        self::assertNotNull($result);
-    }
-
     protected function assertResponseContains(string $text): void
     {
         $this->assertStringContainsString($text, $this->client->getResponse()->getContent());
     }
+
 }
