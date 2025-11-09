@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\Message\MessageHandlerService;
+use App\Service\Message\MessageManagerService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class MessageHandlerCommand extends Command
 {
-    public function __construct(private MessageHandlerService $messageHandler)
+    public function __construct(private MessageManagerService $messageHandler)
     {
         parent::__construct();
     }

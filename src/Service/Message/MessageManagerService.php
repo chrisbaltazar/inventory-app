@@ -7,7 +7,7 @@ use App\Event\MessageProcessedEvent;
 use App\Repository\MessageRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MessageHandlerService
+class MessageManagerService
 {
 
     public function __construct(

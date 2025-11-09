@@ -4,14 +4,14 @@ namespace App\Subscriber;
 
 use App\Enum\MessageTypeEnum;
 use App\Event\MessageProcessedEvent;
-use App\Service\Message\Channel\SMSMessageAdapterInterface;
+use App\Service\Message\Channel\Sms\SMSMessageHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SMSMessageChannelSubscriber implements EventSubscriberInterface
 {
 
     public function __construct(
-        private SMSMessageAdapterInterface $sms,
+        private SMSMessageHandler $sms,
     ) {}
 
     public static function getSubscribedEvents(): array

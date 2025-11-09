@@ -49,7 +49,7 @@ services:
     App\Service\Auth\SSOAuthenticatorInterface:
       factory: '@App\Service\Auth\AuthenticatorFactory'
 
-    App\Service\Message\Channel\TwilioSMSAdapter:
+    App\Service\Message\Channel\Sms\TwilioSMSAdapter:
       arguments:
         $senderNumber: '%env(string:TWILIO_FROM_NUMBER)%'
         $appName: '%env(string:APP_NAME)%'

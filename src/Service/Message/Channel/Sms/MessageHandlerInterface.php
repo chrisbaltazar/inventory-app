@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service\Message\Channel;
+namespace App\Service\Message\Channel\Sms;
 
 use App\Entity\Message;
 
-interface SMSMessageAdapterInterface {
+interface MessageHandlerInterface {
 
     public function handle(Message $message): void;
 }

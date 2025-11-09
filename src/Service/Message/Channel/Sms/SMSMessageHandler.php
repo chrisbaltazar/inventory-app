@@ -1,21 +1,20 @@
 <?php
 
-namespace App\Service\Message\Channel;
+namespace App\Service\Message\Channel\Sms;
 
 use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Twilio\Rest\Client;
 
-class TwilioSMSAdapter implements SMSMessageAdapterInterface
+class SMSMessageHandler implements MessageHandlerInterface
 {
     const MAX_MESSAGE_LENGTH = 160;
 
     public function __construct(
-        private readonly Client $client,
         private readonly string $senderNumber,
         private readonly string $appName,
+        private readonly SMSProviderInterface $provider,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
     ) {}
@@ -25,7 +24,7 @@ class TwilioSMSAdapter implements SMSMessageAdapterInterface
         try {
             $recipient = $this->getMessageRecipient($message);
             $messageBody = $this->getMessageBody($message);
-            $this->sendMessage($recipient, $messageBody);
+            $this->provider->send($recipient, $this->senderNumber, $messageBody);
             $this->markMessageAs(MessageStatusEnum::SENT, $message);
         } catch (\Exception $e) {
             $this->logger->error('Error sending SMS: ' . $e->getMessage());
@@ -61,17 +60,6 @@ class TwilioSMSAdapter implements SMSMessageAdapterInterface
         }
 
         return $recipientNumber;
-    }
-
-    private function sendMessage(string $recipient, string $body): void
-    {
-        $this->client->messages->create(
-            $recipient,
-            [
-                'from' => $this->senderNumber,
-                'body' => $body,
-            ],
-        );
     }
 
     private function markMessageAs(MessageStatusEnum $status, Message $message): void
