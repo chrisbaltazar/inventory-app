@@ -57,4 +57,36 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->assertNotNull($message->getProcessedAt());
     }
 
+    public function testProcessMessagesForbiddenNumber(): void
+    {
+        $user = UserFactory::create(phoneNumber: '+11111111111'); // U.S
+        $message = MessageFactory::create(
+            user: $user,
+            content: 'Message content...',
+            scheduledAt: new \DateTimeImmutable('now'),
+        );
+        $message->setRecipient(null);
+        $message->setStatus(null);
+        $message->setProcessedAt(null);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($message);
+        $this->entityManager->flush();
+        $this->assertDatabaseCount(1, Message::class);
+
+        $repository = $this->entityManager->getRepository(Message::class);
+        $eventDispatcher = $this->get(EventDispatcherInterface::class);
+        $smsProvider = $this->createMock(SMSProviderInterface::class);
+        $smsProvider->expects($this->never())->method('send');
+        $this->set(SMSProviderInterface::class, $smsProvider);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $test = new MessageManagerService($repository, $eventDispatcher);
+        $test->processAllPending();
+
+        $message = $repository->find($message->getId());
+        $this->assertSame(MessageStatusEnum::ERROR->value, $message->getStatus());
+        $this->assertNotNull($message->getProcessedAt());
+    }
+
 }
