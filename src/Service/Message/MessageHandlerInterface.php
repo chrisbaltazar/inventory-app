@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Message\Channel\Sms;
+namespace App\Service\Message;
 
 use App\Entity\Message;
 

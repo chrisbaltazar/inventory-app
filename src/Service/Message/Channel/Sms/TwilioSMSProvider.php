@@ -13,7 +13,7 @@ class TwilioSMSProvider implements SMSProviderInterface
 
     public function send(string $number, string $sender, string $message): mixed
     {
-        $this->twilio->messages->create(
+        return $this->twilio->messages->create(
             $number,
             [
                 'from' => $sender,

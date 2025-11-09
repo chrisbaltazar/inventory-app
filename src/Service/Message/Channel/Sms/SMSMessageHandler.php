@@ -4,6 +4,7 @@ namespace App\Service\Message\Channel\Sms;
 
 use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
+use App\Service\Message\MessageHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
