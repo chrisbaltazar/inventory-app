@@ -5,12 +5,14 @@ namespace App\Tests\Service;
 use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
+use App\Service\Message\Channel\Sms\SMSProviderInterface;
+use App\Service\Message\MessageManagerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MessageManagerServiceTest extends KernelTestCase
 {
-
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -20,17 +22,37 @@ class MessageManagerServiceTest extends KernelTestCase
         $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
     }
 
-    public function testSomething(): void
+    public function testProcessAllPendingMessages(): void
     {
-//        $this->assertSame('test', $kernel->getEnvironment());
-        $user = UserFactory::create(phoneNumber: '+34234567890');
-        $message = MessageFactory::create(user: $user);
+        $user = UserFactory::create(phoneNumber: '+34111111111');
+        $message = MessageFactory::create(
+            user: $user,
+            content: 'Message content...',
+            scheduledAt: new \DateTimeImmutable('now'),
+        );
         $message->setRecipient(null);
+        $message->setStatus(null);
+        $message->setProcessedAt(null);
 
         $this->entityManager->persist($user);
         $this->entityManager->persist($message);
         $this->entityManager->flush();
         $this->assertDatabaseCount(1, Message::class);
+
+        $repository = $this->entityManager->getRepository(Message::class);
+        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $smsProvider = $this->createMock(SMSProviderInterface::class);
+        $smsProvider->expects($this->once())->method('send')->willReturnCallback(
+            function ($number, $sender, $content) use ($message, $user) {
+                $this->assertSame($user->getPhone(), $number);
+                $this->assertNotEmpty($sender);
+                $this->assertStringContainsString($message->getContent(), $content);
+            },
+        );
+        static::getContainer()->set(SMSProviderInterface::class, $smsProvider);
+
+        $test = new MessageManagerService($repository, $eventDispatcher);
+        $test->processAllPending();
     }
 
     protected function assertDatabaseCount(int $count, string $entityClass): void
