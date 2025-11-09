@@ -1,26 +1,17 @@
 <?php
 
-namespace App\Tests\Service;
+namespace Service\Message;
 
 use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
 use App\Service\Message\MessageManagerService;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Tests\AbstractKernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MessageManagerServiceTest extends KernelTestCase
+class MessageManagerServiceTest extends AbstractKernelTestCase
 {
-    private EntityManagerInterface $entityManager;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $kernel = self::bootKernel();
-        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
-    }
 
     public function testProcessAllPendingMessages(): void
     {
@@ -40,7 +31,7 @@ class MessageManagerServiceTest extends KernelTestCase
         $this->assertDatabaseCount(1, Message::class);
 
         $repository = $this->entityManager->getRepository(Message::class);
-        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $eventDispatcher = $this->get(EventDispatcherInterface::class);
         $smsProvider = $this->createMock(SMSProviderInterface::class);
         $smsProvider->expects($this->once())->method('send')->willReturnCallback(
             function ($number, $sender, $content) use ($message, $user) {
@@ -49,7 +40,7 @@ class MessageManagerServiceTest extends KernelTestCase
                 $this->assertStringContainsString($message->getContent(), $content);
             },
         );
-        static::getContainer()->set(SMSProviderInterface::class, $smsProvider);
+        $this->set(SMSProviderInterface::class, $smsProvider);
 
         $test = new MessageManagerService($repository, $eventDispatcher);
         $test->processAllPending();
