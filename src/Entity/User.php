@@ -65,6 +65,12 @@ class User implements
     #[Assert\Length(max: 50)]
     private ?string $officialId = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $accessCode = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $codeExpiration = null;
+
     public function __construct()
     {
         $this->loans = new ArrayCollection();
@@ -290,5 +296,29 @@ class User implements
             $this->getBirthday(),
             $this->getOfficialId(),
         ];
+    }
+
+    public function getAccessCode(): ?string
+    {
+        return $this->accessCode;
+    }
+
+    public function setAccessCode(?string $accessCode): static
+    {
+        $this->accessCode = $accessCode;
+
+        return $this;
+    }
+
+    public function getCodeExpiration(): ?\DateTimeInterface
+    {
+        return $this->codeExpiration;
+    }
+
+    public function setCodeExpiration(?\DateTimeInterface $codeExpiration): static
+    {
+        $this->codeExpiration = $codeExpiration;
+
+        return $this;
     }
 }

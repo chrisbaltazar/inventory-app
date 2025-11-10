@@ -6,10 +6,12 @@ use App\Form\RecoverPasswordType;
 use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
 use App\Service\Auth\SSOAuthenticatorInterface;
+use App\Service\User\UserAccessService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -59,6 +61,7 @@ class LoginController extends AbstractController
     public function recoverAccess(
         Request $request,
         UserRepository $userRepository,
+        UserAccessService $userAccess,
     ): Response {
         if ($this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('app_home_index');
@@ -69,11 +72,14 @@ class LoginController extends AbstractController
 
         try {
             if ($form->isSubmitted() && $form->isValid()) {
-                $user = $userRepository->findOneBy(['email' => $request->get('email')]);
+                $user = $userRepository->findOneBy(['email' => $form->get('email')->getData()]);
                 if (!$user) {
                     throw new \UnexpectedValueException('User not found');
                 }
 
+                $accessToken = $userAccess->getAccessToken($user);
+
+                return $this->redirectToRoute('app_login_code', ['t' => $accessToken]);
             }
         } catch (\Exception $e) {
             return $this->redirectWithAuthError($request, $e);
@@ -81,6 +87,25 @@ class LoginController extends AbstractController
 
         return $this->render('login/recover.html.twig', [
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/login/code', name: 'app_login_code', methods: ['GET', 'POST'])]
+    public function userCode(#[MapQueryParameter] string $t, UserAccessService $userAccess): Response
+    {
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('app_home_index');
+        }
+
+        try {
+            $data = $userAccess->getAccessData($t);
+        } catch (\Exception $e) {
+            throw $this->createAccessDeniedException($e->getMessage(), $e);
+        }
+
+        return $this->render('login/code.html.twig', [
+            'time' => $data->expiration,
+            'number' => $data->userNumber,
         ]);
     }
 
