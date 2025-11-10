@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\RecoverPasswordType;
+use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
 use App\Service\Auth\SSOAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,11 +55,33 @@ class LoginController extends AbstractController
         }
     }
 
-    #[Route('/recover-access', name: 'app_login_recover', methods: ['GET'])]
+    #[Route('/recover-access', name: 'app_login_recover', methods: ['GET', 'POST'])]
     public function recoverAccess(
         Request $request,
+        UserRepository $userRepository,
     ): Response {
-        return $this->render('login/recover.html.twig');
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('app_home_index');
+        }
+
+        $form = $this->createForm(RecoverPasswordType::class);
+        $form->handleRequest($request);
+
+        try {
+            if ($form->isSubmitted() && $form->isValid()) {
+                $user = $userRepository->findOneBy(['email' => $request->get('email')]);
+                if (!$user) {
+                    throw new \UnexpectedValueException('User not found');
+                }
+
+            }
+        } catch (\Exception $e) {
+            return $this->redirectWithAuthError($request, $e);
+        }
+
+        return $this->render('login/recover.html.twig', [
+            'form' => $form,
+        ]);
     }
 
     private function redirectWithAuthError(Request $request, \Exception $e): Response
