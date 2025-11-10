@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recupera password{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">{{ error.message }}</div>
+            {% endif %}
+            <form method="POST" action="{{ path('app_login_recover') }}">
+                <h1 class="h3 mb-3 fw-normal text-center">Recupera password</h1>
+                <img class="mb-4 w-100" src="{{ asset('img/logo.PNG') }}" alt="">
+                <h6 class="text-center">Introduce tu email asociado a tu cuenta</h6>
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" name="email"
+                           placeholder="name@example.com">
+                    <label for="floatingInput">Email</label>
+                </div>
+                <button class="mt-3 w-100 btn btn-lg btn-secondary" type="submit">Enviar</button>
+                <a href="{{ path('app_login') }}" class="mt-3 w-100 btn btn-link">Volver a login</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

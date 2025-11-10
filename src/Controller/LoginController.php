@@ -53,6 +53,13 @@ class LoginController extends AbstractController
         }
     }
 
+    #[Route('/recover-access', name: 'app_login_recover', methods: ['GET'])]
+    public function recoverAccess(
+        Request $request,
+    ): Response {
+        return $this->render('login/recover.html.twig');
+    }
+
     private function redirectWithAuthError(Request $request, \Exception $e): Response
     {
         $session = $request->getSession();
