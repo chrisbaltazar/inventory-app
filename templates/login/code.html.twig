@@ -4,6 +4,26 @@
 
 {% block body %}
 
+    <div class="row">
+        <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+            <h1 class="h3 mb-3 fw-normal text-center">Código de acceso</h1>
+            <img class="mb-4 w-100" src="{{ asset('img/logo.PNG') }}" alt="">
+
+            {% embed 'partials/_form-wrapper.html.twig' %}
+                {% block form_fields %}
+                    <h6 class="text-center">Introduce el código que se ha enviado a tu teléfono
+                        con terminación: {{ number }}</h6>
+                    {% include 'partials/_form-field.html.twig' with {'field': form.code} %}
+                {% endblock %}
+                {% block form_actions %}
+                    <button class="mt-3 w-100 btn btn-lg btn-success" type="submit">Verificar</button>
+                    <a href="{{ path('app_login') }}" class="mt-3 w-100 btn btn-link">Volver a login</a>
+                {% endblock %}
+            {% endembed %}
+
+        </div>
+    </div>
+
 {% endblock %}
 
 

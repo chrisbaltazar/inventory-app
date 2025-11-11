@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -19,6 +18,8 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginController extends AbstractController
 {
+    const USER_ACCESS_ID = '_sdm_user_access_id';
+
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function index(AuthenticationUtils $utils, GoogleOAuthService $googleAuth): Response
     {
@@ -72,14 +73,11 @@ class LoginController extends AbstractController
 
         try {
             if ($form->isSubmitted() && $form->isValid()) {
-                $user = $userRepository->findOneBy(['email' => $form->get('email')->getData()]);
-                if (!$user) {
-                    throw new \UnexpectedValueException('User not found');
-                }
+                $search = ['email' => $form->get('email')->getData()];
+                $user = $userAccess->make($search);
+                $request->getSession()->set(self::USER_ACCESS_ID, $user->getId());
 
-                $accessToken = $userAccess->getAccessToken($user);
-
-                return $this->redirectToRoute('app_login_code', ['t' => $accessToken]);
+                return $this->redirectToRoute('app_login_code');
             }
         } catch (\Exception $e) {
             return $this->redirectWithAuthError($request, $e);
@@ -91,21 +89,29 @@ class LoginController extends AbstractController
     }
 
     #[Route('/login/code', name: 'app_login_code', methods: ['GET', 'POST'])]
-    public function userCode(#[MapQueryParameter] string $t, UserAccessService $userAccess): Response
+    public function userCode(Request $request, UserRepository $userRepository): Response
     {
         if ($this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('app_home_index');
         }
 
-        try {
-            $data = $userAccess->getAccessData($t);
-        } catch (\Exception $e) {
-            throw $this->createAccessDeniedException($e->getMessage(), $e);
+        $userSessionId = $request->getSession()->get(self::USER_ACCESS_ID);
+        $user = $userRepository->find($userSessionId);
+        if (!$user) {
+            throw $this->createAccessDeniedException();
         }
 
+        $expiration = $user->getCodeExpiration();
+        if (!$expiration || $expiration < new \DateTime('now')) {
+            return $this->redirectWithAuthError($request, new \RuntimeException('Access code expired'));
+        }
+
+        $number = substr($user->getPhone(), -3);
+        $time = $expiration->getTimestamp() - time();
+
         return $this->render('login/code.html.twig', [
-            'time' => $data->expiration,
-            'number' => $data->userNumber,
+            'time' => $time,
+            'number' => $number,
         ]);
     }
 

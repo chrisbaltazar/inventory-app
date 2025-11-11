@@ -2,6 +2,7 @@
 
 namespace App\Service\User;
 
+use App\Dto\User\UserAccessData;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,14 +18,21 @@ class UserAccessService
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
-    public function getAccessToken(User $user): string
+
+    public function make(array $search): User
     {
-        if ($user->getAccessCode() && $user->getCodeExpiration() && $user->getCodeExpiration() > new \DateTime('now')) {
-            return $this->createToken($user);
+        $user = $this->userRepository->findOneBy($search);
+
+        if (!$user) {
+            throw new \UnexpectedValueException('User email not found');
         }
 
         if (!$user->getPhone()) {
             throw new \RuntimeException('User phone number is required');
+        }
+
+        if ($user->getAccessCode() && $user->getCodeExpiration() && $user->getCodeExpiration() > new \DateTime('now')) {
+            return $user;
         }
 
         $newAccessCode = $this->getCode();
@@ -33,7 +41,7 @@ class UserAccessService
         $user->setCodeExpiration($expirationTime);
         $this->entityManager->flush();
 
-        return $this->createToken($user);
+        return $user;
     }
 
     private function getCode(): int
@@ -43,31 +51,4 @@ class UserAccessService
 
         return random_int((int) $min, (int) $max);
     }
-
-    public function getAccessData(string $token): UserAccessData
-    {
-        $decoded = base64_decode($token);
-        if (!$decoded) {
-            throw new \RuntimeException('Invalid token');
-        }
-
-        $parts = explode('|', $decoded);
-
-        return new UserAccessData(
-            new \DateTime($parts[0]),
-            $parts[1],
-        );
-    }
-
-    private function createToken(User $user): string
-    {
-        return base64_encode(
-            sprintf(
-                '%s|%s',
-                $user->getCodeExpiration()->format('Y-m-d H:i:s'),
-                substr($user->getPhone(), -4),
-            ),
-        );
-    }
-
 }
