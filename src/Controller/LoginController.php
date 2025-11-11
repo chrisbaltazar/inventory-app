@@ -75,7 +75,7 @@ class LoginController extends AbstractController
         try {
             if ($form->isSubmitted() && $form->isValid()) {
                 $search = ['email' => $form->get('email')->getData()];
-                $user = $userAccess->make($search, self::DEFAULT_CODE_LENGTH);
+                $user = $userAccess($search, self::DEFAULT_CODE_LENGTH);
                 $request->getSession()->set(self::USER_ACCESS_ID, $user->getId());
 
                 return $this->redirectToRoute('app_login_code');
@@ -90,7 +90,7 @@ class LoginController extends AbstractController
     }
 
     #[Route('/login/code', name: 'app_login_code', methods: ['GET', 'POST'])]
-    public function userCode(Request $request, UserRepository $userRepository): Response
+    public function userCode(Request $request, UserRepository $userRepository, Security $security): Response
     {
         if ($this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('app_home_index');
@@ -107,15 +107,25 @@ class LoginController extends AbstractController
             return $this->redirectWithAuthError($request, new \RuntimeException('Access code expired'));
         }
 
-//        $form = $this->createForm(UserAccessCodeType::class, options: ['code_length' => self::DEFAULT_CODE_LENGTH]);
-//        $form->handleRequest($request);
-//        dd($form);
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('access_code', $request->get('csrf_token'))) {
+                throw $this->createAccessDeniedException();
+            }
+
+            $code = implode('', $request->get('code'));
+            if ($code !== (string) $user->getAccessCode()) {
+                return $this->redirectToRoute('app_login_code');
+            }
+
+            $security->login($user);
+
+            return $this->redirectToRoute('app_user_password', ['id' => $user->getId()]);
+        }
 
         $number = substr($user->getPhone(), -3);
         $time = $expiration->getTimestamp() - time();
 
         return $this->render('login/code.html.twig', [
-//            'form' => $form,
             'time' => $time,
             'number' => $number,
             'length' => self::DEFAULT_CODE_LENGTH,

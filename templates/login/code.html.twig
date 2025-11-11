@@ -21,7 +21,7 @@
             <h1 class="h3 mb-3 fw-normal text-center">Código de acceso</h1>
             <img class="mb-4 w-100" src="{{ asset('img/logo.PNG') }}" alt="">
 
-            <form method="POST" action="{{ path('app_login_code') }}">
+            <form method="POST" action="{{ path('app_login_code') }}" data-turbo="false">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token('access_code') }}">
                 <h6 class="text-center">Introduce el código que se ha enviado a tu teléfono
                     con terminación: <strong>{{ number }}</strong></h6>

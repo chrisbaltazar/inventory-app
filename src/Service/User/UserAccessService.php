@@ -17,7 +17,7 @@ class UserAccessService
     ) {}
 
 
-    public function make(array $search, int $codeLength): User
+    public function __invoke(array $search, int $codeLength): User
     {
         if ($codeLength <= 0) {
             throw new \InvalidArgumentException('Code length must be greater than 0');
@@ -48,8 +48,8 @@ class UserAccessService
 
     private function getCode(int $size): int
     {
-        $min = str_pad(1, $size - 1, '0', STR_PAD_RIGHT);
-        $max = str_pad(9, $size - 1, '9', STR_PAD_RIGHT);
+        $min = str_pad(1, $size, '0', STR_PAD_RIGHT);
+        $max = str_pad(9, $size, '9', STR_PAD_RIGHT);
 
         return random_int((int) $min, (int) $max);
     }
