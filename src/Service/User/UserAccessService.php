@@ -2,7 +2,6 @@
 
 namespace App\Service\User;
 
-use App\Dto\User\UserAccessData;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,7 +10,6 @@ class UserAccessService
 {
 
     const DEFAULT_EXPIRATION_TIME = '+5 min';
-    const DEFAULT_CODE_LENGTH = 6;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -19,8 +17,12 @@ class UserAccessService
     ) {}
 
 
-    public function make(array $search): User
+    public function make(array $search, int $codeLength): User
     {
+        if ($codeLength <= 0) {
+            throw new \InvalidArgumentException('Code length must be greater than 0');
+        }
+
         $user = $this->userRepository->findOneBy($search);
 
         if (!$user) {
@@ -35,7 +37,7 @@ class UserAccessService
             return $user;
         }
 
-        $newAccessCode = $this->getCode();
+        $newAccessCode = $this->getCode($codeLength);
         $expirationTime = new \DateTime(self::DEFAULT_EXPIRATION_TIME);
         $user->setAccessCode($newAccessCode);
         $user->setCodeExpiration($expirationTime);
@@ -44,10 +46,10 @@ class UserAccessService
         return $user;
     }
 
-    private function getCode(): int
+    private function getCode(int $size): int
     {
-        $min = str_pad(1, self::DEFAULT_CODE_LENGTH - 1, '0', STR_PAD_RIGHT);
-        $max = str_pad(9, self::DEFAULT_CODE_LENGTH - 1, '9', STR_PAD_RIGHT);
+        $min = str_pad(1, $size - 1, '0', STR_PAD_RIGHT);
+        $max = str_pad(9, $size - 1, '9', STR_PAD_RIGHT);
 
         return random_int((int) $min, (int) $max);
     }

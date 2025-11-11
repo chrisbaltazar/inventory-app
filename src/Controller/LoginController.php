@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginController extends AbstractController
 {
+    const DEFAULT_CODE_LENGTH = 6;
     const USER_ACCESS_ID = '_sdm_user_access_id';
 
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
@@ -74,7 +75,7 @@ class LoginController extends AbstractController
         try {
             if ($form->isSubmitted() && $form->isValid()) {
                 $search = ['email' => $form->get('email')->getData()];
-                $user = $userAccess->make($search);
+                $user = $userAccess->make($search, self::DEFAULT_CODE_LENGTH);
                 $request->getSession()->set(self::USER_ACCESS_ID, $user->getId());
 
                 return $this->redirectToRoute('app_login_code');
@@ -106,12 +107,18 @@ class LoginController extends AbstractController
             return $this->redirectWithAuthError($request, new \RuntimeException('Access code expired'));
         }
 
+//        $form = $this->createForm(UserAccessCodeType::class, options: ['code_length' => self::DEFAULT_CODE_LENGTH]);
+//        $form->handleRequest($request);
+//        dd($form);
+
         $number = substr($user->getPhone(), -3);
         $time = $expiration->getTimestamp() - time();
 
         return $this->render('login/code.html.twig', [
+//            'form' => $form,
             'time' => $time,
             'number' => $number,
+            'length' => self::DEFAULT_CODE_LENGTH,
         ]);
     }
 
