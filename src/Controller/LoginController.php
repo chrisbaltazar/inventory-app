@@ -90,40 +90,42 @@ class LoginController extends AbstractController
     }
 
     #[Route('/login/code', name: 'app_login_code', methods: ['GET', 'POST'])]
-    public function userCode(Request $request, UserRepository $userRepository, Security $security): Response
-    {
+    public function userCode(
+        Request $request,
+        UserRepository $userRepository,
+        UserAccessService $userAccess,
+        Security $security,
+    ): Response {
         if ($this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('app_home_index');
         }
 
-        $userSessionId = $request->getSession()->get(self::USER_ACCESS_ID);
-        $user = $userRepository->find($userSessionId);
-        if (!$user) {
-            throw $this->createAccessDeniedException();
-        }
+        try {
+            $userSessionId = $request->getSession()->get(self::USER_ACCESS_ID);
+            $user = $userRepository->find($userSessionId) ?? throw new \RuntimeException('User not found');
 
-        $expiration = $user->getCodeExpiration();
-        if (!$expiration || $expiration < new \DateTime('now')) {
-            return $this->redirectWithAuthError($request, new \RuntimeException('Access code expired'));
-        }
+            if ($request->isMethod('POST')) {
+                if (!$this->isCsrfTokenValid('access_code', $request->get('csrf_token'))) {
+                    throw $this->createAccessDeniedException();
+                }
 
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('access_code', $request->get('csrf_token'))) {
-                throw $this->createAccessDeniedException();
-            }
+                $code = implode('', $request->get('code', []));
+                if ($userAccess->validate($user, $code)) {
+                    $security->login($user);
 
-            $code = implode('', $request->get('code'));
-            if ($code !== (string) $user->getAccessCode()) {
+                    return $this->redirectToRoute('app_user_password', ['id' => $user->getId()]);
+                }
+
                 return $this->redirectToRoute('app_login_code');
             }
-
-            $security->login($user);
-
-            return $this->redirectToRoute('app_user_password', ['id' => $user->getId()]);
+        } catch (\LogicException $e) {
+            return $this->redirectWithAuthError($request, $e);
+        } catch (\Exception $e) {
+            throw $this->createAccessDeniedException($e->getMessage(), $e);
         }
 
         $number = substr($user->getPhone(), -3);
-        $time = $expiration->getTimestamp() - time();
+        $time = $user->getCodeExpiration()?->getTimestamp() - time();
 
         return $this->render('login/code.html.twig', [
             'time' => $time,

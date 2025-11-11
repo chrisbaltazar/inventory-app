@@ -53,4 +53,19 @@ class UserAccessService
 
         return random_int((int) $min, (int) $max);
     }
+
+    public function validate(User $user, string $code): bool
+    {
+        if (!$code) {
+            throw new \RuntimeException('Access code required');
+        }
+
+        $expiration = $user->getCodeExpiration();
+        if (!$expiration || $expiration < new \DateTime('now')) {
+            throw new \LogicException('Access code expired');
+        }
+
+        return $code === (string) $user->getAccessCode();
+    }
+
 }
