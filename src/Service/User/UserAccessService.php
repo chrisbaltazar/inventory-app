@@ -17,7 +17,7 @@ class UserAccessService
     ) {}
 
 
-    public function __invoke(array $search, int $codeLength): User
+    public function make(array $search, int $codeLength): User
     {
         if ($codeLength <= 0) {
             throw new \InvalidArgumentException('Code length must be greater than 0');

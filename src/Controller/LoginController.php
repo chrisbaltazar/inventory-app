@@ -75,7 +75,7 @@ class LoginController extends AbstractController
         try {
             if ($form->isSubmitted() && $form->isValid()) {
                 $search = ['email' => $form->get('email')->getData()];
-                $user = $userAccess($search, self::DEFAULT_CODE_LENGTH);
+                $user = $userAccess->make($search, self::DEFAULT_CODE_LENGTH);
                 $request->getSession()->set(self::USER_ACCESS_ID, $user->getId());
 
                 return $this->redirectToRoute('app_login_code');
