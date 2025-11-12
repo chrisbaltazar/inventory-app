@@ -84,12 +84,61 @@ class LoginControllerTest extends AbstractWebTestCase
         $this->client->getContainer()->set('security.csrf.token_manager', $csrfToken);
 
         $this->client->request('GET', '/login/code');
-
         $this->client->submitForm('Verificar', [
             'csrf_token' => 'token',
             'code' => [1, 2, 3, 4, 5, 6],
         ]);
 
         self::assertResponseRedirects("/user/{$user->getId()}/password");
+    }
+
+    public function testUserCodeExpired()
+    {
+        $user = UserFactory::create();
+        $user->setAccessCode('123456');
+        $user->setCodeExpiration(new DateTimeImmutable('-1 min'));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $session = $this->createSession($this->client);
+        $session->set(LoginController::USER_ACCESS_ID, $user->getId());
+        $session->save();
+
+        $csrfToken = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfToken->expects($this->once())->method('isTokenValid')->willReturn(true);
+        $this->client->getContainer()->set('security.csrf.token_manager', $csrfToken);
+
+        $this->client->request('GET', '/login/code');
+        $this->client->submitForm('Verificar', [
+            'csrf_token' => 'token',
+            'code' => [1, 2, 3, 4, 5, 6],
+        ]);
+
+        self::assertResponseRedirects('/login');
+    }
+
+    public function testUserCodeError()
+    {
+        $user = UserFactory::create();
+        $user->setAccessCode('123456');
+        $user->setCodeExpiration(new DateTimeImmutable('+5 min'));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $session = $this->createSession($this->client);
+        $session->set(LoginController::USER_ACCESS_ID, $user->getId());
+        $session->save();
+
+        $csrfToken = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfToken->expects($this->once())->method('isTokenValid')->willReturn(true);
+        $this->client->getContainer()->set('security.csrf.token_manager', $csrfToken);
+
+        $this->client->request('GET', '/login/code');
+        $this->client->submitForm('Verificar', [
+            'csrf_token' => 'token',
+            'code' => [1, 1, 1, 1, 1, 1],
+        ]);
+
+        self::assertResponseRedirects('/login/code');
     }
 }

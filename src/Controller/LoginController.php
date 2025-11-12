@@ -102,7 +102,6 @@ class LoginController extends AbstractController
 
         try {
             $userSessionId = $request->getSession()->get(self::USER_ACCESS_ID);
-//            dd($userSessionId);
             $user = $userRepository->find($userSessionId) ?? throw new \RuntimeException('User not found');
 
             if ($request->isMethod('POST')) {
@@ -120,10 +119,8 @@ class LoginController extends AbstractController
                 return $this->redirectToRoute('app_login_code');
             }
         } catch (\LogicException $e) {
-            dd($e);
             return $this->redirectWithAuthError($request, $e);
         } catch (\Exception $e) {
-            dd($e);
             throw $this->createAccessDeniedException($e->getMessage(), $e);
         }
 
