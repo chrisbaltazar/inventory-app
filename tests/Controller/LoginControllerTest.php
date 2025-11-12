@@ -2,13 +2,20 @@
 
 namespace Tests\Controller;
 
+use App\Controller\LoginController;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\User;
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
+use DateTime;
+use DateTimeImmutable;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Tests\AbstractWebTestCase;
+use Tests\Trait\WithRequestSession;
 
 class LoginControllerTest extends AbstractWebTestCase
 {
+    use WithRequestSession;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -35,7 +42,7 @@ class LoginControllerTest extends AbstractWebTestCase
         /** @var User $user */
         $user = $userRepository->find($user->getId());
         self::assertNotNull($user->getAccessCode());
-        self::assertGreaterThan(new \DateTime(), $user->getCodeExpiration());
+        self::assertGreaterThan(new DateTime(), $user->getCodeExpiration());
         self::assertResponseRedirects('/login/code');
     }
 
@@ -43,7 +50,7 @@ class LoginControllerTest extends AbstractWebTestCase
     {
         $user = UserFactory::create();
         $user->setAccessCode('123456');
-        $user->setCodeExpiration(new \DateTimeImmutable('+5 min'));
+        $user->setCodeExpiration(new DateTimeImmutable('+5 min'));
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
@@ -56,7 +63,33 @@ class LoginControllerTest extends AbstractWebTestCase
             'recover_password[email]' => $user->getEmail(),
         ]);
 
-        self::assertGreaterThan(new \DateTime(), $user->getCodeExpiration());
+        self::assertGreaterThan(new DateTime(), $user->getCodeExpiration());
         self::assertResponseRedirects('/login/code');
+    }
+
+    public function testUserCodeSuccessfull()
+    {
+        $user = UserFactory::create();
+        $user->setAccessCode('123456');
+        $user->setCodeExpiration(new DateTimeImmutable('+5 min'));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $session = $this->createSession($this->client);
+        $session->set(LoginController::USER_ACCESS_ID, $user->getId());
+        $session->save();
+
+        $csrfToken = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfToken->expects($this->once())->method('isTokenValid')->willReturn(true);
+        $this->client->getContainer()->set('security.csrf.token_manager', $csrfToken);
+
+        $this->client->request('GET', '/login/code');
+
+        $this->client->submitForm('Verificar', [
+            'csrf_token' => 'token',
+            'code' => [1, 2, 3, 4, 5, 6],
+        ]);
+
+        self::assertResponseRedirects("/user/{$user->getId()}/password");
     }
 }
