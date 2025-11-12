@@ -35,7 +35,27 @@ class LoginControllerTest extends AbstractWebTestCase
         /** @var User $user */
         $user = $userRepository->find($user->getId());
         self::assertNotNull($user->getAccessCode());
-        self::assertNotNull($user->getCodeExpiration());
+        self::assertGreaterThan(new \DateTime(), $user->getCodeExpiration());
+        self::assertResponseRedirects('/login/code');
+    }
+
+    public function testRecoverAccessExisting()
+    {
+        $user = UserFactory::create();
+        $user->setAccessCode('123456');
+        $user->setCodeExpiration(new \DateTimeImmutable('+5 min'));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $smsProvider = $this->createMock(SMSProviderInterface::class);
+        $smsProvider->expects($this->never())->method('send');
+
+        $this->client->getContainer()->set(SMSProviderInterface::class, $smsProvider);
+        $this->client->request('GET', '/recover-access');
+        $this->client->submitForm('Enviar', [
+            'recover_password[email]' => $user->getEmail(),
+        ]);
+
         self::assertGreaterThan(new \DateTime(), $user->getCodeExpiration());
         self::assertResponseRedirects('/login/code');
     }

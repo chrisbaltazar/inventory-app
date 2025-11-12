@@ -78,7 +78,7 @@ class UserAccessService
         $this->entityManager->flush();
     }
 
-    private function createMessage(User $user)
+    private function createMessage(User $user): void
     {
         $message = $this->messageBuilder->passwordRecovery($user);
         $this->entityManager->persist($message);
