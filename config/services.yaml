@@ -59,13 +59,3 @@ services:
       arguments:
         $username: '%env(string:TWILIO_ACCOUNT_SID)%'
         $password: '%env(string:TWILIO_AUTH_TOKEN)%'
-
-    App\Service\Message\Channel\Sms\SMSProviderInterface:
-      alias: App\Service\Message\Channel\Sms\TwilioSMSProvider
-
-when@test:
-  services:
-    App\Tests\Mock\MockSMSProvider: ~
-
-    App\Service\Message\Channel\Sms\SMSProviderInterface:
-      alias: App\Tests\Mock\MockSMSProvider
