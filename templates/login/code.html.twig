@@ -47,12 +47,14 @@
     <script>
         document.addEventListener('turbo:load', () => {
             let time = {{ time }}
-                setInterval(() => {
-                    setClockTimer(time--)
-                    if (time < 0) {
-                        window.location.href = "{{ path('app_login') }}"
-                    }
-                }, 1000)
+            setClockTimer(time)
+
+            setInterval(() => {
+                setClockTimer(time--)
+                if (time < 0) {
+                    window.location.href = "{{ path('app_login') }}"
+                }
+            }, 1000)
 
             document.querySelectorAll('.js-code-digit').forEach(function (el) {
                 if (el.dataset.bound) return
@@ -60,7 +62,8 @@
                 el.addEventListener('keyup', function (e) {
                     const value = e.currentTarget.value
                     const next = e.currentTarget.nextElementSibling
-                    if (value && next) {
+                    const isNumber = isInteger(e.key)
+                    if (value !== '' && isNumber && next) {
                         next.focus()
                     }
                 })
@@ -68,6 +71,8 @@
                 el.dataset.bound = 'true'
             })
         })
+
+        const isInteger = (keyCode) => /\d$/.test(keyCode.toString());
 
         const setClockTimer = (time) => {
             const minutes = Math.floor(time / 60)
