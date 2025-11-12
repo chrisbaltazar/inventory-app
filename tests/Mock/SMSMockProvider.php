@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Mock;
+namespace Tests\Mock;
 
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
 
