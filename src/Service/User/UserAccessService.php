@@ -4,6 +4,8 @@ namespace App\Service\User;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\Message\MessageBuilder;
+use App\Service\Message\MessageManagerService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserAccessService
@@ -14,6 +16,8 @@ class UserAccessService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly MessageBuilder $messageBuilder,
+        private readonly MessageManagerService $messageManager,
     ) {}
 
 
@@ -37,11 +41,8 @@ class UserAccessService
             return $user;
         }
 
-        $newAccessCode = $this->getCode($codeLength);
-        $expirationTime = new \DateTime(self::DEFAULT_EXPIRATION_TIME);
-        $user->setAccessCode($newAccessCode);
-        $user->setCodeExpiration($expirationTime);
-        $this->entityManager->flush();
+        $this->setUserData($user, $codeLength);
+        $this->createMessage($user);
 
         return $user;
     }
@@ -66,6 +67,23 @@ class UserAccessService
         }
 
         return $code === (string) $user->getAccessCode();
+    }
+
+    private function setUserData(User $user, int $codeLength): void
+    {
+        $newAccessCode = $this->getCode($codeLength);
+        $expirationTime = new \DateTime(self::DEFAULT_EXPIRATION_TIME);
+        $user->setAccessCode($newAccessCode);
+        $user->setCodeExpiration($expirationTime);
+        $this->entityManager->flush();
+    }
+
+    private function createMessage(User $user)
+    {
+        $message = $this->messageBuilder->passwordRecovery($user);
+        $this->entityManager->persist($message);
+        $this->entityManager->flush();
+        $this->messageManager->dispatch($message);
     }
 
 }
