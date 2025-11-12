@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Tests\Application\Controller;
+namespace Tests\Controller;
 
 use App\DataFixtures\Factory\UserFactory;
 use App\Repository\UserRepository;
-use App\Tests\AbstractWebTestCase;
-use App\Tests\Trait\WithUserSession;
+use tests\AbstractWebTestCase;
+use Tests\Trait\WithUserSession;
 
 class UserProfileControllerTest extends AbstractWebTestCase
 {

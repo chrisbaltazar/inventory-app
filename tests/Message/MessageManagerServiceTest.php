@@ -1,6 +1,6 @@
 <?php
 
-namespace Service\Message;
+namespace Tests\Service\Message;
 
 use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
@@ -8,8 +8,8 @@ use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
 use App\Service\Message\MessageManagerService;
-use App\Tests\AbstractKernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Tests\AbstractKernelTestCase;
 
 class MessageManagerServiceTest extends AbstractKernelTestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Trait;
+namespace Tests\Trait;
 
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 

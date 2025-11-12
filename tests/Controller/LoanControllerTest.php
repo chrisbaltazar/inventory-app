@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Application\Controller;
+namespace Tests\Controller;
 
 use App\DataFixtures\Factory\EventFactory;
 use App\DataFixtures\Factory\InventoryFactory;
@@ -11,8 +11,8 @@ use App\Entity\Loan;
 use App\Enum\GenderEnum;
 use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
-use App\Tests\AbstractWebTestCase;
-use App\Tests\Trait\WithUserSession;
+use tests\AbstractWebTestCase;
+use Tests\Trait\WithUserSession;
 
 class LoanControllerTest extends AbstractWebTestCase
 {

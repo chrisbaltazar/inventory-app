@@ -18,7 +18,8 @@ class SMSMessageHandler implements MessageHandlerInterface
         private readonly SMSProviderInterface $provider,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     public function handle(Message $message): void
     {

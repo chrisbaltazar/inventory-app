@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Trait;
+namespace Tests\Trait;
 
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\User;
