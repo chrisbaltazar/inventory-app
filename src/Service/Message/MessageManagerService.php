@@ -2,6 +2,7 @@
 
 namespace App\Service\Message;
 
+use App\Entity\Message;
 use App\Enum\MessageTypeEnum;
 use App\Event\MessageProcessedEvent;
 use App\Repository\MessageRepository;
@@ -18,9 +19,14 @@ class MessageManagerService
     public function processAllPending(): void
     {
         foreach ($this->messageRepository->findAllPending() as $message) {
-            $messageType = MessageTypeEnum::from($message->getType());
-            $this->eventDispatcher->dispatch(new MessageProcessedEvent($messageType, $message));
+            $this->dispatch($message);
         }
+    }
+
+    public function dispatch(Message $message): void
+    {
+        $messageType = MessageTypeEnum::from($message->getType());
+        $this->eventDispatcher->dispatch(new MessageProcessedEvent($messageType, $message));
     }
 
 }

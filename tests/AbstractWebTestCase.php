@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Tests;
+namespace Tests;
 
-use App\Tests\Trait\WithDatabase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Tests\Trait\WithDatabase;
 
 abstract class AbstractWebTestCase extends WebTestCase
 {

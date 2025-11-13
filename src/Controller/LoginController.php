@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Form\RecoverPasswordType;
+use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
 use App\Service\Auth\SSOAuthenticatorInterface;
+use App\Service\User\UserAccessService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +18,9 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginController extends AbstractController
 {
+    const DEFAULT_CODE_LENGTH = 6;
+    const USER_ACCESS_ID = '_sdm_user_access_id';
+
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function index(AuthenticationUtils $utils, GoogleOAuthService $googleAuth): Response
     {
@@ -51,6 +57,81 @@ class LoginController extends AbstractController
         } catch (\Throwable $t) {
             throw $this->createAccessDeniedException($t->getMessage(), $t);
         }
+    }
+
+    #[Route('/recover-access', name: 'app_login_recover', methods: ['GET', 'POST'])]
+    public function recoverAccess(
+        Request $request,
+        UserRepository $userRepository,
+        UserAccessService $userAccess,
+    ): Response {
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('app_home_index');
+        }
+
+        $form = $this->createForm(RecoverPasswordType::class);
+        $form->handleRequest($request);
+
+        try {
+            if ($form->isSubmitted() && $form->isValid()) {
+                $search = ['email' => $form->get('email')->getData()];
+                $user = $userAccess->make($search, self::DEFAULT_CODE_LENGTH);
+                $request->getSession()->set(self::USER_ACCESS_ID, $user->getId());
+
+                return $this->redirectToRoute('app_login_code');
+            }
+        } catch (\Exception $e) {
+            return $this->redirectWithAuthError($request, $e);
+        }
+
+        return $this->render('login/recover.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/login/code', name: 'app_login_code', methods: ['GET', 'POST'])]
+    public function userCode(
+        Request $request,
+        UserRepository $userRepository,
+        UserAccessService $userAccess,
+        Security $security,
+    ): Response {
+        if ($this->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('app_home_index');
+        }
+
+        try {
+            $userSessionId = $request->getSession()->get(self::USER_ACCESS_ID);
+            $user = $userRepository->find($userSessionId) ?? throw new \RuntimeException('User not found');
+
+            if ($request->isMethod('POST')) {
+                if (!$this->isCsrfTokenValid('access_code', $request->get('csrf_token'))) {
+                    throw $this->createAccessDeniedException();
+                }
+
+                $code = implode('', $request->get('code', []));
+                if ($userAccess->validate($user, $code)) {
+                    $security->login($user);
+
+                    return $this->redirectToRoute('app_user_password', ['id' => $user->getId()]);
+                }
+
+                return $this->redirectToRoute('app_login_code');
+            }
+        } catch (\LogicException $e) {
+            return $this->redirectWithAuthError($request, $e);
+        } catch (\Exception $e) {
+            throw $this->createAccessDeniedException($e->getMessage(), $e);
+        }
+
+        $number = substr($user->getPhone(), -3);
+        $time = $user->getCodeExpiration()?->getTimestamp() - time();
+
+        return $this->render('login/code.html.twig', [
+            'time' => $time,
+            'number' => $number,
+            'length' => self::DEFAULT_CODE_LENGTH,
+        ]);
     }
 
     private function redirectWithAuthError(Request $request, \Exception $e): Response

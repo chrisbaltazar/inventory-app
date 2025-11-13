@@ -57,6 +57,11 @@ class Message
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $processedAt = null;
 
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+    }
+
     public function getId(): ?int
     {
         return $this->id;

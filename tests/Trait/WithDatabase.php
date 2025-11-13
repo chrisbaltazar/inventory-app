@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Tests\Trait;
+namespace Tests\Trait;
 
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 trait WithDatabase
 {
 
-    protected function refreshDatabase(): void
+    public function refreshDatabase(): void
     {
         $purger = new ORMPurger($this->entityManager);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
         $purger->purge();
     }
 
-    protected function assertDatabaseCount(int $count, string $entityClass): void
+    public function assertDatabaseCount(int $count, string $entityClass): void
     {
         $repository = $this->entityManager->getRepository($entityClass);
 
@@ -23,7 +23,7 @@ trait WithDatabase
         self::assertCount($count, $result);
     }
 
-    protected function assertDatabaseEntity(string $entityClass, array $data): void
+    public function assertDatabaseEntity(string $entityClass, array $data): void
     {
         $repository = $this->entityManager->getRepository($entityClass);
 
