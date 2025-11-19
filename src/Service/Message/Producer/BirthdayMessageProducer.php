@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Service\Message\Producer;
+
+use App\Entity\Message;
+use App\Entity\User;
+use App\Enum\MessageTypeEnum;
+use App\Repository\MessageRepository;
+use App\Repository\UserRepository;
+use App\Service\Message\MessageBuilder;
+use Doctrine\ORM\EntityManagerInterface;
+
+class BirthdayMessageProducer implements MessageProducerInterface
+{
+
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly MessageRepository $messageRepository,
+        private readonly MessageBuilder $messageBuilder,
+        private readonly EntityManagerInterface $entityManager,
+    ) {}
+
+    public function createAdminMessages()
+    {
+        $birthdayUsers = $this->userRepository->findUsersWithBirthday(date('m'), date('d'));
+        if (empty($birthdayUsers)) {
+            return;
+        }
+
+        $admins = $this->userRepository->findAllAdmin();
+        foreach ($admins as $admin) {
+            foreach ($birthdayUsers as $user) {
+                if ($admin->getId() === $user->getId()) {
+                    continue;
+                }
+
+                $existingMessage = $this->existMessage($admin, $user->getName());
+                if ($existingMessage && $this->isRelevant($existingMessage)) {
+                    continue;
+                }
+
+                $message = $this->messageBuilder->adminBirthdayMessage($admin);
+                $this->entityManager->persist($message);
+            }
+        }
+
+        $this->entityManager->flush();
+    }
+
+
+    public function existMessage(...$args): ?Message
+    {
+        /** @var User $user */
+        [$user, $name] = $args;
+
+        return $this->messageRepository->findOnePendingBy(
+            type: MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
+            user: $user,
+            scheduled: new \DateTime('now'),
+            content: $name,
+        );
+    }
+
+    public function isRelevant(?Message $message): bool
+    {
+        return !is_null($message)
+            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format(
+                'Y-m-d',
+            );
+    }
+}
