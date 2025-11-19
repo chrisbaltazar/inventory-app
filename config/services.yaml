@@ -55,7 +55,19 @@ services:
         $senderNumber: '%env(string:TWILIO_FROM_NUMBER)%'
         $appName: '%env(string:APP_NAME)%'
 
+    App\Service\Message\Channel\Sms\SMSProviderInterface:
+      alias: App\Service\Message\Channel\Sms\TelnyxSMSProvider
+
     Twilio\Rest\Client:
       arguments:
         $username: '%env(string:TWILIO_ACCOUNT_SID)%'
         $password: '%env(string:TWILIO_AUTH_TOKEN)%'
+
+    Telnyx\Client:
+      arguments:
+        $apiKey: '%env(string:TELNYX_API_KEY)%'
+        $baseUrl: '%env(string:TELNYX_BASE_URL)%'
+
+    App\Service\Message\Channel\Sms\TelnyxSMSProvider:
+      arguments:
+        $messagingProfileId: '%env(string:TELNYX_MESSAGING_PROFILE_ID)%'
