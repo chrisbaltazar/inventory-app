@@ -40,7 +40,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
                     continue;
                 }
 
-                $message = $this->messageBuilder->adminBirthdayMessage($admin);
+                $message = $this->messageBuilder->adminBirthdayMessage($admin, $user->getName());
                 $this->entityManager->persist($message);
             }
         }
