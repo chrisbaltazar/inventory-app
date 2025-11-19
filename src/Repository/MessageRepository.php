@@ -31,6 +31,7 @@ class MessageRepository extends ServiceEntityRepository
         return $this
             ->createQueryBuilder('m')
             ->where('m.processedAt IS NULL')
+            ->andWhere('m.status IS NULL')
             ->andWhere('m.scheduledAt <= :now')
             ->setParameter('now', new \DateTime('now'))
             ->orderBy('m.scheduledAt', 'ASC')

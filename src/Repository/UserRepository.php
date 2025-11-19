@@ -65,7 +65,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         return $this
             ->createQueryBuilder('u')
-            ->andWhere('MONTH(u.birthday) = :month')
+            ->where('MONTH(u.birthday) = :month')
             ->andWhere('DAY(u.birthday) = :day')
             ->setParameter('month', abs($month))
             ->setParameter('day', abs($day))
