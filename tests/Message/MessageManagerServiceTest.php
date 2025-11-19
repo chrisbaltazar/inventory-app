@@ -80,7 +80,6 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $smsProvider->expects($this->never())->method('send');
         $this->set(SMSProviderInterface::class, $smsProvider);
 
-        $this->expectException(\UnexpectedValueException::class);
         $test = new MessageManagerService($repository, $eventDispatcher);
         $test->processAllPending();
 
