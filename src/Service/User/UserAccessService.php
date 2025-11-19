@@ -43,6 +43,8 @@ class UserAccessService
 
         $this->setUserData($user, $codeLength);
         $this->createMessage($user);
+        // Persist changes after message processed
+        $this->entityManager->flush();
 
         return $user;
     }
@@ -75,7 +77,6 @@ class UserAccessService
         $expirationTime = new \DateTime(self::DEFAULT_EXPIRATION_TIME);
         $user->setAccessCode($newAccessCode);
         $user->setCodeExpiration($expirationTime);
-        $this->entityManager->flush();
     }
 
     private function createMessage(User $user): void
