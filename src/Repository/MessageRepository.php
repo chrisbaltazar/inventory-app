@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Message;
 use App\Entity\User;
+use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,18 +40,17 @@ class MessageRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findOnePendingBy(
+    public function findOneWith(
         MessageTypeEnum $type,
         User $user = null,
         \DateTime $scheduled = null,
         string $content = null,
+        MessageStatusEnum $status = null,
     ): ?Message {
         $query = $this
             ->createQueryBuilder('m')
             ->where('m.type = :type')
-            ->setParameter('type', $type->value)
-            ->andWhere('m.processedAt IS NULL')
-            ->andWhere('m.status IS NULL');
+            ->setParameter('type', $type->value);
         if ($scheduled) {
             $query
                 ->andWhere('DATE(m.scheduledAt) = :scheduledDate')
@@ -65,6 +65,11 @@ class MessageRepository extends ServiceEntityRepository
             $query
                 ->andWhere('m.content LIKE :content')
                 ->setParameter('content', "%$content%");
+        }
+        if ($status) {
+            $query
+                ->andWhere('m.status = :status')
+                ->setParameter('status', $status->value);
         }
 
         return $query

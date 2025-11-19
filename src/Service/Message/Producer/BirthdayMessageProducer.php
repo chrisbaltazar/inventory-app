@@ -4,6 +4,7 @@ namespace App\Service\Message\Producer;
 
 use App\Entity\Message;
 use App\Entity\User;
+use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
@@ -53,7 +54,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
         /** @var User $user */
         [$user, $name] = $args;
 
-        return $this->messageRepository->findOnePendingBy(
+        return $this->messageRepository->findOneWith(
             type: MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
             user: $user,
             scheduled: new \DateTime('now'),
@@ -63,9 +64,8 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
     public function isRelevant(?Message $message): bool
     {
-        return !is_null($message)
-            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format(
-                'Y-m-d',
-            );
+        return $message
+            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
+            && (!$message->getStatus() || $message->getStatus() !== MessageStatusEnum::ERROR->value);
     }
 }
