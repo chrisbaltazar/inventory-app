@@ -16,8 +16,8 @@ class TelnyxSMSProvider implements SmsProviderInterface
     {
         return $this->client->messages->send(
             to: $number,
+            messagingProfileID: $this->messagingProfileId,
             text: $message,
-//            messagingProfileID: $this->messagingProfileId,
         );
     }
 }

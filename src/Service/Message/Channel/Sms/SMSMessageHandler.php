@@ -13,20 +13,18 @@ class SMSMessageHandler implements MessageHandlerInterface
     const MAX_MESSAGE_LENGTH = 160;
 
     public function __construct(
-        private readonly string $senderNumber,
         private readonly string $appName,
         private readonly SMSProviderInterface $provider,
         private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
-    ) {
-    }
+    ) {}
 
     public function handle(Message $message): void
     {
         try {
             $recipient = $this->getMessageRecipient($message);
             $messageBody = $this->getMessageBody($message);
-            $this->provider->send($recipient, $this->senderNumber, $messageBody);
+            $this->provider->send($recipient, $this->appName, $messageBody);
             $this->markMessageAs(MessageStatusEnum::SENT, $message);
         } catch (\Exception $e) {
             $this->logger->error('Error sending SMS: ' . $e->getMessage());
@@ -39,9 +37,7 @@ class SMSMessageHandler implements MessageHandlerInterface
 
     private function getMessageBody(Message $message): string
     {
-        $sender = $message->getSender() ?? $this->appName;
-
-        return substr(sprintf('%s: %s', $sender, $message->getContent()), 0, self::MAX_MESSAGE_LENGTH);
+        return substr($message->getContent(), 0, self::MAX_MESSAGE_LENGTH);
     }
 
 
