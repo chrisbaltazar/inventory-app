@@ -50,9 +50,11 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         );
         $this->set(SMSProviderInterface::class, $smsProvider);
 
-        $producer = $this->createMock(MessageProducerInterface::class);
-        $producer->expects($this->once())->method('isRelevant')->willReturn(true);
-        $iterator = $this->getIteratorWith([$producer]);
+        $producer1 = $this->createMock(MessageProducerInterface::class);
+        $producer1->expects($this->once())->method('isRelevant')->willReturn(true);
+        $producer2 = $this->createMock(MessageProducerInterface::class);
+        $producer2->expects($this->never())->method('isRelevant');
+        $iterator = $this->getIteratorWith([$producer1, $producer2]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
