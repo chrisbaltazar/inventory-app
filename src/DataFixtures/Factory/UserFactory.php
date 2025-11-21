@@ -20,7 +20,7 @@ class UserFactory extends AbstractFactory
         $user->setPassword($password ?? self::faker()->password);
         $user->setRoles($roles ?? []);
         $user->setPhone($phoneNumber ?? sprintf('+34%d', self::faker()->randomNumber(9)));
-        $user->setBirthday($birthday ?? self::faker()->dateTimeBetween('-30 years'));
+        $user->setBirthday($birthday ?? self::faker()->dateTimeBetween('-50 years', '-18 years'));
 
         return $user;
     }

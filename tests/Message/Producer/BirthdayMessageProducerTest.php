@@ -21,18 +21,31 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
     public function testProduceMessages(): void
     {
         $user1 = UserFactory::create(birthday: new \DateTime('today'));
-        $user2 = UserFactory::create(birthday: new \DateTime('-1 day'));
+        $user2 = UserFactory::create(birthday: new \DateTime('today'));
+        $user3 = UserFactory::create(birthday: new \DateTime('-1 day'));
         $admin = UserFactory::admin();
+
+        $message = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            user: $user2,
+            content: $user2->getName(),
+            scheduledAt: new \DateTimeImmutable('-1 min'),
+        );
+        $message->setStatus(null);
+        $message->setProcessedAt(null);
+
         $this->entityManager->persist($user1);
         $this->entityManager->persist($user2);
+        $this->entityManager->persist($user3);
         $this->entityManager->persist($admin);
+        $this->entityManager->persist($message);
         $this->entityManager->flush();
 
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
         $test->produce();
 
-        $this->assertDatabaseCount(2, Message::class);
+        $this->assertDatabaseCount(3, Message::class);
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::USER_BIRTHDAY_GREET->value,
             'user' => $user1,

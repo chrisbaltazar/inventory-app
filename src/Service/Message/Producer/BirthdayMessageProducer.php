@@ -28,15 +28,6 @@ class BirthdayMessageProducer implements MessageProducerInterface
             return;
         }
 
-        $this->createUserMessages($birthdayUsers);
-        $this->createAdminMessages($birthdayUsers);
-    }
-
-    /**
-     * @param User[] $birthdayUsers
-     */
-    private function createUserMessages(array $birthdayUsers): void
-    {
         foreach ($birthdayUsers as $user) {
             $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user, $user->getName());
             if ($existingMessage && $this->isRelevant($existingMessage)) {
@@ -45,36 +36,31 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
             $message = $this->messageBuilder->userBirthdayMessage($user);
             $this->entityManager->persist($message);
+            $this->createAdminMessages($user);
         }
 
         $this->entityManager->flush();
     }
 
-    /**
-     * @param User[] $birthdayUsers
-     */
-    private function createAdminMessages(array $birthdayUsers): void
+    private function createAdminMessages(User $user): void
     {
         $admins = $this->userRepository->findAllAdmin();
         foreach ($admins as $admin) {
-            foreach ($birthdayUsers as $user) {
-                if ($admin->getId() === $user->getId()) {
-                    continue;
-                }
-
-                $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getName());
-                if ($existingMessage && $this->isRelevant($existingMessage)) {
-                    continue;
-                }
-
-                $message = $this->messageBuilder->adminBirthdayMessage($admin, $user->getName());
-                $this->entityManager->persist($message);
+            if ($admin->getId() === $user->getId()) {
+                continue;
             }
+
+            $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getName());
+            if ($existingMessage && $this->isRelevant($existingMessage)) {
+                continue;
+            }
+
+            $message = $this->messageBuilder->adminBirthdayMessage($admin, $user->getName());
+            $this->entityManager->persist($message);
         }
 
         $this->entityManager->flush();
     }
-
 
     public function existMessage(...$args): ?Message
     {
