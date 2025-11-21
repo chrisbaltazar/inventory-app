@@ -32,7 +32,7 @@ class MessageManagerService
     {
         foreach ($this->messageRepository->findAllPending() as $message) {
             foreach ($this->messageProducers as $messageProducer) {
-                if ($messageProducer->canBeSent($message)) {
+                if ($messageProducer->isWaiting($message)) {
                     $this->dispatch($message);
                     break;
                 }

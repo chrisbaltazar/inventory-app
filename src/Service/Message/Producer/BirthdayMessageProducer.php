@@ -30,7 +30,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
         foreach ($birthdayUsers as $user) {
             $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user, $user->getName());
-            if ($existingMessage && $this->canBeCreated($existingMessage)) {
+            if ($existingMessage && $this->isRelevant($existingMessage)) {
                 continue;
             }
 
@@ -51,7 +51,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
             }
 
             $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getName());
-            if ($existingMessage && $this->canBeCreated($existingMessage)) {
+            if ($existingMessage && $this->isRelevant($existingMessage)) {
                 continue;
             }
 
@@ -76,7 +76,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
         );
     }
 
-    public function canBeCreated(Message $message): bool
+    public function isRelevant(Message $message): bool
     {
         $type = MessageTypeEnum::from($message->getType());
 
@@ -85,12 +85,12 @@ class BirthdayMessageProducer implements MessageProducerInterface
             && (!$message->getStatus() || $message->getStatus() !== MessageStatusEnum::ERROR->value);
     }
 
-    public function canBeSent(Message $message): bool
+    public function isWaiting(Message $message): bool
     {
         $type = MessageTypeEnum::from($message->getType());
 
         return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
             && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
-            && (!$message->getStatus() || $message->getStatus() === MessageStatusEnum::ERROR->value);
+            && !$message->getStatus();
     }
 }

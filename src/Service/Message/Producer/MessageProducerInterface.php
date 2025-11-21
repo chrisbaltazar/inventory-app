@@ -11,8 +11,8 @@ interface MessageProducerInterface
 
     public function existMessage(...$args): ?Message;
 
-    public function canBeCreated(Message $message): bool;
+    public function isRelevant(Message $message): bool;
 
-    public function canBeSent(Message $message): bool;
+    public function isWaiting(Message $message): bool;
 
 }

@@ -50,9 +50,9 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer1 = $this->createMock(MessageProducerInterface::class);
-        $producer1->expects($this->once())->method('canBeSent')->willReturn(true);
+        $producer1->expects($this->once())->method('isWaiting')->willReturn(true);
         $producer2 = $this->createMock(MessageProducerInterface::class);
-        $producer2->expects($this->never())->method('canBeSent');
+        $producer2->expects($this->never())->method('isWaiting');
         $iterator = $this->getIteratorWith([$producer1, $producer2]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
@@ -87,7 +87,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer = $this->createMock(MessageProducerInterface::class);
-        $producer->expects($this->once())->method('canBeSent')->willReturn(true);
+        $producer->expects($this->once())->method('isWaiting')->willReturn(true);
         $iterator = $this->getIteratorWith([$producer]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);

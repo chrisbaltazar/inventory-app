@@ -20,10 +20,10 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
 
     public function testProduceMessages(): void
     {
-        $user1 = UserFactory::create(birthday: new \DateTime('today'));
-        $user2 = UserFactory::create(birthday: new \DateTime('today'));
-        $user3 = UserFactory::create(birthday: new \DateTime('-1 day'));
-        $admin = UserFactory::admin();
+        $user1 = UserFactory::create(birthday: new \DateTime('today')); // HBD (1)
+        $user2 = UserFactory::create(birthday: new \DateTime('today')); // Existing (2)
+        $user3 = UserFactory::create(birthday: new \DateTime('-1 day')); // No HBD
+        $admin = UserFactory::admin(); // (3)
 
         $message = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
@@ -56,7 +56,7 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         ]);
     }
 
-    public function testMessageIsRelevant(): void
+    public function testMessagesValidation(): void
     {
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
@@ -72,9 +72,25 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $message2->setStatus(MessageStatusEnum::SENT->value);
         $message2->setProcessedAt(new \DateTimeImmutable('now'));
 
+        $message3 = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            scheduledAt: new \DateTimeImmutable('-1 min'),
+        );
+        $message3->setStatus(null);
+        $message3->setProcessedAt(null);
+
+        $message4 = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            scheduledAt: new \DateTimeImmutable('-1 min'),
+        );
+        $message4->setStatus(MessageStatusEnum::ERROR->value);
+        $message4->setProcessedAt(new \DateTimeImmutable('now'));
+
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
-        $this->assertTrue($test->canBeCreated($message1));
-        $this->assertFalse($test->canBeCreated($message2));
+        $this->assertTrue($test->isWaiting($message1));
+        $this->assertFalse($test->isWaiting($message2));
+        $this->assertTrue($test->isRelevant($message3));
+        $this->assertFalse($test->isRelevant($message4));
     }
 }
