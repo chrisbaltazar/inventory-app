@@ -16,6 +16,7 @@ A demo Inventory Management Application built with PHP + Symfony + MySQL, showca
   - Record loans & returns 
   - Associate users with borrowed items 
 - Event Tracking 
+- System notifications using Domain events and messaging channels
 - Responsive UI 
   - Clean, mobile-friendly design
 
@@ -66,6 +67,10 @@ symfony serve
 Run the tests with:
 ```php 
 php bin/phpunit
+```
+or 
+```php 
+composer test
 ```
 
 The app will be available at: http://localhost:8000
