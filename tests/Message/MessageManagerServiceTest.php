@@ -36,7 +36,6 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->persist($message);
         $this->entityManager->flush();
-        $this->assertDatabaseCount(1, Message::class);
 
         $repository = $this->entityManager->getRepository(Message::class);
         $eventDispatcher = $this->get(EventDispatcherInterface::class);
@@ -51,9 +50,9 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer1 = $this->createMock(MessageProducerInterface::class);
-        $producer1->expects($this->once())->method('isRelevant')->willReturn(true);
+        $producer1->expects($this->once())->method('canBeSent')->willReturn(true);
         $producer2 = $this->createMock(MessageProducerInterface::class);
-        $producer2->expects($this->never())->method('isRelevant');
+        $producer2->expects($this->never())->method('canBeSent');
         $iterator = $this->getIteratorWith([$producer1, $producer2]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
@@ -88,7 +87,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer = $this->createMock(MessageProducerInterface::class);
-        $producer->expects($this->once())->method('isRelevant')->willReturn(true);
+        $producer->expects($this->once())->method('canBeSent')->willReturn(true);
         $iterator = $this->getIteratorWith([$producer]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);

@@ -66,7 +66,7 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $message1->setProcessedAt(null);
 
         $message2 = MessageFactory::create(
-            type: MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
             scheduledAt: new \DateTimeImmutable('-1 min'),
         );
         $message2->setStatus(MessageStatusEnum::SENT->value);
@@ -74,7 +74,7 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
 
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
-        $this->assertTrue($test->isRelevant($message1));
-        $this->assertFalse($test->isRelevant($message2));
+        $this->assertTrue($test->canBeCreated($message1));
+        $this->assertFalse($test->canBeCreated($message2));
     }
 }
