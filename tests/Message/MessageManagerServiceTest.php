@@ -8,6 +8,7 @@ use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
 use App\Service\Message\MessageManagerService;
+use App\Service\Message\Producer\MessageProducerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Tests\AbstractKernelTestCase;
 
@@ -49,7 +50,11 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         );
         $this->set(SMSProviderInterface::class, $smsProvider);
 
-        $test = new MessageManagerService($repository, $eventDispatcher);
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->once())->method('isRelevant')->willReturn(true);
+        $iterator = $this->getIteratorWith([$producer]);
+
+        $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
 
         $message = $repository->find($message->getId());
@@ -80,12 +85,24 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $smsProvider->expects($this->never())->method('send');
         $this->set(SMSProviderInterface::class, $smsProvider);
 
-        $test = new MessageManagerService($repository, $eventDispatcher);
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->once())->method('isRelevant')->willReturn(true);
+        $iterator = $this->getIteratorWith([$producer]);
+
+        $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
 
         $message = $repository->find($message->getId());
         $this->assertSame(MessageStatusEnum::ERROR->value, $message->getStatus());
         $this->assertNotNull($message->getProcessedAt());
+    }
+
+    private function getIteratorWith(array $iteratorItems)
+    {
+        $iterator = $this->getMockBuilder(\IteratorAggregate::class)->getMock();
+        $iterator->method('getIterator')->willReturn(new \ArrayIterator($iteratorItems));
+
+        return $iterator;
     }
 
 }
