@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use App\Service\Message\MessageManagerService;
-use App\Service\Message\Producer\BirthdayMessageProducer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,21 +18,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class MessageHandlerCommand extends Command
 {
     public function __construct(
-        private readonly MessageManagerService $messageHandler,
-        private readonly BirthdayMessageProducer $birthdayMessageProducer,
+        private readonly MessageManagerService $messageManager,
     ) {
         parent::__construct();
-    }
-
-    private function consume(): void
-    {
-        $this->messageHandler->processAllPending();
-    }
-
-
-    private function produce(): void
-    {
-        $this->birthdayMessageProducer->createAdminMessages();
     }
 
     protected function configure(): void
@@ -48,8 +35,8 @@ class MessageHandlerCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $this->produce();
-            $this->consume();
+            $this->messageManager->produceNew();
+            $this->messageManager->processAllPending();
             $io->success('All pending messages have been processed.');
 
             return Command::SUCCESS;

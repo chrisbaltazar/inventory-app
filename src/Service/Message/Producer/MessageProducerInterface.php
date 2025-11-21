@@ -7,9 +7,10 @@ use App\Entity\Message;
 interface MessageProducerInterface
 {
 
+    public function produce(): void;
+
     public function existMessage(...$args): ?Message;
 
-
-    public function isRelevant(?Message $message): bool;
+    public function isRelevant(Message $message): bool;
 
 }

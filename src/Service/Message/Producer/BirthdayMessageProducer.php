@@ -21,7 +21,12 @@ class BirthdayMessageProducer implements MessageProducerInterface
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
-    public function createAdminMessages()
+    public function produce(): void
+    {
+        $this->createAdminMessages();
+    }
+
+    public function createAdminMessages(): void
     {
         $birthdayUsers = $this->userRepository->findUsersWithBirthday(date('m'), date('d'));
         if (empty($birthdayUsers)) {
@@ -62,9 +67,9 @@ class BirthdayMessageProducer implements MessageProducerInterface
         );
     }
 
-    public function isRelevant(?Message $message): bool
+    public function isRelevant(Message $message): bool
     {
-        return $message
+        return MessageTypeEnum::from($message->getType())->isAdminBirthdayNotif()
             && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
             && (!$message->getStatus() || $message->getStatus() !== MessageStatusEnum::ERROR->value);
     }
