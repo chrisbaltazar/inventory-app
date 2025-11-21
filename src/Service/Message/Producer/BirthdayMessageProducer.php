@@ -23,16 +23,38 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
     public function produce(): void
     {
-        $this->createAdminMessages();
-    }
-
-    public function createAdminMessages(): void
-    {
         $birthdayUsers = $this->userRepository->findUsersWithBirthday(date('m'), date('d'));
         if (empty($birthdayUsers)) {
             return;
         }
 
+        $this->createUserMessages($birthdayUsers);
+        $this->createAdminMessages($birthdayUsers);
+    }
+
+    /**
+     * @param User[] $birthdayUsers
+     */
+    public function createUserMessages(array $birthdayUsers): void
+    {
+        foreach ($birthdayUsers as $user) {
+            $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user, $user->getName());
+            if ($existingMessage && $this->isRelevant($existingMessage)) {
+                continue;
+            }
+
+            $message = $this->messageBuilder->userBirthdayMessage($user);
+            $this->entityManager->persist($message);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param User[] $birthdayUsers
+     */
+    public function createAdminMessages(array $birthdayUsers): void
+    {
         $admins = $this->userRepository->findAllAdmin();
         foreach ($admins as $admin) {
             foreach ($birthdayUsers as $user) {
@@ -40,7 +62,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
                     continue;
                 }
 
-                $existingMessage = $this->existMessage($admin, $user->getName());
+                $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getName());
                 if ($existingMessage && $this->isRelevant($existingMessage)) {
                     continue;
                 }
@@ -56,11 +78,12 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
     public function existMessage(...$args): ?Message
     {
+        /** @var MessageTypeEnum $type */
         /** @var User $user */
-        [$user, $name] = $args;
+        [$type, $user, $name] = $args;
 
         return $this->messageRepository->findOneWith(
-            type: MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
+            type: $type,
             user: $user,
             scheduled: new \DateTime('now'),
             content: $name,
@@ -69,7 +92,9 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
     public function isRelevant(Message $message): bool
     {
-        return MessageTypeEnum::from($message->getType())->isAdminBirthdayNotif()
+        $type = MessageTypeEnum::from($message->getType());
+
+        return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
             && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
             && (!$message->getStatus() || $message->getStatus() !== MessageStatusEnum::ERROR->value);
     }
