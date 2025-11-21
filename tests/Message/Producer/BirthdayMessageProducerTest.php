@@ -2,8 +2,10 @@
 
 namespace Tests\Service\Message\Producer;
 
+use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
+use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Service\Message\Producer\BirthdayMessageProducer;
 use Tests\AbstractKernelTestCase;
@@ -26,6 +28,7 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $this->entityManager->persist($admin);
         $this->entityManager->flush();
 
+        /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
         $test->produce();
 
@@ -38,5 +41,27 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
             'type' => MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF->value,
             'user' => $admin,
         ]);
+    }
+
+    public function testMessageIsRelevant(): void
+    {
+        $message1 = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            scheduledAt: new \DateTimeImmutable('-1 min'),
+        );
+        $message1->setStatus(null);
+        $message1->setProcessedAt(null);
+
+        $message2 = MessageFactory::create(
+            type: MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
+            scheduledAt: new \DateTimeImmutable('-1 min'),
+        );
+        $message2->setStatus(MessageStatusEnum::SENT->value);
+        $message2->setProcessedAt(new \DateTimeImmutable('now'));
+
+        /** @var BirthdayMessageProducer $test */
+        $test = $this->get(BirthdayMessageProducer::class);
+        $this->assertTrue($test->isRelevant($message1));
+        $this->assertFalse($test->isRelevant($message2));
     }
 }

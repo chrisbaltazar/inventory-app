@@ -35,7 +35,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
     /**
      * @param User[] $birthdayUsers
      */
-    public function createUserMessages(array $birthdayUsers): void
+    private function createUserMessages(array $birthdayUsers): void
     {
         foreach ($birthdayUsers as $user) {
             $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user, $user->getName());
@@ -53,7 +53,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
     /**
      * @param User[] $birthdayUsers
      */
-    public function createAdminMessages(array $birthdayUsers): void
+    private function createAdminMessages(array $birthdayUsers): void
     {
         $admins = $this->userRepository->findAllAdmin();
         foreach ($admins as $admin) {
