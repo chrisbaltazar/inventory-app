@@ -74,3 +74,11 @@ services:
     App\Service\Message\Channel\Sms\TelnyxSMSProvider:
       arguments:
         $messagingProfileId: '%env(string:TELNYX_MESSAGING_PROFILE_ID)%'
+
+    _instanceof:
+      App\Service\Message\Producer\MessageProducerInterface:
+        tags: ['app.message.producer']
+
+    App\Service\Message\MessageManagerService:
+      arguments:
+        $messageProducers: !tagged_iterator 'app.message.producer'

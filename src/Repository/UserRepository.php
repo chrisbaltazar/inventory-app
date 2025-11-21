@@ -43,4 +43,34 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         return $this->createQueryBuilder('u')->orderBy('u.name', 'ASC')->getQuery()->getResult();
     }
+
+    /**
+     * @return User[]
+     */
+    public function findAllAdmin(): array
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%ROLE_ADMIN%')
+            ->orderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return User[]
+     */
+    public function findUsersWithBirthday(int $month, int $day): array
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('MONTH(u.birthday) = :month')
+            ->andWhere('DAY(u.birthday) = :day')
+            ->setParameter('month', abs($month))
+            ->setParameter('day', abs($day))
+            ->getQuery()
+            ->getResult();
+    }
+
 }

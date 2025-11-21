@@ -17,8 +17,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class MessageHandlerCommand extends Command
 {
-    public function __construct(private MessageManagerService $messageHandler)
-    {
+    public function __construct(
+        private readonly MessageManagerService $messageManager,
+    ) {
         parent::__construct();
     }
 
@@ -34,12 +35,14 @@ class MessageHandlerCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $this->messageHandler->processAllPending();
+            $this->messageManager->produceNew();
+            $this->messageManager->processAllPending();
             $io->success('All pending messages have been processed.');
 
             return Command::SUCCESS;
         } catch (\Throwable $t) {
-            $io->error($t->getMessage());
+            $error = sprintf('%s: %s', $t->getMessage(), $t->getTraceAsString());
+            $io->error($error);
 
             return Command::FAILURE;
         }

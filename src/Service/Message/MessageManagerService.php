@@ -6,20 +6,37 @@ use App\Entity\Message;
 use App\Enum\MessageTypeEnum;
 use App\Event\MessageProcessedEvent;
 use App\Repository\MessageRepository;
+use App\Service\Message\Producer\MessageProducerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MessageManagerService
 {
 
+    /**
+     * @param MessageProducerInterface[] $messageProducers
+     */
     public function __construct(
-        private MessageRepository $messageRepository,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly MessageRepository $messageRepository,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly iterable $messageProducers,
     ) {}
+
+    public function produceNew(): void
+    {
+        foreach ($this->messageProducers as $messageProducer) {
+            $messageProducer->produce();
+        }
+    }
 
     public function processAllPending(): void
     {
         foreach ($this->messageRepository->findAllPending() as $message) {
-            $this->dispatch($message);
+            foreach ($this->messageProducers as $messageProducer) {
+                if ($messageProducer->isWaiting($message)) {
+                    $this->dispatch($message);
+                    break;
+                }
+            }
         }
     }
 

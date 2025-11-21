@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'message_scheduled_idx', columns: ['scheduled_at'])]
 #[ORM\Index(name: 'message_processed_idx', columns: ['processed_at'])]
 #[ORM\Index(name: 'message_status_idx', columns: ['status'])]
+#[ORM\Index(name: 'message_user_idx', columns: ['user_id'])]
 class Message
 {
     #[ORM\Id]

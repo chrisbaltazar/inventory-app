@@ -26,12 +26,23 @@ doctrine:
             soft_delete_filter:
                 class: App\Service\Database\DoctrineSoftDeleteFilter
                 enabled: true
+        dql:
+            string_functions:
+                MONTH: DoctrineExtensions\Query\Mysql\Month
+                DAY: DoctrineExtensions\Query\Mysql\Day
+                DATE: DoctrineExtensions\Query\Mysql\Date
 
 when@test:
     doctrine:
         dbal:
             # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+        orm:
+            dql:
+              string_functions:
+                  MONTH: DoctrineExtensions\Query\Sqlite\Month
+                  DAY: DoctrineExtensions\Query\Sqlite\Day
+                  DATE: DoctrineExtensions\Query\Sqlite\Date
 
 when@prod:
     doctrine:

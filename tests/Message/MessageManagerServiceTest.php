@@ -8,6 +8,7 @@ use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
 use App\Service\Message\MessageManagerService;
+use App\Service\Message\Producer\MessageProducerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Tests\AbstractKernelTestCase;
 
@@ -35,7 +36,6 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->persist($message);
         $this->entityManager->flush();
-        $this->assertDatabaseCount(1, Message::class);
 
         $repository = $this->entityManager->getRepository(Message::class);
         $eventDispatcher = $this->get(EventDispatcherInterface::class);
@@ -49,7 +49,13 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         );
         $this->set(SMSProviderInterface::class, $smsProvider);
 
-        $test = new MessageManagerService($repository, $eventDispatcher);
+        $producer1 = $this->createMock(MessageProducerInterface::class);
+        $producer1->expects($this->once())->method('isWaiting')->willReturn(true);
+        $producer2 = $this->createMock(MessageProducerInterface::class);
+        $producer2->expects($this->never())->method('isWaiting');
+        $iterator = $this->getIteratorWith([$producer1, $producer2]);
+
+        $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
 
         $message = $repository->find($message->getId());
@@ -80,13 +86,24 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $smsProvider->expects($this->never())->method('send');
         $this->set(SMSProviderInterface::class, $smsProvider);
 
-        $this->expectException(\UnexpectedValueException::class);
-        $test = new MessageManagerService($repository, $eventDispatcher);
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->once())->method('isWaiting')->willReturn(true);
+        $iterator = $this->getIteratorWith([$producer]);
+
+        $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
 
         $message = $repository->find($message->getId());
         $this->assertSame(MessageStatusEnum::ERROR->value, $message->getStatus());
         $this->assertNotNull($message->getProcessedAt());
+    }
+
+    private function getIteratorWith(array $iteratorItems)
+    {
+        $iterator = $this->getMockBuilder(\IteratorAggregate::class)->getMock();
+        $iterator->method('getIterator')->willReturn(new \ArrayIterator($iteratorItems));
+
+        return $iterator;
     }
 
 }

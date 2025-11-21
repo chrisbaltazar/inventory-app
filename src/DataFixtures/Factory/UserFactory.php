@@ -12,6 +12,7 @@ class UserFactory extends AbstractFactory
         string $password = null,
         array $roles = null,
         string $phoneNumber = null,
+        \DateTime $birthday = null,
     ): User {
         $user = new User();
         $user->setName($name ?? self::faker()->name);
@@ -19,6 +20,7 @@ class UserFactory extends AbstractFactory
         $user->setPassword($password ?? self::faker()->password);
         $user->setRoles($roles ?? []);
         $user->setPhone($phoneNumber ?? sprintf('+34%d', self::faker()->randomNumber(9)));
+        $user->setBirthday($birthday ?? self::faker()->dateTimeBetween('-50 years', '-18 years'));
 
         return $user;
     }
@@ -27,7 +29,7 @@ class UserFactory extends AbstractFactory
     {
         return self::create(
             email: $email,
-            roles: ['ROLE_ADMIN']
+            roles: ['ROLE_ADMIN'],
         );
     }
 }
