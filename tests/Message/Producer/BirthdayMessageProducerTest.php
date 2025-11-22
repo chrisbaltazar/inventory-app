@@ -66,7 +66,7 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
     {
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
+            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
         );
         $message1->setStatus(null);
         $message1->setProcessedAt(null);
@@ -87,13 +87,14 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
 
         $message4 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
+            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
         );
         $message4->setStatus(MessageStatusEnum::ERROR->value);
         $message4->setProcessedAt(new \DateTimeImmutable('now'));
 
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
+        $this->assertTrue($test->isRelevant($message1));
         $this->assertTrue($test->isWaiting($message1));
         $this->assertFalse($test->isWaiting($message2));
         $this->assertTrue($test->isRelevant($message3));
