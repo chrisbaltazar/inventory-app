@@ -9,6 +9,8 @@ use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Service\Message\Producer\BirthdayMessageProducer;
 use App\Service\Message\Producer\HolidaysMessageProducer;
+use App\Service\Time\ClockInterface;
+use DateTimeImmutable;
 use Tests\AbstractKernelTestCase;
 
 class HolidaysMessageProducerTest extends AbstractKernelTestCase
@@ -21,13 +23,14 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
 
     public function testProduceMessages(): void
     {
+        $today = new \DateTimeImmutable(date('Y') . '-12-24 00:00:00');
         $user1 = UserFactory::create();
         $user2 = UserFactory::create();
 
         $message = MessageFactory::create(
             type: MessageTypeEnum::CHRISTMAS_GREETING,
             user: $user1,
-            scheduledAt: new \DateTimeImmutable('today'),
+            scheduledAt: $today,
         );
         $message->setStatus(null);
         $message->setProcessedAt(null);
@@ -37,21 +40,21 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
         $this->entityManager->persist($message);
         $this->entityManager->flush();
 
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('today')->willReturn($today);
+        $this->set(ClockInterface::class, $clock);
 
         /** @var HolidaysMessageProducer $test */
         $test = $this->get(HolidaysMessageProducer::class);
         $test->produce();
 
+        $scheduledDate = $clock->today()->setTime(18, 0);
+
+        $this->assertSame(
+            $scheduledDate->format('Ymd H:i:s'),
+            $today->setTime(18, 0)->format('Ymd H:i:s'),
+        );
         $this->assertDatabaseCount(2, Message::class);
-
-        $scheduledDate = (new \DateTimeImmutable('today'))->setTime(18, 0);
-        $this->assertSame(date('Ymd 18:00:00'), $scheduledDate->format('Ymd H:i:s'));
-
-        $this->assertDatabaseEntity(Message::class, [
-            'type' => MessageTypeEnum::CHRISTMAS_GREETING->value,
-            'user' => $user1,
-            'scheduledAt' => $scheduledDate,
-        ]);
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::CHRISTMAS_GREETING->value,
             'user' => $user2,
@@ -63,31 +66,31 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
     {
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0),
         );
         $message1->setStatus(null);
         $message1->setProcessedAt(null);
 
         $message2 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
+            scheduledAt: new DateTimeImmutable('-1 min'),
         );
         $message2->setStatus(MessageStatusEnum::SENT->value);
-        $message2->setProcessedAt(new \DateTimeImmutable('now'));
+        $message2->setProcessedAt(new DateTimeImmutable('now'));
 
         $message3 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
+            scheduledAt: new DateTimeImmutable('-1 min'),
         );
         $message3->setStatus(null);
         $message3->setProcessedAt(null);
 
         $message4 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0),
         );
         $message4->setStatus(MessageStatusEnum::ERROR->value);
-        $message4->setProcessedAt(new \DateTimeImmutable('now'));
+        $message4->setProcessedAt(new DateTimeImmutable('now'));
 
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);

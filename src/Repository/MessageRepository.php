@@ -43,7 +43,7 @@ class MessageRepository extends ServiceEntityRepository
     public function findOneWith(
         MessageTypeEnum $type,
         User $user = null,
-        \DateTime $scheduled = null,
+        \DateTimeInterface $scheduled = null,
         string $content = null,
         MessageStatusEnum $status = null,
     ): ?Message {

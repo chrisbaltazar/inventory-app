@@ -45,7 +45,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
         return $this->messageRepository->findOneWith(
             type: $messageType,
             user: $user,
-            scheduled: new \DateTime('today'),
+            scheduled: $this->clock->today(),
         );
     }
 
@@ -54,7 +54,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
         $type = MessageTypeEnum::from($message->getType());
 
         return ($type->isChristmasGreeting())
-            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
+            && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d')
             && $message->getStatus() !== MessageStatusEnum::ERROR->value;
     }
 
@@ -63,7 +63,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
         $type = MessageTypeEnum::from($message->getType());
 
         return ($type->isChristmasGreeting())
-            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
+            && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d')
             && !$message->getStatus();
     }
 
@@ -85,7 +85,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
                 continue;
             }
 
-            $message = $this->messageBuilder->merryChristmas($user);
+            $message = $this->messageBuilder->merryChristmas($user, $this->clock->today()->setTime(18, 0));
             $this->entityManager->persist($message);
         }
         $this->entityManager->flush();
