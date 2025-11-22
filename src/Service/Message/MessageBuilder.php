@@ -46,5 +46,18 @@ class MessageBuilder
         return $message;
     }
 
+    public function merryChristmas(User $user): Message
+    {
+        $message = new Message();
+        $message->setUser($user);
+        $message->setType(MessageTypeEnum::CHRISTMAS_GREETING->value);
+        $message->setScheduledAt((new \DateTimeImmutable('today'))->setTime(18, 0));
+        $message->setContent(
+            "¡Feliz Navidad {$user->getName()}! Que la magia de esta temporada llene tu hogar de alegría, amor y sobre todo baile!.",
+        );
+
+        return $message;
+    }
+
 
 }
