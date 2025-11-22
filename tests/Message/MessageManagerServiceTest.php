@@ -74,6 +74,9 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message1 = $repository->find($message1->getId());
         $this->assertSame(MessageStatusEnum::SENT->value, $message1->getStatus());
         $this->assertNotNull($message1->getProcessedAt());
+        $message2 = $repository->find($message2->getId());
+        $this->assertNull($message2->getStatus());
+        $this->assertNull($message2->getProcessedAt());
     }
 
     public static function provideProcessAllMessages(): array
