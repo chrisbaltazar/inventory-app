@@ -35,6 +35,7 @@ class SMSMessageChannelSubscriber implements EventSubscriberInterface
             MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF => true,
             MessageTypeEnum::USER_BIRTHDAY_GREET => true,
             MessageTypeEnum::CHRISTMAS_GREETING => true,
+            MessageTypeEnum::NEW_YEAR_GREETING => true,
             default => false,
         };
     }
