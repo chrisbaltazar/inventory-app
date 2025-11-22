@@ -46,5 +46,31 @@ class MessageBuilder
         return $message;
     }
 
+    public function merryChristmas(User $user, \DateTimeImmutable $scheduled = null): Message
+    {
+        $message = new Message();
+        $message->setUser($user);
+        $message->setType(MessageTypeEnum::CHRISTMAS_GREETING->value);
+        $message->setScheduledAt($scheduled ?? (new \DateTimeImmutable('today'))->setTime(18, 0));
+        $message->setContent(
+            "¡Feliz Navidad {$user->getName()}! Que la magia de esta temporada llene tu hogar de alegría, amor y sobre todo baile!.",
+        );
+
+        return $message;
+    }
+
+    public function newYearsEve(mixed $user, \DateTimeImmutable $scheduled = null): Message
+    {
+        $message = new Message();
+        $message->setUser($user);
+        $message->setType(MessageTypeEnum::NEW_YEAR_GREETING->value);
+        $message->setScheduledAt($scheduled ?? (new \DateTimeImmutable('today'))->setTime(23, 00));
+        $message->setContent(
+            "¡Feliz Año Nuevo {$user->getName()}! Que este nuevo año te traiga mucho éxito y mucho baile... y fiestas épicas.",
+        );
+
+        return $message;
+    }
+
 
 }

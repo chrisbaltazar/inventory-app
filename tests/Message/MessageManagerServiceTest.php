@@ -6,9 +6,11 @@ use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
+use App\Enum\MessageTypeEnum;
 use App\Service\Message\Channel\Sms\SMSProviderInterface;
 use App\Service\Message\MessageManagerService;
 use App\Service\Message\Producer\MessageProducerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Tests\AbstractKernelTestCase;
 
@@ -21,30 +23,41 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->refreshDatabase();
     }
 
-    public function testProcessAllPendingMessages(): void
+    #[DataProvider('provideProcessAllMessages')]
+    public function testProcessAllPendingMessages(MessageTypeEnum $messageType): void
     {
         $user = UserFactory::create(phoneNumber: '+34111111111');
-        $message = MessageFactory::create(
+        $message1 = MessageFactory::create(
+            type: $messageType,
             user: $user,
             content: 'Message content...',
             scheduledAt: new \DateTimeImmutable('now'),
         );
-        $message->setRecipient(null);
-        $message->setStatus(null);
-        $message->setProcessedAt(null);
+        $message1->setRecipient(null);
+        $message1->setStatus(null);
+        $message1->setProcessedAt(null);
+
+        $message2 = MessageFactory::create(
+            user: $user,
+            scheduledAt: new \DateTimeImmutable('+1 hour'),
+        );
+        $message2->setRecipient(null);
+        $message2->setStatus(null);
+        $message2->setProcessedAt(null);
 
         $this->entityManager->persist($user);
-        $this->entityManager->persist($message);
+        $this->entityManager->persist($message1);
+        $this->entityManager->persist($message2);
         $this->entityManager->flush();
 
         $repository = $this->entityManager->getRepository(Message::class);
         $eventDispatcher = $this->get(EventDispatcherInterface::class);
         $smsProvider = $this->createMock(SMSProviderInterface::class);
         $smsProvider->expects($this->once())->method('send')->willReturnCallback(
-            function ($number, $sender, $content) use ($message, $user) {
+            function ($number, $sender, $content) use ($message1, $user) {
                 $this->assertSame($user->getPhone(), $number);
                 $this->assertNotEmpty($sender);
-                $this->assertStringContainsString($message->getContent(), $content);
+                $this->assertStringContainsString($message1->getContent(), $content);
             },
         );
         $this->set(SMSProviderInterface::class, $smsProvider);
@@ -58,9 +71,17 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
 
-        $message = $repository->find($message->getId());
-        $this->assertSame(MessageStatusEnum::SENT->value, $message->getStatus());
-        $this->assertNotNull($message->getProcessedAt());
+        $message1 = $repository->find($message1->getId());
+        $this->assertSame(MessageStatusEnum::SENT->value, $message1->getStatus());
+        $this->assertNotNull($message1->getProcessedAt());
+        $message2 = $repository->find($message2->getId());
+        $this->assertNull($message2->getStatus());
+        $this->assertNull($message2->getProcessedAt());
+    }
+
+    public static function provideProcessAllMessages(): array
+    {
+        return array_map(fn($type) => [$type], MessageTypeEnum::cases());
     }
 
     public function testProcessMessagesForbiddenNumber(): void
