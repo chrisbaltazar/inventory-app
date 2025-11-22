@@ -53,7 +53,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
     {
         $type = MessageTypeEnum::from($message->getType());
 
-        return ($type->isChristmasGreeting())
+        return ($type->isChristmasGreeting() || $type->isNewYearGreeting())
             && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d')
             && $message->getStatus() !== MessageStatusEnum::ERROR->value;
     }
@@ -99,7 +99,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
                 continue;
             }
 
-            $message = $this->messageBuilder->newYearsEve($user);
+            $message = $this->messageBuilder->newYearsEve($user, $this->clock->today()->setTime(23, 0));
             $this->entityManager->persist($message);
         }
         $this->entityManager->flush();

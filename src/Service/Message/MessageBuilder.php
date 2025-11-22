@@ -59,12 +59,12 @@ class MessageBuilder
         return $message;
     }
 
-    public function newYearsEve(mixed $user): Message
+    public function newYearsEve(mixed $user, \DateTimeImmutable $scheduled = null): Message
     {
         $message = new Message();
         $message->setUser($user);
         $message->setType(MessageTypeEnum::NEW_YEAR_GREETING->value);
-        $message->setScheduledAt((new \DateTimeImmutable('today'))->setTime(23, 00));
+        $message->setScheduledAt($scheduled ?? (new \DateTimeImmutable('today'))->setTime(23, 00));
         $message->setContent(
             "¡Feliz Año Nuevo {$user->getName()}! Que este nuevo año te traiga mucho éxito y mucho baile... y fiestas épicas.",
         );
