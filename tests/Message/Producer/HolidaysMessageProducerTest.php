@@ -94,40 +94,57 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
 
     public function testMessagesValidation(): void
     {
+        /** @var HolidaysMessageProducer $test */
+        $test = $this->get(HolidaysMessageProducer::class);
+
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::CHRISTMAS_GREETING,
             scheduledAt: (new DateTimeImmutable('today'))->setTime(18, 0),
-        );
-        $message1->setStatus(null);
-        $message1->setProcessedAt(null);
+        )
+            ->setStatus(null)
+            ->setProcessedAt(null);
+
+        $this->assertTrue($test->isRelevant($message1));
+        $this->assertTrue($test->isWaiting($message1));
 
         $message2 = MessageFactory::create(
             type: MessageTypeEnum::NEW_YEAR_GREETING,
             scheduledAt: new DateTimeImmutable('-1 min'),
-        );
-        $message2->setStatus(MessageStatusEnum::SENT->value);
-        $message2->setProcessedAt(new DateTimeImmutable('now'));
+        )
+            ->setStatus(MessageStatusEnum::SENT->value)
+            ->setProcessedAt(new DateTimeImmutable('now'));
+
+        $this->assertTrue($test->isRelevant($message2));
+        $this->assertFalse($test->isWaiting($message2));
 
         $message3 = MessageFactory::create(
             type: MessageTypeEnum::CHRISTMAS_GREETING,
             scheduledAt: new DateTimeImmutable('-1 min'),
-        );
-        $message3->setStatus(null);
-        $message3->setProcessedAt(null);
+        )
+            ->setStatus(null)
+            ->setProcessedAt(null);
+
+        $this->assertTrue($test->isRelevant($message3));
+        $this->assertTrue($test->isWaiting($message3));
 
         $message4 = MessageFactory::create(
             type: MessageTypeEnum::NEW_YEAR_GREETING,
             scheduledAt: (new DateTimeImmutable('today'))->setTime(23, 0),
-        );
-        $message4->setStatus(MessageStatusEnum::ERROR->value);
-        $message4->setProcessedAt(new DateTimeImmutable('now'));
+        )
+            ->setStatus(MessageStatusEnum::ERROR->value)
+            ->setProcessedAt(new DateTimeImmutable('now'));
 
-        /** @var HolidaysMessageProducer $test */
-        $test = $this->get(HolidaysMessageProducer::class);
-        $this->assertTrue($test->isRelevant($message1));
-        $this->assertTrue($test->isWaiting($message1));
-        $this->assertFalse($test->isWaiting($message2));
-        $this->assertTrue($test->isRelevant($message3));
         $this->assertFalse($test->isRelevant($message4));
+        $this->assertFalse($test->isWaiting($message4));
+
+        $message5 = MessageFactory::create(
+            type: MessageTypeEnum::NEW_YEAR_GREETING,
+            scheduledAt: (new DateTimeImmutable('tomorrow'))->setTime(23, 0),
+        )
+            ->setStatus(null)
+            ->setProcessedAt(null);
+
+        $this->assertFalse($test->isRelevant($message5));
+        $this->assertFalse($test->isWaiting($message5));
     }
 }
