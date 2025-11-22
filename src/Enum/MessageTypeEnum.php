@@ -10,6 +10,7 @@ enum MessageTypeEnum: string
     case ADMIN_BIRTHDAY_NOTIF = 'ADMIN_BIRTHDAY_NOTIF';
     case USER_BIRTHDAY_GREET = 'USER_BIRTHDAY_GREET';
     case CHRISTMAS_GREETING = 'CHRISTMAS_GREETING';
+    case NEW_YEAR_GREETING = 'NEW_YEAR_GREETING';
 
     public function isPwdRecovery(): bool
     {
@@ -29,5 +30,10 @@ enum MessageTypeEnum: string
     public function isChristmasGreeting(): bool
     {
         return $this === self::CHRISTMAS_GREETING;
+    }
+
+    public function isNewYearGreeting(): bool
+    {
+        return $this === self::NEW_YEAR_GREETING;
     }
 }

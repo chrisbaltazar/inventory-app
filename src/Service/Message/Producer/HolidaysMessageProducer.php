@@ -24,8 +24,13 @@ class HolidaysMessageProducer implements MessageProducerInterface
     public function produce(): void
     {
         $allUsers = $this->userRepository->findAll();
+
         if ($this->isXmas()) {
             $this->createXmasMessages($allUsers);
+        }
+
+        if ($this->isNewYearsEve()) {
+            $this->createNewYearMessages($allUsers);
         }
     }
 
@@ -65,6 +70,11 @@ class HolidaysMessageProducer implements MessageProducerInterface
         return (new \DateTime())->format('m-d') === '12-24';
     }
 
+    private function isNewYearsEve(): bool
+    {
+        return (new \DateTime())->format('m-d') === '12-31';
+    }
+
     private function createXmasMessages(array $allUsers): void
     {
         foreach ($allUsers as $user) {
@@ -74,6 +84,20 @@ class HolidaysMessageProducer implements MessageProducerInterface
             }
 
             $message = $this->messageBuilder->merryChristmas($user);
+            $this->entityManager->persist($message);
+        }
+        $this->entityManager->flush();
+    }
+
+    private function createNewYearMessages(array $allUsers): void
+    {
+        foreach ($allUsers as $user) {
+            $existingMessage = $this->existMessage(MessageTypeEnum::NEW_YEAR_GREETING, $user);
+            if ($existingMessage && $this->isRelevant($existingMessage)) {
+                continue;
+            }
+
+            $message = $this->messageBuilder->newYearsEve($user);
             $this->entityManager->persist($message);
         }
         $this->entityManager->flush();
