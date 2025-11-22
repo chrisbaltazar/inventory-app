@@ -7,7 +7,6 @@ use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
-use App\Service\Message\Producer\BirthdayMessageProducer;
 use App\Service\Message\Producer\HolidaysMessageProducer;
 use App\Service\Time\ClockInterface;
 use DateTimeImmutable;
@@ -95,38 +94,36 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
 
     public function testMessagesValidation(): void
     {
-        $this->markTestIncomplete();
-
         $message1 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0),
+            type: MessageTypeEnum::CHRISTMAS_GREETING,
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(18, 0),
         );
         $message1->setStatus(null);
         $message1->setProcessedAt(null);
 
         $message2 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            type: MessageTypeEnum::NEW_YEAR_GREETING,
             scheduledAt: new DateTimeImmutable('-1 min'),
         );
         $message2->setStatus(MessageStatusEnum::SENT->value);
         $message2->setProcessedAt(new DateTimeImmutable('now'));
 
         $message3 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            type: MessageTypeEnum::CHRISTMAS_GREETING,
             scheduledAt: new DateTimeImmutable('-1 min'),
         );
         $message3->setStatus(null);
         $message3->setProcessedAt(null);
 
         $message4 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0),
+            type: MessageTypeEnum::NEW_YEAR_GREETING,
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(23, 0),
         );
         $message4->setStatus(MessageStatusEnum::ERROR->value);
         $message4->setProcessedAt(new DateTimeImmutable('now'));
 
-        /** @var BirthdayMessageProducer $test */
-        $test = $this->get(BirthdayMessageProducer::class);
+        /** @var HolidaysMessageProducer $test */
+        $test = $this->get(HolidaysMessageProducer::class);
         $this->assertTrue($test->isRelevant($message1));
         $this->assertTrue($test->isWaiting($message1));
         $this->assertFalse($test->isWaiting($message2));
