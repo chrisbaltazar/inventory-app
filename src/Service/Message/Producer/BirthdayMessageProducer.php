@@ -29,7 +29,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
         }
 
         foreach ($birthdayUsers as $user) {
-            $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user, $user->getName());
+            $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user);
             if ($existingMessage && $this->isRelevant($existingMessage)) {
                 continue;
             }
@@ -66,7 +66,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
     {
         /** @var MessageTypeEnum $type */
         /** @var User $user */
-        [$type, $user, $name] = $args;
+        [$type, $user, $name] = $args + [null, null, null];
 
         return $this->messageRepository->findOneWith(
             type: $type,

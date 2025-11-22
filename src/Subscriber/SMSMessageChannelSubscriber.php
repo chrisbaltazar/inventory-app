@@ -34,6 +34,7 @@ class SMSMessageChannelSubscriber implements EventSubscriberInterface
             MessageTypeEnum::PWD_RECOVERY => true,
             MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF => true,
             MessageTypeEnum::USER_BIRTHDAY_GREET => true,
+            MessageTypeEnum::CHRISTMAS_GREETING => true,
             default => false,
         };
     }
