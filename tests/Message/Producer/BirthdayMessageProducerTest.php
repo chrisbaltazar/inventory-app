@@ -46,13 +46,19 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $test->produce();
 
         $this->assertDatabaseCount(3, Message::class);
+
+        $scheduledDate = (new \DateTimeImmutable('today'))->setTime(9, 0);
+        $this->assertSame(date('Ymd 09:00:00'), $scheduledDate->format('Ymd H:i:s'));
+
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::USER_BIRTHDAY_GREET->value,
             'user' => $user1,
+            'scheduledAt' => $scheduledDate,
         ]);
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF->value,
             'user' => $admin,
+            'scheduledAt' => $scheduledDate,
         ]);
     }
 

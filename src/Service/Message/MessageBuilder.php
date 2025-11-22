@@ -25,7 +25,7 @@ class MessageBuilder
         $message = new Message();
         $message->setUser($user);
         $message->setType(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF->value);
-        $message->setScheduledAt(new \DateTimeImmutable('now'));
+        $message->setScheduledAt((new \DateTimeImmutable('today'))->setTime(9, 0));
         $message->setContent(
             "Hoy es el cumpleaños de $name. No olvides enviarle tus felicitaciones... y quizá unas chelas!",
         );
@@ -38,7 +38,7 @@ class MessageBuilder
         $message = new Message();
         $message->setUser($user);
         $message->setType(MessageTypeEnum::USER_BIRTHDAY_GREET->value);
-        $message->setScheduledAt(new \DateTimeImmutable('now'));
+        $message->setScheduledAt((new \DateTimeImmutable('today'))->setTime(9, 0));
         $message->setContent(
             "¡Feliz cumpleaños {$user->getName()}! Te deseamos un día lleno de sorpresas y no olvides celebrar al máximo... e invitarnos :)",
         );
