@@ -9,6 +9,7 @@ use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Message\MessageBuilder;
+use App\Service\Time\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HolidaysMessageProducer implements MessageProducerInterface
@@ -19,6 +20,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
         private readonly MessageRepository $messageRepository,
         private readonly MessageBuilder $messageBuilder,
         private readonly EntityManagerInterface $entityManager,
+        private readonly ClockInterface $clock,
     ) {}
 
     public function produce(): void
@@ -67,12 +69,12 @@ class HolidaysMessageProducer implements MessageProducerInterface
 
     private function isXmas(): bool
     {
-        return (new \DateTime())->format('m-d') === '12-24';
+        return $this->clock->today()->format('m-d') === '12-24';
     }
 
     private function isNewYearsEve(): bool
     {
-        return (new \DateTime())->format('m-d') === '12-31';
+        return $this->clock->today()->format('m-d') === '12-31';
     }
 
     private function createXmasMessages(array $allUsers): void
