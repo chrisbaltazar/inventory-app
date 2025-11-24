@@ -74,7 +74,7 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
             'new_year' => [
                 'messageType' => MessageTypeEnum::NEW_YEAR_GREETING,
                 'today' => new \DateTimeImmutable(date('Y') . '-12-31 00:00:00'),
-                'expectedHour' => 23,
+                'expectedHour' => 22,
                 'expectedCount' => 2,
             ],
             'other_day' => [
@@ -129,7 +129,7 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
 
         $message4 = MessageFactory::create(
             type: MessageTypeEnum::NEW_YEAR_GREETING,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(23, 0),
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(22, 0),
         )
             ->setStatus(MessageStatusEnum::ERROR->value)
             ->setProcessedAt(new DateTimeImmutable('now'));
@@ -139,7 +139,7 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
 
         $message5 = MessageFactory::create(
             type: MessageTypeEnum::NEW_YEAR_GREETING,
-            scheduledAt: (new DateTimeImmutable('tomorrow'))->setTime(23, 0),
+            scheduledAt: (new DateTimeImmutable('tomorrow'))->setTime(22, 0),
         )
             ->setStatus(null)
             ->setProcessedAt(null);
