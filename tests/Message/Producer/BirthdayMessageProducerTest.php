@@ -21,31 +21,43 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
     public function testProduceMessages(): void
     {
         $user1 = UserFactory::create(birthday: new \DateTime('today')); // HBD (1)
-        $user2 = UserFactory::create(birthday: new \DateTime('today')); // Existing (2)
+        $user2 = UserFactory::create(birthday: new \DateTime('today')); // Pending not sent (2)
         $user3 = UserFactory::create(birthday: new \DateTime('-1 day')); // No HBD
-        $admin = UserFactory::admin(); // (3)
+        $user4 = UserFactory::create(birthday: new \DateTime('today')); // Existing and sent (3)
+        $admin = UserFactory::admin(); // Notif (4)
 
-        $message = MessageFactory::create(
+        $pendingMessage = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
             user: $user2,
             content: $user2->getName(),
             scheduledAt: new \DateTimeImmutable('-1 min'),
         );
-        $message->setStatus(null);
-        $message->setProcessedAt(null);
+        $pendingMessage->setStatus(null);
+        $pendingMessage->setProcessedAt(null);
+
+        $existingMessage = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            user: $user4,
+            content: $user2->getName(),
+            scheduledAt: new \DateTimeImmutable('-1 hour'),
+        );
+        $existingMessage->setStatus(MessageStatusEnum::SENT->value);
+        $existingMessage->setProcessedAt(new \DateTimeImmutable('-1 min'));
 
         $this->entityManager->persist($user1);
         $this->entityManager->persist($user2);
         $this->entityManager->persist($user3);
+        $this->entityManager->persist($user4);
         $this->entityManager->persist($admin);
-        $this->entityManager->persist($message);
+        $this->entityManager->persist($pendingMessage);
+        $this->entityManager->persist($existingMessage);
         $this->entityManager->flush();
 
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
         $test->produce();
 
-        $this->assertDatabaseCount(3, Message::class);
+        $this->assertDatabaseCount(4, Message::class);
 
         $scheduledDate = (new \DateTimeImmutable('today'))->setTime(9, 0);
         $this->assertSame(date('Ymd 09:00:00'), $scheduledDate->format('Ymd H:i:s'));
