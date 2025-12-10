@@ -30,17 +30,29 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
     ): void {
         $user1 = UserFactory::create();
         $user2 = UserFactory::create();
-        $message = MessageFactory::create(
+        $user3 = UserFactory::create();
+        // Pending message to send
+        $message1 = MessageFactory::create(
             type: $messageType,
             user: $user1,
             scheduledAt: $today,
         );
-        $message->setStatus(null);
-        $message->setProcessedAt(null);
+        $message1->setStatus(null);
+        $message1->setProcessedAt(null);
+        // Already sent message
+        $message2 = MessageFactory::create(
+            type: $messageType,
+            user: $user3,
+            scheduledAt: $today,
+        );
+        $message2->setStatus(MessageStatusEnum::SENT->value);
+        $message2->setProcessedAt(new DateTimeImmutable('-1 hour'));
 
         $this->entityManager->persist($user1);
         $this->entityManager->persist($user2);
-        $this->entityManager->persist($message);
+        $this->entityManager->persist($user3);
+        $this->entityManager->persist($message1);
+        $this->entityManager->persist($message2);
         $this->entityManager->flush();
 
         $clock = $this->createMock(ClockInterface::class);
@@ -52,7 +64,8 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
         $test->produce();
 
         $scheduledDate = $today->setTime($expectedHour, 0);
-        $this->assertDatabaseCount($expectedCount, Message::class);
+        // Adding manually the existing message
+        $this->assertDatabaseCount($expectedCount + 1, Message::class);
         if ($expectedCount > 1) {
             $this->assertDatabaseEntity(Message::class, [
                 'type' => $messageType->value,
