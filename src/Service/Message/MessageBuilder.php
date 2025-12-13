@@ -72,14 +72,14 @@ class MessageBuilder
         return $message;
     }
 
-    public function createLoanReturnNoticeMessage(User $user, \DateTimeImmutable $date): Message
+    public function createLoanReturnNoticeMessage(User $user, string $date): Message
     {
         $message = new Message();
         $message->setUser($user);
         $message->setType(MessageTypeEnum::LOAN_RETURN_NOTICE->value);
         $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(10, 0));
         $message->setContent(
-            "Hola {$user->getName()}, te recordamos que la siguiente devolución de vestuario será el día: {$date->format('d/m/Y')}, contamos contigo para hacerlo todos juntos.",
+            "Hola {$user->getName()}, te recordamos que la próxima devolución de vestuario será el día: $date, contamos contigo para hacerlo todos juntos.",
         );
 
         return $message;

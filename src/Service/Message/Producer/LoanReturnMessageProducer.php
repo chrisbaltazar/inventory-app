@@ -26,18 +26,34 @@ class LoanReturnMessageProducer implements MessageProducerInterface
 
     public function produce(): void
     {
-        $this->produceLoanReturnNotice();
+        $returnDateStart = new \DateTimeImmutable(self::RETURN_NOTICE_START);
+        $returnDateFinal = new \DateTimeImmutable(self::RETURN_NOTICE_END);
+        $loanReturnUsers = $this->getLoanUsers($returnDateStart, $returnDateFinal);
+        foreach ($loanReturnUsers as $returnDate => $users) {
+            /** @var User $user */
+            foreach ($users as $user) {
+                $existingMessage = $this->existMessage(MessageTypeEnum::LOAN_RETURN_NOTICE, $user, $returnDate);
+                if ($existingMessage && $this->isRelevant($existingMessage)) {
+                    continue;
+                }
+
+                $message = $this->messageBuilder->createLoanReturnNoticeMessage($user, $returnDate);
+                $this->entityManager->persist($message);
+            }
+        }
+        $this->entityManager->flush();
     }
 
     public function existMessage(...$args): ?Message
     {
         /** @var MessageTypeEnum $type */
         /** @var User $user */
-        [$type, $user] = $args;
+        [$type, $user, $returnDate] = $args;
 
         return $this->messageRepository->findOneWith(
             type: $type,
             user: $user,
+            content: $returnDate,
         );
     }
 
@@ -47,8 +63,7 @@ class LoanReturnMessageProducer implements MessageProducerInterface
 
         return $type->isLoanReturnNotice()
             && $message->getStatus() !== MessageStatusEnum::ERROR->value
-            && $message->getScheduledAt() >= new \DateTimeImmutable(self::RETURN_NOTICE_START)
-            && $message->getScheduledAt() <= new \DateTimeImmutable(self::RETURN_NOTICE_END);
+            && $message->getScheduledAt()->format('Ymd') === (new \DateTime('now'))->format('Ymd');
     }
 
     public function isWaiting(Message $message): bool
@@ -60,26 +75,6 @@ class LoanReturnMessageProducer implements MessageProducerInterface
             && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
     }
 
-    private function produceLoanReturnNotice(): void
-    {
-        $returnDateStart = new \DateTimeImmutable(self::RETURN_NOTICE_START);
-        $returnDateFinal = new \DateTimeImmutable(self::RETURN_NOTICE_END);
-        $users = $this->getLoanUsers($returnDateStart, $returnDateFinal);
-        foreach ($users as $user) {
-            $existingMessage = $this->existMessage(MessageTypeEnum::LOAN_RETURN_NOTICE, $user);
-            if ($existingMessage && $this->isRelevant($existingMessage)) {
-                continue;
-            }
-
-            $message = $this->messageBuilder->createLoanReturnNoticeMessage($user, $returnDateFinal);
-            $this->entityManager->persist($message);
-        }
-        $this->entityManager->flush();
-    }
-
-    /**
-     * @return User[]
-     */
     private function getLoanUsers(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
     {
         $loanUsers = [];
@@ -87,10 +82,12 @@ class LoanReturnMessageProducer implements MessageProducerInterface
         /** @var Loan $loan */
         foreach ($allLoans as $loan) {
             $user = $loan->getUser();
-            $loanUsers[$user?->getId()] = $user;
+            $event = $loan->getEvent();
+            $returnDate = $event->getReturnDate()->format('d/m/Y');
+            $loanUsers[$returnDate][$user->getId()] = $user;
         }
 
-        return array_filter($loanUsers);
+        return $loanUsers;
     }
 
 
