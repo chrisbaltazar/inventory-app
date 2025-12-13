@@ -5,6 +5,7 @@ namespace App\Service\Message;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Enum\MessageTypeEnum;
+use App\Service\Time\ClockService;
 
 class MessageBuilder
 {
@@ -80,6 +81,28 @@ class MessageBuilder
         $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(10, 0));
         $message->setContent(
             "Hola {$user->getName()}, te recordamos que la próxima devolución de vestuario será el día: $date, contamos contigo para hacerlo todos juntos.",
+        );
+
+        return $message;
+    }
+
+    public function createLoanReturnReminderMessage(User $user, string $returnDateString): Message
+    {
+        $clock = new ClockService();
+        $returnDate = new \DateTimeImmutable($returnDateString);
+
+        $returnDay = match (true) {
+            $returnDate->format('Ymd') === $clock->today()->format('Ymd') => 'hoy',
+            $returnDate->format('Ymd') === $clock->tomorrow()->format('Ymd') => 'mañana',
+            default => $returnDate->format('d/m/Y')
+        };
+
+        $message = new Message();
+        $message->setUser($user);
+        $message->setType(MessageTypeEnum::LOAN_RETURN_REMINDER->value);
+        $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(9, 0));
+        $message->setContent(
+            "Hola {$user->getName()}, este es un recordatorio amistoso de que la devolución de vestuario es $returnDay! No olvides tener todo listo y gracias :)",
         );
 
         return $message;
