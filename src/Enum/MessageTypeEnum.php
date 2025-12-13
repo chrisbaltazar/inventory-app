@@ -11,6 +11,7 @@ enum MessageTypeEnum: string
     case USER_BIRTHDAY_GREET = 'USER_BIRTHDAY_GREET';
     case CHRISTMAS_GREETING = 'CHRISTMAS_GREETING';
     case NEW_YEAR_GREETING = 'NEW_YEAR_GREETING';
+    case LOAN_RETURN_NOTICE = 'LOAN_RETURN_NOTICE';
 
     public function isPwdRecovery(): bool
     {
@@ -35,5 +36,10 @@ enum MessageTypeEnum: string
     public function isNewYearGreeting(): bool
     {
         return $this === self::NEW_YEAR_GREETING;
+    }
+
+    public function isLoanReturnNotice(): bool
+    {
+        return $this === self::LOAN_RETURN_NOTICE;
     }
 }
