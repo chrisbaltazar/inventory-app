@@ -12,7 +12,7 @@ use App\Repository\MessageRepository;
 use App\Service\Message\MessageBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 
-class LoanReturnMessageProducer implements MessageProducerInterface
+class LoanReturnNoticeMessageProducer implements MessageProducerInterface
 {
     const RETURN_NOTICE_START = '+5 days';
     const RETURN_NOTICE_END = '+8 days';
