@@ -14,8 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class LoanReturnReminderMessageProducer implements MessageProducerInterface
 {
-    const RETURN_RANGE_START = 'now';
-    const RETURN_RANGE_END = '+1 day';
+    const RETURN_DATE_TARGET = '+1 day';
 
     public function __construct(
         private readonly LoanRepository $loanRepository,
@@ -26,20 +25,17 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
 
     public function produce(): void
     {
-        $returnRangeStart = new \DateTimeImmutable(self::RETURN_RANGE_START);
-        $returnRangeFinal = new \DateTimeImmutable(self::RETURN_RANGE_END);
-        $loanReturnUsers = $this->getLoanUsers($returnRangeStart, $returnRangeFinal);
-        foreach ($loanReturnUsers as $returnDate => $users) {
-            /** @var User $user */
-            foreach ($users as $user) {
-                $existingMessage = $this->existMessage(MessageTypeEnum::LOAN_RETURN_REMINDER, $user, $returnDate);
-                if ($existingMessage && $this->isRelevant($existingMessage)) {
-                    continue;
-                }
-
-                $message = $this->messageBuilder->createLoanReturnReminderMessage($user, $returnDate);
-                $this->entityManager->persist($message);
+        $returnDate = new \DateTimeImmutable(self::RETURN_DATE_TARGET);
+        $loanReturnUsers = $this->getLoanUsers($returnDate);
+        /** @var User $user */
+        foreach ($loanReturnUsers as $user) {
+            $existingMessage = $this->existMessage(MessageTypeEnum::LOAN_RETURN_REMINDER, $user, $returnDate);
+            if ($existingMessage && $this->isRelevant($existingMessage)) {
+                continue;
             }
+
+            $message = $this->messageBuilder->createLoanReturnReminderMessage($user, $returnDate);
+            $this->entityManager->persist($message);
         }
         $this->entityManager->flush();
     }
@@ -48,21 +44,22 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
     {
         /** @var MessageTypeEnum $type */
         /** @var User $user */
-        [$type, $user, $returnDate] = $args;
+        [$type, $user] = $args;
 
         return $this->messageRepository->findOneWith(
             type: $type,
             user: $user,
+            scheduled: new \DateTimeImmutable(),
         );
     }
 
     public function isRelevant(Message $message): bool
     {
         $type = MessageTypeEnum::from($message->getType());
-        // Scheduled date is not relevant for loan return reminders
+
         return $type->isLoanReturnReminder()
             && $message->getStatus() !== MessageStatusEnum::ERROR->value
-            && (str_contains($message->getContent(), 'hoy!') || str_contains($message->getContent(), 'mañana!'));
+            && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
     }
 
     public function isWaiting(Message $message): bool
@@ -74,16 +71,14 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
             && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
     }
 
-    private function getLoanUsers(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
+    private function getLoanUsers(\DateTimeImmutable $date): array
     {
         $loanUsers = [];
-        $allLoans = $this->loanRepository->findAllWithLoanReturnBetween($date1, $date2);
+        $allLoans = $this->loanRepository->findAllWithLoanReturnFor($date);
         /** @var Loan $loan */
         foreach ($allLoans as $loan) {
             $user = $loan->getUser();
-            $event = $loan->getEvent();
-            $returnDate = $event->getReturnDate()->format('d/m/Y');
-            $loanUsers[$returnDate][$user->getId()] = $user;
+            $loanUsers[$user->getId()] = $user;
         }
 
         return $loanUsers;

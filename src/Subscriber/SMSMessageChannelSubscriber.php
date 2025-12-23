@@ -37,6 +37,7 @@ class SMSMessageChannelSubscriber implements EventSubscriberInterface
             MessageTypeEnum::CHRISTMAS_GREETING => true,
             MessageTypeEnum::NEW_YEAR_GREETING => true,
             MessageTypeEnum::LOAN_RETURN_NOTICE => true,
+            MessageTypeEnum::LOAN_RETURN_REMINDER => true,
             default => false,
         };
     }

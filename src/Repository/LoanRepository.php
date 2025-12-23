@@ -167,7 +167,7 @@ class LoanRepository extends ServiceEntityRepository
     {
         return $this
             ->createQueryBuilder('l')
-            ->select( 'l', 'u', 'e')
+            ->select('l', 'u', 'e')
             ->join('l.event', 'e')
             ->join('l.user', 'u')
             ->where('l.endDate IS NULL')
@@ -175,6 +175,22 @@ class LoanRepository extends ServiceEntityRepository
             ->andWhere('e.returnDate <= :date2')
             ->setParameter('date1', $date1->format('Y-m-d'))
             ->setParameter('date2', $date2->format('Y-m-d'))
+            ->orderBy('e.returnDate', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithLoanReturnFor(\DateTimeImmutable $date): array
+    {
+        return $this
+            ->createQueryBuilder('l')
+            ->select('l', 'u', 'e')
+            ->join('l.event', 'e')
+            ->join('l.user', 'u')
+            ->where('l.endDate IS NULL')
+            ->andWhere('e.returnDate = :date')
+            ->setParameter('date', $date->format('Y-m-d'))
             ->orderBy('e.returnDate', 'ASC')
             ->addOrderBy('u.name', 'ASC')
             ->getQuery()
