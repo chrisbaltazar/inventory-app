@@ -109,7 +109,6 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
 
         // Re-run
         $test->produce();
-        // Same count
         $this->assertDatabaseCount(2, Message::class);
     }
 
