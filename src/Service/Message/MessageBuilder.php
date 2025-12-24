@@ -86,15 +86,14 @@ class MessageBuilder
         return $message;
     }
 
-    public function createLoanReturnReminderMessage(User $user, string $date): Message
+    public function createLoanReturnReminderMessage(User $user, \DatetimeInterface $date): Message
     {
         $clock = new ClockService();
-        $returnDate = new \DateTimeImmutable($date);
 
         $returnDay = match (true) {
-            $returnDate->format('Ymd') === $clock->today()->format('Ymd') => 'hoy',
-            $returnDate->format('Ymd') === $clock->tomorrow()->format('Ymd') => 'mañana',
-            default => $returnDate->format('d/m/Y')
+            $date->format('Ymd') === $clock->today()->format('Ymd') => 'hoy',
+            $date->format('Ymd') === $clock->tomorrow()->format('Ymd') => 'mañana',
+            default => $date->format('d/m/Y')
         };
 
         $message = new Message();
