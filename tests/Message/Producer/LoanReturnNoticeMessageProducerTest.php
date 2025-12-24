@@ -41,6 +41,15 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
             event: $eventFuture,
         );
 
+        $eventPast = EventFactory::create(returnDate: new DateTimeImmutable('-1 day'));
+        $userOnEventPast = UserFactory::create();
+        $loanOnEventPast = LoanFactory::create(
+            startDate: new DateTimeImmutable('-3 days'),
+            endDate: null,
+            user: $userOnEventPast,
+            event: $eventPast,
+        );
+
         $eventComing = EventFactory::create(returnDate: new DateTimeImmutable('+7 days'));
         $userOnEventComing1 = UserFactory::create();
         $loanOnEventComing1 = LoanFactory::create(
@@ -71,6 +80,9 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
             $eventFuture,
             $userOnEventFuture,
             $loanOnEventFuture,
+            $eventPast,
+            $userOnEventPast,
+            $loanOnEventPast,
             $eventComing,
             $userOnEventComing1,
             $loanOnEventComing1,
