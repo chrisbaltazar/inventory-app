@@ -103,11 +103,11 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
 
     public function testMessagesValidation(): void
     {
-        /** @var LoanReturnNoticeMessageProducer $test */
-        $test = $this->get(LoanReturnNoticeMessageProducer::class);
+        /** @var LoanReturnReminderMessageProducer $test */
+        $test = $this->get(LoanReturnReminderMessageProducer::class);
 
         $message1 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
             scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0)
         )
             ->setStatus(null)
@@ -117,7 +117,7 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
         $this->assertTrue($test->isWaiting($message1));
 
         $message2 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
             scheduledAt: new DateTimeImmutable('-1 min'),
         )
             ->setStatus(MessageStatusEnum::SENT->value)
@@ -127,7 +127,7 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
         $this->assertFalse($test->isWaiting($message2));
 
         $message3 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
             scheduledAt: new DateTimeImmutable('-1 day'),
         )
             ->setStatus(null)
@@ -137,7 +137,7 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
         $this->assertFalse($test->isWaiting($message3));
 
         $message4 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
             scheduledAt: new DateTimeImmutable('-1 min'),
         )
             ->setStatus(MessageStatusEnum::ERROR->value)
