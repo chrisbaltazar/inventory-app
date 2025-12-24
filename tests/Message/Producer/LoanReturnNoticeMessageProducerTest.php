@@ -4,8 +4,10 @@ namespace Tests\Service\Message\Producer;
 
 use App\DataFixtures\Factory\EventFactory;
 use App\DataFixtures\Factory\LoanFactory;
+use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
 use App\Entity\Message;
+use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Service\Message\Producer\LoanReturnNoticeMessageProducer;
 use DateTimeImmutable;
@@ -90,7 +92,56 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
             'type' => MessageTypeEnum::LOAN_RETURN_NOTICE->value,
             'user' => $userOnEventComing2,
         ]);
+
+        // Re-run
+        $test->produce();
+        // Same count
+        $this->assertDatabaseCount(2, Message::class);
     }
 
-    public function testMessagesValidation(): void {}
+    public function testMessagesValidation(): void
+    {
+        /** @var LoanReturnNoticeMessageProducer $test */
+        $test = $this->get(LoanReturnNoticeMessageProducer::class);
+
+        $message1 = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0)
+        )
+            ->setStatus(null)
+            ->setProcessedAt(null);
+
+        $this->assertTrue($test->isRelevant($message1));
+        $this->assertTrue($test->isWaiting($message1));
+
+        $message2 = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            scheduledAt: new DateTimeImmutable('-1 min'),
+        )
+            ->setStatus(MessageStatusEnum::SENT->value)
+            ->setProcessedAt(new DateTimeImmutable('now'));
+
+        $this->assertTrue($test->isRelevant($message2));
+        $this->assertFalse($test->isWaiting($message2));
+
+        $message3 = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            scheduledAt: new DateTimeImmutable('-1 day'),
+        )
+            ->setStatus(null)
+            ->setProcessedAt(null);
+
+        $this->assertFalse($test->isRelevant($message3));
+        $this->assertFalse($test->isWaiting($message3));
+
+        $message4 = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            scheduledAt: new DateTimeImmutable('-1 min'),
+        )
+            ->setStatus(MessageStatusEnum::ERROR->value)
+            ->setProcessedAt(new DateTimeImmutable('now'));
+
+        $this->assertFalse($test->isRelevant($message4));
+        $this->assertFalse($test->isWaiting($message4));
+    }
 }

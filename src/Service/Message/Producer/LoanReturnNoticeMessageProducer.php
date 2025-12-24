@@ -60,8 +60,10 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
     public function isRelevant(Message $message): bool
     {
         $type = MessageTypeEnum::from($message->getType());
-        // Scheduled date is not relevant for loan return notices
-        return $type->isLoanReturnNotice() && $message->getStatus() !== MessageStatusEnum::ERROR->value;
+
+        return $type->isLoanReturnNotice()
+            && $message->getStatus() !== MessageStatusEnum::ERROR->value
+            && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
     }
 
     public function isWaiting(Message $message): bool
