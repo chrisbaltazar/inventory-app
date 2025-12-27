@@ -72,6 +72,9 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
             'user' => $admin,
             'scheduledAt' => $scheduledDate,
         ]);
+        // Re-run
+        $test->produce();
+        $this->assertDatabaseCount(4, Message::class);
     }
 
     public function testMessagesValidation(): void

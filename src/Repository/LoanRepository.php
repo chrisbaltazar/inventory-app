@@ -27,7 +27,8 @@ class LoanRepository extends ServiceEntityRepository
 
     public function findOpenByUserAndItem(User $user, Item $item): ?Loan
     {
-        return $this->createQueryBuilder('l')
+        return $this
+            ->createQueryBuilder('l')
             ->where('l.endDate IS NULL')
             ->andWhere('l.user = :user')
             ->andWhere('l.item = :item')
@@ -44,7 +45,8 @@ class LoanRepository extends ServiceEntityRepository
     {
         is_int($item) || $item = $item->getId();
 
-        return $this->createQueryBuilder('l')
+        return $this
+            ->createQueryBuilder('l')
             ->join('l.item', 'i')
             ->where('l.endDate IS NULL')
             ->andWhere('i.id = :itemId')
@@ -58,7 +60,8 @@ class LoanRepository extends ServiceEntityRepository
      */
     public function findOpenByUser(User $user): array
     {
-        return $this->createQueryBuilder('l')
+        return $this
+            ->createQueryBuilder('l')
             ->select('l', 'i', 'e')
             ->join('l.item', 'i')
             ->join('l.event', 'e')
@@ -76,7 +79,8 @@ class LoanRepository extends ServiceEntityRepository
      */
     public function findOpenByEvent(Event $event, User $user): array
     {
-        return $this->createQueryBuilder('l')
+        return $this
+            ->createQueryBuilder('l')
             ->select('l', 'i', 'e')
             ->join('l.item', 'i')
             ->join('l.event', 'e')
@@ -94,7 +98,8 @@ class LoanRepository extends ServiceEntityRepository
      */
     public function findAllByUser(User $user): array
     {
-        return $this->createQueryBuilder('l')
+        return $this
+            ->createQueryBuilder('l')
             ->select('l', 'e', 'i')
             ->join('l.event', 'e')
             ->join('l.item', 'i')
@@ -111,7 +116,8 @@ class LoanRepository extends ServiceEntityRepository
      */
     public function findAllByItem(Item $item, ?Inventory $invent = null): array
     {
-        $query = $this->createQueryBuilder('l')
+        $query = $this
+            ->createQueryBuilder('l')
             ->select('l', 'e', 'u')
             ->join('l.event', 'e')
             ->join('l.user', 'u')
@@ -130,7 +136,8 @@ class LoanRepository extends ServiceEntityRepository
             }
         }
 
-        return $query->orderBy('e.date', 'DESC')->addOrderBy('l.startDate', 'DESC')
+        return $query
+            ->orderBy('e.date', 'DESC')->addOrderBy('l.startDate', 'DESC')
             ->getQuery()->getResult();
     }
 
@@ -139,7 +146,8 @@ class LoanRepository extends ServiceEntityRepository
      */
     public function findAllDelayed(): array
     {
-        return $this->createQueryBuilder('l')
+        return $this
+            ->createQueryBuilder('l')
             ->select('l', 'e', 'u', 'i')
             ->join('l.event', 'e')
             ->join('l.item', 'i')
@@ -151,6 +159,40 @@ class LoanRepository extends ServiceEntityRepository
             ->orderBy('e.returnDate', 'ASC')
             ->addOrderBy('u.name', 'ASC')
             ->addOrderBy('i.region', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithReturnBetween(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
+    {
+        return $this
+            ->createQueryBuilder('l')
+            ->select('l', 'u', 'e')
+            ->join('l.event', 'e')
+            ->join('l.user', 'u')
+            ->where('l.endDate IS NULL')
+            ->andWhere('e.returnDate >= :date1')
+            ->andWhere('e.returnDate <= :date2')
+            ->setParameter('date1', $date1->format('Y-m-d'))
+            ->setParameter('date2', $date2->format('Y-m-d'))
+            ->orderBy('e.returnDate', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithReturnIn(\DateTimeImmutable $date): array
+    {
+        return $this
+            ->createQueryBuilder('l')
+            ->select('l', 'u', 'e')
+            ->join('l.event', 'e')
+            ->join('l.user', 'u')
+            ->where('l.endDate IS NULL')
+            ->andWhere('e.returnDate = :date')
+            ->setParameter('date', $date->format('Y-m-d'))
+            ->orderBy('e.returnDate', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
             ->getQuery()
             ->getResult();
     }

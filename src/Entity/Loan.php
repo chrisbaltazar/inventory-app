@@ -34,7 +34,7 @@ class Loan
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $endDate = null;
 
-    #[ORM\ManyToOne(inversedBy: 'loans')]
+    #[ORM\ManyToOne(inversedBy: 'loans', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank]
     private ?Item $item = null;

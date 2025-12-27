@@ -28,4 +28,12 @@ abstract class AbstractKernelTestCase extends KernelTestCase
     {
         static::getContainer()->set($key, $service);
     }
+
+    protected function persistAll(...$entities): void
+    {
+        foreach ($entities as $entity) {
+            $this->entityManager->persist($entity);
+        }
+        $this->entityManager->flush();
+    }
 }

@@ -73,6 +73,9 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
                 'scheduledAt' => $scheduledDate,
             ]);
         }
+        // Re-run
+        $test->produce();
+        $this->assertDatabaseCount($expectedCount + 1, Message::class);
     }
 
     public static function provideProduceMessages(): array
