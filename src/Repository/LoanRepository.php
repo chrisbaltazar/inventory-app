@@ -163,7 +163,7 @@ class LoanRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllWithLoanReturnBetween(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
+    public function findAllWithReturnBetween(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
     {
         return $this
             ->createQueryBuilder('l')
@@ -181,7 +181,7 @@ class LoanRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllWithLoanReturnFor(\DateTimeImmutable $date): array
+    public function findAllWithReturnIn(\DateTimeImmutable $date): array
     {
         return $this
             ->createQueryBuilder('l')

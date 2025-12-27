@@ -74,7 +74,7 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
     private function getLoanUsers(\DateTimeImmutable $date): array
     {
         $loanUsers = [];
-        $allLoans = $this->loanRepository->findAllWithLoanReturnFor($date);
+        $allLoans = $this->loanRepository->findAllWithReturnIn($date);
         /** @var Loan $loan */
         foreach ($allLoans as $loan) {
             $user = $loan->getUser();
