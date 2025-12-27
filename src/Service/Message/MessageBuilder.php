@@ -80,7 +80,7 @@ class MessageBuilder
         $message->setType(MessageTypeEnum::LOAN_RETURN_NOTICE->value);
         $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(10, 0));
         $message->setContent(
-            "Hola {$user->getName()}, te recordamos que la próxima devolución de vestuario será el día: $date, contamos contigo para hacerlo todos juntos.",
+            "Hola {$user->getName()}, aviso devolución de vestuario el día: $date. Contamos contigo, si no, por favor gestiona con ayuda de alguien. Fecha única. Gracias",
         );
 
         return $message;
@@ -101,7 +101,7 @@ class MessageBuilder
         $message->setType(MessageTypeEnum::LOAN_RETURN_REMINDER->value);
         $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(9, 0));
         $message->setContent(
-            "Hola {$user->getName()}, este es un recordatorio amistoso de que la devolución de vestuario es $returnDay! No olvides tener todo listo y gracias :)",
+            "Hola {$user->getName()}, recordatorio amistoso de que la devolución de vestuario es $returnDay! No olvides tener todo listo y gracias por tu colaboración :)",
         );
 
         return $message;
