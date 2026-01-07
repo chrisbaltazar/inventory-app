@@ -11,7 +11,7 @@ use App\Entity\Loan;
 use App\Enum\GenderEnum;
 use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
-use tests\AbstractWebTestCase;
+use Tests\AbstractWebTestCase;
 use Tests\Trait\WithUserSession;
 
 class LoanControllerTest extends AbstractWebTestCase
@@ -69,11 +69,12 @@ class LoanControllerTest extends AbstractWebTestCase
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
         $item2->addInventory(InventoryFactory::create(quantity: 1));
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item1,
+            $item2
+        );
 
         $this->asUser($this->client, $user)->request('POST', '/loan/store', [
             'loan' => [
@@ -107,11 +108,12 @@ class LoanControllerTest extends AbstractWebTestCase
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
         $item2->addInventory(InventoryFactory::create(quantity: 1));
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item1,
+            $item2
+        );
 
         $this->asUser($this->client, $user)->request('POST', '/loan/store', [
             'loan' => [
@@ -144,12 +146,13 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->persist($loan);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item1,
+            $item2,
+            $loan
+        );
 
         $this->asUser($this->client, $user)->request('POST', '/loan/store', [
             'loan' => [
@@ -176,7 +179,10 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertDatabaseCount(1, Loan::class);
     }
 
-    public function testStoreLoanErrorSameItem(): void
+    /**
+     * Skipped for now while testing multiple items per loan
+     */
+    public function _testStoreLoanErrorSameItem(): void
     {
         $user = UserFactory::admin();
         $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
@@ -227,6 +233,56 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertDatabaseCount(1, Loan::class);
     }
 
+    public function testStoreLoanSameItem(): void
+    {
+        $user = UserFactory::admin();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
+        $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item1->addInventory(InventoryFactory::create(quantity: 2));
+        $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
+        $item2->addInventory(InventoryFactory::create(quantity: 1));
+        $loan = LoanFactory::create(
+            startDate: new \DateTimeImmutable(),
+            endDate: null,
+            user: $user,
+            event: $event,
+            item: $item1,
+            inventory: $item1->getInventory()->first(),
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->persistAll(
+            $user,
+            $event,
+            $item1,
+            $item2,
+            $loan
+        );
+
+        $this->asUser($this->client, $user)->request('POST', '/loan/store', [
+            'loan' => [
+                'event' => $event->getId(),
+                'user' => $user->getId(),
+                'item' => [
+                    sprintf(
+                        '%d|%s',
+                        $item1->getInventory()->first()->getId(),
+                        $item1->getInventory()->first()->getSize()
+                    ),
+                    sprintf(
+                        '%d|%s',
+                        $item2->getInventory()->first()->getId(),
+                        $item2->getInventory()->first()->getSize()
+                    ),
+                ],
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertDatabaseCount(3, Loan::class);
+    }
+
     public function testShowLoanUser(): void
     {
         $user = UserFactory::admin();
@@ -261,14 +317,15 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event1);
-        $this->entityManager->persist($event2);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->persist($loan1);
-        $this->entityManager->persist($loan2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event1,
+            $event2,
+            $item1,
+            $item2,
+            $loan1,
+            $loan2
+        );
 
         $this->asUser($this->client, $user)->request('GET', '/loan/user/' . $user->getId());
 
@@ -313,13 +370,14 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($item);
-        $this->entityManager->persist($event1);
-        $this->entityManager->persist($event2);
-        $this->entityManager->persist($loan1);
-        $this->entityManager->persist($loan2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $item,
+            $event1,
+            $event2,
+            $loan1,
+            $loan2
+        );
 
         $crawler = $this->asUser($this->client, $user)->request('GET', '/loan/item/' . $item->getId());
 
@@ -346,11 +404,12 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item);
-        $this->entityManager->persist($loan);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item,
+            $loan
+        );
 
         $this->asUser($this->client, $user)->request('POST', '/loan/update', [
             'id' => $loan->getId(),
@@ -383,11 +442,12 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item);
-        $this->entityManager->persist($loan);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item,
+            $loan
+        );
 
         $this->asUser($this->client, $user)->request('POST', '/loan/update', [
             'id' => $loan->getId(),
@@ -417,11 +477,12 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::CLOSED,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item);
-        $this->entityManager->persist($loan);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item,
+            $loan
+        );
 
         $this->asUser($this->client, $user)->request('GET', "/loan/{$loan->getId()}/reopen");
 
@@ -467,14 +528,15 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event1);
-        $this->entityManager->persist($event2);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->persist($loan1);
-        $this->entityManager->persist($loan2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event1,
+            $event2,
+            $item1,
+            $item2,
+            $loan1,
+            $loan2
+        );
 
         $query = http_build_query([
             'source' => $event1->getId(),
@@ -532,14 +594,15 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event1);
-        $this->entityManager->persist($event2);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->persist($loan1);
-        $this->entityManager->persist($loan2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event1,
+            $event2,
+            $item1,
+            $item2,
+            $loan1,
+            $loan2
+        );
 
         $query = http_build_query([
             'source' => $event1->getId(),
@@ -589,14 +652,15 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::OPEN,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event1);
-        $this->entityManager->persist($event2);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->persist($loan1);
-        $this->entityManager->persist($loan2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event1,
+            $event2,
+            $item1,
+            $item2,
+            $loan1,
+            $loan2
+        );
 
         $query = http_build_query([
             'source' => $event1->getId(),
@@ -646,14 +710,15 @@ class LoanControllerTest extends AbstractWebTestCase
             status: LoanStatusEnum::CLOSED,
         );
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event1);
-        $this->entityManager->persist($event2);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->persist($loan1);
-        $this->entityManager->persist($loan2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event1,
+            $event2,
+            $item1,
+            $item2,
+            $loan1,
+            $loan2
+        );
 
         $query = http_build_query([
             'source' => $event1->getId(),
