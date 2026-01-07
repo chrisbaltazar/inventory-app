@@ -106,6 +106,8 @@ class LoanRepository extends ServiceEntityRepository
             ->where('l.user = :user')
             ->setParameter('user', $user)
             ->orderBy('e.date', 'DESC')
+            ->addOrderBy('i.name', 'ASC')
+            ->addOrderBy('l.info', 'ASC')
             ->addOrderBy('l.startDate', 'ASC')
             ->getQuery()
             ->getResult();

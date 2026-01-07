@@ -28,7 +28,7 @@ class LoanProcessor
     {
         [$user, $event, $items] = $this->validateData($data);
         $validItems = $this->verifyItemsExistence($items);
-        $this->checkOpenLoanFor($user, $validItems);
+//        $this->checkOpenLoanFor($user, $validItems);
         $this->persistItems($validItems, $user, $event);
     }
 

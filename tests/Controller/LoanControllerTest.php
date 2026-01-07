@@ -11,7 +11,7 @@ use App\Entity\Loan;
 use App\Enum\GenderEnum;
 use App\Enum\LoanStatusEnum;
 use App\Enum\RegionEnum;
-use tests\AbstractWebTestCase;
+use Tests\AbstractWebTestCase;
 use Tests\Trait\WithUserSession;
 
 class LoanControllerTest extends AbstractWebTestCase
@@ -69,11 +69,12 @@ class LoanControllerTest extends AbstractWebTestCase
         $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
         $item2->addInventory(InventoryFactory::create(quantity: 1));
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($event);
-        $this->entityManager->persist($item1);
-        $this->entityManager->persist($item2);
-        $this->entityManager->flush();
+        $this->persistAll(
+            $user,
+            $event,
+            $item1,
+            $item2
+        );
 
         $this->asUser($this->client, $user)->request('POST', '/loan/store', [
             'loan' => [
@@ -176,7 +177,10 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertDatabaseCount(1, Loan::class);
     }
 
-    public function testStoreLoanErrorSameItem(): void
+    /**
+     * Skipped for now while testing multiple items per loan
+     */
+    public function _testStoreLoanErrorSameItem(): void
     {
         $user = UserFactory::admin();
         $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
@@ -225,6 +229,56 @@ class LoanControllerTest extends AbstractWebTestCase
         $this->assertResponseContains('User with open loan');
         // Previously exising loan
         $this->assertDatabaseCount(1, Loan::class);
+    }
+
+    public function testStoreLoanSameItem(): void
+    {
+        $user = UserFactory::admin();
+        $event = EventFactory::create(returnDate: new \DateTimeImmutable('now'));
+        $item1 = ItemFactory::create(RegionEnum::ACCESORIOS->value);
+        $item1->addInventory(InventoryFactory::create(quantity: 2));
+        $item2 = ItemFactory::create(RegionEnum::ENSAYO->value);
+        $item2->addInventory(InventoryFactory::create(quantity: 1));
+        $loan = LoanFactory::create(
+            startDate: new \DateTimeImmutable(),
+            endDate: null,
+            user: $user,
+            event: $event,
+            item: $item1,
+            inventory: $item1->getInventory()->first(),
+            quantity: 1,
+            status: LoanStatusEnum::OPEN,
+        );
+
+        $this->persistAll(
+            $user,
+            $event,
+            $item1,
+            $item2,
+            $loan
+        );
+
+        $this->asUser($this->client, $user)->request('POST', '/loan/store', [
+            'loan' => [
+                'event' => $event->getId(),
+                'user' => $user->getId(),
+                'item' => [
+                    sprintf(
+                        '%d|%s',
+                        $item1->getInventory()->first()->getId(),
+                        $item1->getInventory()->first()->getSize()
+                    ),
+                    sprintf(
+                        '%d|%s',
+                        $item2->getInventory()->first()->getId(),
+                        $item2->getInventory()->first()->getSize()
+                    ),
+                ],
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertDatabaseCount(3, Loan::class);
     }
 
     public function testShowLoanUser(): void

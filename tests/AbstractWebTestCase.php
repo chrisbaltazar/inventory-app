@@ -27,4 +27,12 @@ abstract class AbstractWebTestCase extends WebTestCase
         $this->assertStringContainsString($text, $this->client->getResponse()->getContent());
     }
 
+    protected function persistAll(...$entities): void
+    {
+        foreach ($entities as $entity) {
+            $this->entityManager->persist($entity);
+        }
+        $this->entityManager->flush();
+    }
+
 }
