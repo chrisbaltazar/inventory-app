@@ -12,7 +12,7 @@
                     {% endif %}
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ suit.region }} - {{ suit.name }} ({{ suit.genderName }})</h5>
-                        <p class="card-text">{{ suit.note }}</p>
+                        <p class="card-text fst-italic fw-lighter">{{ suit.description }}</p>
                     </div>
                 </div>
                 <div class="col mt-3">
@@ -27,6 +27,11 @@
                             </tbody>
                         </table>
                     </div>
+                    {% if suit.note %}
+                        <div class="alert alert-primary text-center" role="alert">
+                            Nota: {{ suit.note }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="card-body">
