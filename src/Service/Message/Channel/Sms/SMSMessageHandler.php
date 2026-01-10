@@ -29,7 +29,7 @@ class SMSMessageHandler implements MessageHandlerInterface
             $this->markMessageAs(MessageStatusEnum::SENT, $message);
         } catch (\Exception $e) {
             $this->logger->error('Error sending SMS: ' . $e->getMessage());
-            $this->markMessageAs(MessageStatusEnum::ERROR, $message);
+            $this->markMessageAs(MessageStatusEnum::ERROR, $message, $e->getMessage());
         }
     }
 
@@ -59,10 +59,11 @@ class SMSMessageHandler implements MessageHandlerInterface
         return $recipientNumber;
     }
 
-    private function markMessageAs(MessageStatusEnum $status, Message $message): void
+    private function markMessageAs(MessageStatusEnum $status, Message $message, ?string $error = null): void
     {
         $message->setStatus($status->value);
         $message->setProcessedAt(new \DateTimeImmutable());
+        $message->setReason($error);
         $this->entityManager->flush();
     }
 

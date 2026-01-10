@@ -59,6 +59,9 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     #[Assert\Length(max: 255)]
     private ?string $note = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -209,6 +212,18 @@ class Suit implements UpdatedStampInterface, SoftDeleteInterface, UserAwareInter
     public function setNote(?string $note): static
     {
         $this->note = $note;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

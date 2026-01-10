@@ -111,6 +111,7 @@ class SuitController extends AbstractController
             $items = array_map(fn($itemId) => $repository->find($itemId), array_keys($items));
             $suit->setItems($items);
             $suit->setNote($request->get('note'));
+            $suit->setDescription($request->get('description'));
             $entityManager->flush();
 
             $this->addFlash('success', 'Vestuario asignado correctamente');

@@ -58,6 +58,9 @@ class Message
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $processedAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $reason = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable('now');
@@ -184,6 +187,18 @@ class Message
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?string $reason): static
+    {
+        $this->reason = $reason;
 
         return $this;
     }
