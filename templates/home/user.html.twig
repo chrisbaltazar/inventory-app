@@ -27,12 +27,12 @@
                                 </td>
                                 <td>
                                 <span class="fs-6 badge text-bg-success rounded-pill">
-                                    {{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}
+                                    {{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '<i>Pendiente</i>' }}
                                 </span>
                                 </td>
                                 <td>
                                 <span class="fs-6 badge text-bg-dark rounded-pill">
-                                    {{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}
+                                    {{ event.returnDate ? event.returnDate|date('d/m/Y') : '<i>Pendiente</i>' }}
                                 </span>
                                 </td>
                             </tr>

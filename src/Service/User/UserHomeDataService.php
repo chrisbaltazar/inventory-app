@@ -48,7 +48,7 @@ class UserHomeDataService implements UserHomeDataInterface
         $now = new \DateTime('now');
         /** @var Loan $loan */
         foreach ($loans as $loan) {
-            if (!$loan->getEndDate() && $loan->getEvent()?->getReturnDate()?->format('U') < $now->format('U')) {
+            if (!$loan->getEndDate() && $loan->getEvent()?->getReturnDate()?->format('U') > $now->format('U')) {
                 return true;
             }
         }
