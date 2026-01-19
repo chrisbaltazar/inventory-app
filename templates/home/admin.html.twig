@@ -24,8 +24,8 @@
                                     </a>
                                 </td>
                                 <td>{{ event.date|date('d/m/Y') }}</td>
-                                <td>{{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '' }}</td>
-                                <td>{{ event.returnDate ? event.returnDate|date('d/m/Y') : '' }}</td>
+                                <td>{{ event.deliveryDate ? event.deliveryDate|date('d/m/Y') : '<i>Pendiente</i>' }}</td>
+                                <td>{{ event.returnDate ? event.returnDate|date('d/m/Y') : '<i>Pendiente</i>' }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
