@@ -6,6 +6,8 @@ use App\DataFixtures\Factory\UserFactory;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 trait WithUserSession
 {
@@ -33,4 +35,20 @@ trait WithUserSession
 
         return $this->asUser($client, $user);
     }
+
+    public function loginUser(KernelInterface $kernel, User $user): void
+    {
+        $container = $kernel->getContainer()->get('test.service_container');
+        $tokenStorage = $container->get('security.token_storage');
+        $firewallName = 'main'; // Change to your firewall name
+
+        $token = new UsernamePasswordToken(
+            $user,
+            $firewallName,
+            $user->getRoles(),
+        );
+
+        $tokenStorage->setToken($token);
+    }
+
 }
