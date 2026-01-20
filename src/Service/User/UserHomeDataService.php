@@ -50,7 +50,7 @@ class UserHomeDataService implements UserHomeDataInterface
             if (
                 !$loan->getEndDate()
                 && $loan->getEvent()?->getReturnDate()
-                && $loan->getEvent()?->getReturnDate()?->format('U') < $now->format('U')) {
+                && $loan->getEvent()->getReturnDate()->format('U') < $now->format('U')) {
                 return true;
             }
         }
