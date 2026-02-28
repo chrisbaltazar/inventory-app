@@ -76,6 +76,7 @@ services:
     App\Service\Message\Channel\Sms\TelnyxSMSProvider:
       arguments:
         $apiKey: '%env(string:TELNYX_API_KEY)%'
+        $baseUrl: '%env(string:TELNYX_BASE_URL)%'
         $messagingProfileId: '%env(string:TELNYX_MESSAGING_PROFILE_ID)%'
         $retryClient: '@Symfony\Component\HttpClient\RetryableHttpClient'
 
