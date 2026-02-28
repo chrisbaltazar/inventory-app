@@ -2,7 +2,7 @@
 
 namespace App\Service\Message\Channel\Sms;
 
-use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TelnyxSMSProvider implements SmsProviderInterface
 {
@@ -11,7 +11,7 @@ class TelnyxSMSProvider implements SmsProviderInterface
         private readonly string $apiKey,
         private readonly string $baseUrl,
         private readonly string $messagingProfileId,
-        private readonly RetryableHttpClient $retryClient,
+        private readonly HttpClientInterface $retryClient,
     ) {}
 
     public function send(string $number, string $sender, string $message): mixed
