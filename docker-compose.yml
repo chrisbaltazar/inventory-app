@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    container_name: inventory-app
+    restart: always
+    volumes:
+      - ./:/var/www/html
+    command: symfony server:start --port=8000  --no-tls --allow-http --allow-all-ip --dir=public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.inventory-app.rule=Host(`inventory-app.localhost`)"
+      - "traefik.http.services.inventory-app.loadbalancer.server.port=8000"
+    networks:
+      - docker-dev
+
+networks:
+  docker-dev:
+    external: true
