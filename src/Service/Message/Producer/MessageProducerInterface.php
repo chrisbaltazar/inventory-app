@@ -16,9 +16,4 @@ interface MessageProducerInterface
      */
     public function isRelevant(Message $message): bool;
 
-    /**
-     * Determines whether the given message is waiting to be processed by this consumer.
-     */
-    public function isWaiting(Message $message): bool;
-
 }

@@ -39,16 +39,14 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
 
         $message2 = MessageFactory::create(
             user: $user,
+            content: 'More  content...',
             scheduledAt: new \DateTimeImmutable('+1 hour'),
         );
         $message2->setRecipient(null);
         $message2->setStatus(null);
         $message2->setProcessedAt(null);
 
-        $this->entityManager->persist($user);
-        $this->entityManager->persist($message1);
-        $this->entityManager->persist($message2);
-        $this->entityManager->flush();
+        $this->persistAll($user, $message1, $message2);
 
         $repository = $this->entityManager->getRepository(Message::class);
         $eventDispatcher = $this->get(EventDispatcherInterface::class);
@@ -63,9 +61,9 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer1 = $this->createMock(MessageProducerInterface::class);
-        $producer1->expects($this->once())->method('isWaiting')->willReturn(true);
+        $producer1->expects($this->atLeast(1))->method('isRelevant')->willReturn(false);
         $producer2 = $this->createMock(MessageProducerInterface::class);
-        $producer2->expects($this->never())->method('isWaiting');
+        $producer2->expects($this->atLeast(1))->method('isRelevant')->willReturn(true);
         $iterator = $this->getIteratorWith([$producer1, $producer2]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
@@ -108,7 +106,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer = $this->createMock(MessageProducerInterface::class);
-        $producer->expects($this->once())->method('isWaiting')->willReturn(true);
+        $producer->method('isRelevant')->willReturn(true);
         $iterator = $this->getIteratorWith([$producer]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);

@@ -54,17 +54,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
         $type = MessageTypeEnum::from($message->getType());
 
         return ($type->isChristmasGreeting() || $type->isNewYearGreeting())
-            && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d')
-            && $message->getStatus() !== MessageStatusEnum::ERROR->value;
-    }
-
-    public function isWaiting(Message $message): bool
-    {
-        $type = MessageTypeEnum::from($message->getType());
-
-        return ($type->isChristmasGreeting() || $this->isNewYearsEve())
-            && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d')
-            && !$message->getStatus();
+            && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d');
     }
 
     private function isXmas(): bool
