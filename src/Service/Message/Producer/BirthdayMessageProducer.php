@@ -4,7 +4,6 @@ namespace App\Service\Message\Producer;
 
 use App\Entity\Message;
 use App\Entity\User;
-use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
@@ -81,16 +80,6 @@ class BirthdayMessageProducer implements MessageProducerInterface
         $type = MessageTypeEnum::from($message->getType());
 
         return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
-            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
-            && (!$message->getStatus() || $message->getStatus() !== MessageStatusEnum::ERROR->value);
-    }
-
-    public function isWaiting(Message $message): bool
-    {
-        $type = MessageTypeEnum::from($message->getType());
-
-        return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
-            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d')
-            && !$message->getStatus();
+            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d');
     }
 }

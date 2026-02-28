@@ -125,7 +125,6 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
             ->setProcessedAt(null);
 
         $this->assertTrue($test->isRelevant($message1));
-        $this->assertTrue($test->isWaiting($message1));
 
         $message2 = MessageFactory::create(
             type: MessageTypeEnum::LOAN_RETURN_REMINDER,
@@ -135,7 +134,6 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
             ->setProcessedAt(new DateTimeImmutable('now'));
 
         $this->assertTrue($test->isRelevant($message2));
-        $this->assertFalse($test->isWaiting($message2));
 
         $message3 = MessageFactory::create(
             type: MessageTypeEnum::LOAN_RETURN_REMINDER,
@@ -145,7 +143,6 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
             ->setProcessedAt(null);
 
         $this->assertFalse($test->isRelevant($message3));
-        $this->assertFalse($test->isWaiting($message3));
 
         $message4 = MessageFactory::create(
             type: MessageTypeEnum::LOAN_RETURN_REMINDER,
@@ -154,7 +151,6 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
             ->setStatus(MessageStatusEnum::ERROR->value)
             ->setProcessedAt(new DateTimeImmutable('now'));
 
-        $this->assertFalse($test->isRelevant($message4));
-        $this->assertFalse($test->isWaiting($message4));
+        $this->assertTrue($test->isRelevant($message4));
     }
 }

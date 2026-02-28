@@ -62,16 +62,6 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
         $type = MessageTypeEnum::from($message->getType());
 
         return $type->isLoanReturnNotice()
-            && $message->getStatus() !== MessageStatusEnum::ERROR->value
-            && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
-    }
-
-    public function isWaiting(Message $message): bool
-    {
-        $type = MessageTypeEnum::from($message->getType());
-
-        return $type->isLoanReturnNotice()
-            && !$message->getStatus()
             && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
     }
 
