@@ -2,7 +2,7 @@ services:
   app:
     build: .
     container_name: inventory-app
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./:/var/www/html
     command: symfony server:start --port=8000  --no-tls --allow-http --allow-all-ip --dir=public
