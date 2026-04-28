@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(name: 'message_processed_idx', columns: ['processed_at'])]
 #[ORM\Index(name: 'message_status_idx', columns: ['status'])]
 #[ORM\Index(name: 'message_user_idx', columns: ['user_id'])]
+#[ORM\Index(name: 'message_keyword_idx', columns: ['keyword'])]
 class Message
 {
     #[ORM\Id]
@@ -60,6 +61,9 @@ class Message
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $reason = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $keyword = null;
 
     public function __construct()
     {
@@ -199,6 +203,18 @@ class Message
     public function setReason(?string $reason): static
     {
         $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getKeyword(): ?string
+    {
+        return $this->keyword;
+    }
+
+    public function setKeyword(?string $keyword): static
+    {
+        $this->keyword = $keyword;
 
         return $this;
     }
