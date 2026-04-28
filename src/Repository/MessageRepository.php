@@ -44,7 +44,7 @@ class MessageRepository extends ServiceEntityRepository
         MessageTypeEnum $type,
         User $user = null,
         \DateTimeInterface $scheduled = null,
-        string $content = null,
+        ?string $keyword = null,
         MessageStatusEnum $status = null,
     ): ?Message {
         $query = $this
@@ -61,10 +61,10 @@ class MessageRepository extends ServiceEntityRepository
                 ->andWhere('m.user = :user')
                 ->setParameter('user', $user);
         }
-        if ($content) {
+        if ($keyword) {
             $query
-                ->andWhere('m.content LIKE :content')
-                ->setParameter('content', "%$content%");
+                ->andWhere('m.keyword = :keyword')
+                ->setParameter('keyword', substr($keyword, 0, 50));
         }
         if ($status) {
             $query
