@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use App\Service\Message\MessageBuilder;
+use App\Service\Message\MessageComposer;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BirthdayMessageProducer implements MessageProducerInterface
@@ -16,7 +16,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly MessageRepository $messageRepository,
-        private readonly MessageBuilder $messageBuilder,
+        private readonly MessageComposer $messageComposer,
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
@@ -33,7 +33,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
                 continue;
             }
 
-            $message = $this->messageBuilder->userBirthdayMessage($user);
+            $message = $this->messageComposer->userBirthdayMessage($user);
             $this->entityManager->persist($message);
             $this->createAdminMessages($user);
         }
@@ -54,7 +54,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
                 continue;
             }
 
-            $message = $this->messageBuilder->adminBirthdayMessage($admin, $user->getName());
+            $message = $this->messageComposer->adminBirthdayMessage($admin, $user->getName());
             $this->entityManager->persist($message);
         }
 
@@ -71,7 +71,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
             type: $type,
             user: $user,
             scheduled: new \DateTime('now'),
-            content: $name,
+            keyword: $name,
         );
     }
 

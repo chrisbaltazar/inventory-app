@@ -7,9 +7,8 @@ use App\Entity\User;
 use App\Enum\MessageTypeEnum;
 use App\Service\Time\ClockService;
 
-class MessageBuilder
+class MessageComposer
 {
-
     public function passwordRecovery(User $user): Message
     {
         $message = new Message();
@@ -27,6 +26,7 @@ class MessageBuilder
         $message->setUser($user);
         $message->setType(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF->value);
         $message->setScheduledAt((new \DateTimeImmutable('today'))->setTime(9, 0));
+        $message->setKeyword(substr($name, 0, 50));
         $message->setContent(
             "Hoy es el cumpleaños de $name. No olvides enviarle tus felicitaciones... y quizá unas chelas!",
         );
@@ -43,6 +43,7 @@ class MessageBuilder
         $message->setContent(
             "¡Feliz cumpleaños {$user->getName()}! Te deseamos un día lleno de sorpresas y no olvides celebrar al máximo... e invitarnos :)",
         );
+        $message->setKeyword(substr($user->getName(), 0, 50));
 
         return $message;
     }
@@ -79,6 +80,7 @@ class MessageBuilder
         $message->setUser($user);
         $message->setType(MessageTypeEnum::LOAN_RETURN_NOTICE->value);
         $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(10, 0));
+        $message->setKeyword(substr($date, 0, 50));
         $message->setContent(
             "Hola {$user->getName()}, aviso devolución de vestuario el día: $date. Contamos contigo, si no, por favor gestiona con ayuda de alguien. Fecha única. Gracias",
         );

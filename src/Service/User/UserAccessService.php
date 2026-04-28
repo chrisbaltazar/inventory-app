@@ -4,7 +4,7 @@ namespace App\Service\User;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Message\MessageBuilder;
+use App\Service\Message\MessageComposer;
 use App\Service\Message\MessageManagerService;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -16,7 +16,7 @@ class UserAccessService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly MessageBuilder $messageBuilder,
+        private readonly MessageComposer $messageBuilder,
         private readonly MessageManagerService $messageManager,
     ) {}
 

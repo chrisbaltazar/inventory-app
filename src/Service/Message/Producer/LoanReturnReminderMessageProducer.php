@@ -9,7 +9,7 @@ use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\LoanRepository;
 use App\Repository\MessageRepository;
-use App\Service\Message\MessageBuilder;
+use App\Service\Message\MessageComposer;
 use Doctrine\ORM\EntityManagerInterface;
 
 class LoanReturnReminderMessageProducer implements MessageProducerInterface
@@ -18,7 +18,7 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
 
     public function __construct(
         private readonly LoanRepository $loanRepository,
-        private readonly MessageBuilder $messageBuilder,
+        private readonly MessageComposer $messageBuilder,
         private readonly MessageRepository $messageRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {}

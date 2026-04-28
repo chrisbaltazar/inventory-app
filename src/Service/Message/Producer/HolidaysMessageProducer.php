@@ -8,7 +8,7 @@ use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use App\Service\Message\MessageBuilder;
+use App\Service\Message\MessageComposer;
 use App\Service\Time\ClockInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -18,7 +18,7 @@ class HolidaysMessageProducer implements MessageProducerInterface
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly MessageRepository $messageRepository,
-        private readonly MessageBuilder $messageBuilder,
+        private readonly MessageComposer $messageBuilder,
         private readonly EntityManagerInterface $entityManager,
         private readonly ClockInterface $clock,
     ) {}
