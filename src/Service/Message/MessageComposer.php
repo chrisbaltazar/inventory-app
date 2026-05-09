@@ -43,7 +43,6 @@ class MessageComposer
         $message->setContent(
             "¡Feliz cumpleaños {$user->getName()}! Te deseamos un día lleno de sorpresas y no olvides celebrar al máximo... e invitarnos :)",
         );
-        $message->setKeyword(substr($user->getName(), 0, 50));
 
         return $message;
     }

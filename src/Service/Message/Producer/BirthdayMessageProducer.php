@@ -65,13 +65,12 @@ class BirthdayMessageProducer implements MessageProducerInterface
     {
         /** @var MessageTypeEnum $type */
         /** @var User $user */
-        [$type, $user, $name] = $args + [null, null, null];
+        [$type, $user] = $args + [null, null, null];
 
         return $this->messageRepository->findOneWith(
             type: $type,
             user: $user,
             scheduled: new \DateTime('now'),
-            keyword: $name,
         );
     }
 
