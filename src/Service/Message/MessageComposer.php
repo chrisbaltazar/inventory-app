@@ -20,15 +20,15 @@ class MessageComposer
         return $message;
     }
 
-    public function adminBirthdayMessage(User $user, string $name): Message
+    public function adminBirthdayMessage(User $user, string $email): Message
     {
         $message = new Message();
         $message->setUser($user);
         $message->setType(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF->value);
         $message->setScheduledAt((new \DateTimeImmutable('today'))->setTime(9, 0));
-        $message->setKeyword(substr($name, 0, 50));
+        $message->setKeyword(substr($email, 0, 50));
         $message->setContent(
-            "Hoy es el cumpleaños de $name. No olvides enviarle tus felicitaciones... y quizá unas chelas!",
+            "Hoy es el cumpleaños de $email. No olvides enviarle tus felicitaciones... y quizá unas chelas!",
         );
 
         return $message;

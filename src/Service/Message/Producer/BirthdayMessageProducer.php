@@ -49,7 +49,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
                 continue;
             }
 
-            $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getName());
+            $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getEmail());
             if ($existingMessage && $this->isRelevant($existingMessage)) {
                 continue;
             }
