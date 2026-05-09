@@ -30,7 +30,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message1 = MessageFactory::create(
             type: $messageType,
             user: $user,
-            content: 'Message content...',
+            content: 'Content',
             scheduledAt: new \DateTimeImmutable('now'),
         );
         $message1->setRecipient(null);
@@ -38,15 +38,26 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message1->setProcessedAt(null);
 
         $message2 = MessageFactory::create(
+            type: $messageType,
             user: $user,
-            content: 'More  content...',
-            scheduledAt: new \DateTimeImmutable('+1 hour'),
+            content: 'Expired',
+            scheduledAt: new \DateTimeImmutable('-1 hour'),
         );
         $message2->setRecipient(null);
         $message2->setStatus(null);
         $message2->setProcessedAt(null);
 
-        $this->persistAll($user, $message1, $message2);
+        $message3 = MessageFactory::create(
+            type: $messageType,
+            user: $user,
+            content: 'Future',
+            scheduledAt: new \DateTimeImmutable('+1 hour'),
+        );
+        $message3->setRecipient(null);
+        $message3->setStatus(null);
+        $message3->setProcessedAt(null);
+
+        $this->persistAll($user, $message1, $message2, $message3);
 
         $repository = $this->entityManager->getRepository(Message::class);
         $eventDispatcher = $this->get(EventDispatcherInterface::class);
@@ -61,10 +72,20 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer1 = $this->createMock(MessageProducerInterface::class);
-        $producer1->expects($this->atLeast(1))->method('isRelevant')->willReturn(false);
-        $producer2 = $this->createMock(MessageProducerInterface::class);
-        $producer2->expects($this->atLeast(1))->method('isRelevant')->willReturn(true);
-        $iterator = $this->getIteratorWith([$producer1, $producer2]);
+        $producer1
+            ->expects($this->atLeast(1))
+            ->method('isRegistered')
+            ->willReturn(true);
+        $producer1
+            ->expects($this->atLeast(1))
+            ->method('isExpired')
+            ->willReturnCallback(function (Message $message) {
+                return match ($message->getContent()) {
+                    'Expired' => true,
+                    default => false,
+                };
+            });
+        $iterator = $this->getIteratorWith([$producer1]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
@@ -75,11 +96,15 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message2 = $repository->find($message2->getId());
         $this->assertNull($message2->getStatus());
         $this->assertNull($message2->getProcessedAt());
+        $message3 = $repository->find($message3->getId());
+        $this->assertNull($message3->getStatus());
+        $this->assertNull($message3->getProcessedAt());
     }
 
     public static function provideProcessAllMessages(): array
     {
-        return array_map(fn($type) => [$type], MessageTypeEnum::cases());
+        return array_map(fn($type) => [$type],
+            array_filter(MessageTypeEnum::cases(), fn($type) => !$type->isPwdRecovery()));
     }
 
     public function testProcessMessagesForbiddenNumber(): void
@@ -106,7 +131,8 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer = $this->createMock(MessageProducerInterface::class);
-        $producer->method('isRelevant')->willReturn(true);
+        $producer->method('isRegistered')->willReturn(true);
+        $producer->method('isExpired')->willReturn(false);
         $iterator = $this->getIteratorWith([$producer]);
 
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);

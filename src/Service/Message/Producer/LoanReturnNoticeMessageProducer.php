@@ -5,7 +5,6 @@ namespace App\Service\Message\Producer;
 use App\Entity\Loan;
 use App\Entity\Message;
 use App\Entity\User;
-use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\LoanRepository;
 use App\Repository\MessageRepository;
@@ -80,5 +79,13 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
         return $loanUsers;
     }
 
+    public function isRegistered(MessageTypeEnum $messageType): bool
+    {
+        return $messageType->isLoanReturnNotice();
+    }
 
+    public function isExpired(Message $message): bool
+    {
+        return $message->getScheduledAt()->diff(new \DateTime())->h < 72;
+    }
 }

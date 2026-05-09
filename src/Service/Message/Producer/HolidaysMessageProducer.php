@@ -4,7 +4,6 @@ namespace App\Service\Message\Producer;
 
 use App\Entity\Message;
 use App\Entity\User;
-use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
@@ -93,5 +92,19 @@ class HolidaysMessageProducer implements MessageProducerInterface
             $this->entityManager->persist($message);
         }
         $this->entityManager->flush();
+    }
+
+    public function isRegistered(MessageTypeEnum $messageType): bool
+    {
+        return $messageType->isChristmasGreeting() || $messageType->isNewYearGreeting();
+    }
+
+    public function isExpired(Message $message): bool
+    {
+        return match (MessageTypeEnum::from($message->getType())) {
+            MessageTypeEnum::CHRISTMAS_GREETING => $message->getScheduledAt()->diff(new \DateTime())->h < 6,
+            MessageTypeEnum::NEW_YEAR_GREETING => $message->getScheduledAt()->diff(new \DateTime())->h < 2,
+            default => false
+        };
     }
 }

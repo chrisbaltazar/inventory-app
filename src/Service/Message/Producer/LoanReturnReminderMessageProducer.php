@@ -75,4 +75,13 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
     }
 
 
+    public function isRegistered(MessageTypeEnum $messageType): bool
+    {
+        return $messageType->isLoanReturnReminder();
+    }
+
+    public function isExpired(Message $message): bool
+    {
+        return true;
+    }
 }

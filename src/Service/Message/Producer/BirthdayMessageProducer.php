@@ -81,4 +81,15 @@ class BirthdayMessageProducer implements MessageProducerInterface
         return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
             && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d');
     }
+
+    public function isRegistered(MessageTypeEnum $messageType): bool
+    {
+        return $messageType->isUserBirthdayGreet() || $messageType->isAdminBirthdayNotif();
+    }
+
+    public function isExpired(Message $message): bool
+    {
+        dd($message, $message->getScheduledAt()->diff(new \DateTime())->h < 12);
+        return $message->getScheduledAt()->diff(new \DateTime())->h < 12;
+    }
 }
