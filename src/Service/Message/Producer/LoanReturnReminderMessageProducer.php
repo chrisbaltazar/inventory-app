@@ -10,10 +10,13 @@ use App\Enum\MessageTypeEnum;
 use App\Repository\LoanRepository;
 use App\Repository\MessageRepository;
 use App\Service\Message\MessageComposer;
+use App\Service\Time\TimeDiff;
 use Doctrine\ORM\EntityManagerInterface;
 
 class LoanReturnReminderMessageProducer implements MessageProducerInterface
 {
+    use TimeDiff;
+
     const RETURN_DATE_TARGET = '+1 day';
 
     public function __construct(

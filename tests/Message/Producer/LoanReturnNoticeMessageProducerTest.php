@@ -155,7 +155,7 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
 
     public function testMessageErrorFound(): void
     {
-        $returnDate = new DateTimeImmutable('+ 7 days');
+        $returnDate = new DateTimeImmutable('+7 days');
         $event = EventFactory::create(returnDate: $returnDate);
         $user = UserFactory::create();
         $item = ItemFactory::create();
@@ -181,13 +181,13 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
         $test = $this->get(LoanReturnNoticeMessageProducer::class);
         $test->produce();
 
-        $this->assertDatabaseCount(2, Message::class);
+        $this->assertDatabaseCount(1, Message::class);
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::LOAN_RETURN_NOTICE->value,
             'user' => $user,
         ]);
 
         $test->produce();
-        $this->assertDatabaseCount(2, Message::class);
+        $this->assertDatabaseCount(1, Message::class);
     }
 }

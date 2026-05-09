@@ -8,10 +8,12 @@ use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Message\MessageComposer;
+use App\Service\Time\TimeDiff;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BirthdayMessageProducer implements MessageProducerInterface
 {
+    use TimeDiff;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -78,7 +80,7 @@ class BirthdayMessageProducer implements MessageProducerInterface
     {
         $type = MessageTypeEnum::from($message->getType());
 
-        return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
+        return $this->isRegistered($type)
             && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d');
     }
 
@@ -89,7 +91,6 @@ class BirthdayMessageProducer implements MessageProducerInterface
 
     public function isExpired(Message $message): bool
     {
-        dd($message, $message->getScheduledAt()->diff(new \DateTime())->h < 12);
-        return $message->getScheduledAt()->diff(new \DateTime())->h < 12;
+        return $this->getDiffHours($message->getScheduledAt()) > 12;
     }
 }

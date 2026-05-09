@@ -9,10 +9,13 @@ use App\Enum\MessageTypeEnum;
 use App\Repository\LoanRepository;
 use App\Repository\MessageRepository;
 use App\Service\Message\MessageComposer;
+use App\Service\Time\TimeDiff;
 use Doctrine\ORM\EntityManagerInterface;
 
 class LoanReturnNoticeMessageProducer implements MessageProducerInterface
 {
+    use TimeDiff;
+
     const RETURN_RANGE_START = '+5 days';
     const RETURN_RANGE_END = '+8 days';
 
@@ -60,8 +63,7 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
     {
         $type = MessageTypeEnum::from($message->getType());
 
-        return $type->isLoanReturnNotice()
-            && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
+        return $this->isRegistered($type);
     }
 
     private function getLoanUsers(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
@@ -86,6 +88,6 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
 
     public function isExpired(Message $message): bool
     {
-        return $message->getScheduledAt()->diff(new \DateTime())->h < 72;
+        return $this->getDiffHours($message->getScheduledAt()) > 72;
     }
 }

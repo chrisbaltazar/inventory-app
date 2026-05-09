@@ -9,10 +9,13 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Message\MessageComposer;
 use App\Service\Time\ClockInterface;
+use App\Service\Time\TimeDiff;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HolidaysMessageProducer implements MessageProducerInterface
 {
+
+    use TimeDiff;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -102,9 +105,9 @@ class HolidaysMessageProducer implements MessageProducerInterface
     public function isExpired(Message $message): bool
     {
         return match (MessageTypeEnum::from($message->getType())) {
-            MessageTypeEnum::CHRISTMAS_GREETING => $message->getScheduledAt()->diff(new \DateTime())->h < 6,
-            MessageTypeEnum::NEW_YEAR_GREETING => $message->getScheduledAt()->diff(new \DateTime())->h < 2,
-            default => false
+            MessageTypeEnum::CHRISTMAS_GREETING => $this->getDiffHours($message->getScheduledAt()) > 6,
+            MessageTypeEnum::NEW_YEAR_GREETING => $this->getDiffHours($message->getScheduledAt()) > 2,
+            default => true
         };
     }
 }
