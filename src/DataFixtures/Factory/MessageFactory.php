@@ -17,6 +17,7 @@ class MessageFactory extends AbstractFactory
         string $recipient = null,
         string $subject = null,
         string $content = null,
+        string $keyword = null,
         MessageStatusEnum $status = null,
         DatetimeInterface $createdAt = null,
         DatetimeInterface $scheduledAt = null,
@@ -29,6 +30,7 @@ class MessageFactory extends AbstractFactory
         $message->setSubject($subject ?? self::faker()->sentence);
         $message->setContent($content ?? self::faker()->paragraph);
         $message->setStatus($status?->value ?? self::faker()->randomElement(MessageStatusEnum::values()));
+        $message->setKeyword($keyword);
         $message->setCreatedAt(
             $createdAt ?? new \DateTimeImmutable(self::faker()->dateTimeBetween('-3 days', 'now')->format('Ymd H:i:s')),
         );

@@ -3,6 +3,7 @@
 namespace Tests\Service\Message\Producer;
 
 use App\DataFixtures\Factory\EventFactory;
+use App\DataFixtures\Factory\ItemFactory;
 use App\DataFixtures\Factory\LoanFactory;
 use App\DataFixtures\Factory\MessageFactory;
 use App\DataFixtures\Factory\UserFactory;
@@ -117,7 +118,7 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
 
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::LOAN_RETURN_NOTICE,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0)
+            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0),
         )
             ->setStatus(null)
             ->setProcessedAt(null);
@@ -150,5 +151,43 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
             ->setProcessedAt(new DateTimeImmutable('now'));
 
         $this->assertTrue($test->isRelevant($message4));
+    }
+
+    public function testMessageErrorFound(): void
+    {
+        $returnDate = new DateTimeImmutable('+ 7 days');
+        $event = EventFactory::create(returnDate: $returnDate);
+        $user = UserFactory::create();
+        $item = ItemFactory::create();
+        $loan = LoanFactory::create(
+            startDate: new DateTimeImmutable('now'),
+            endDate: null,
+            user: $user,
+            event: $event,
+            item: $item,
+        );
+        $message = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            user: $user,
+            keyword: $returnDate->format('d/m/Y'),
+            status: MessageStatusEnum::SENT,
+            scheduledAt: new DateTimeImmutable('-1 day'),
+            processedAt: new DateTimeImmutable('-1 day'),
+        );
+
+        $this->persistAll($event, $user, $item, $loan, $message);
+
+        /** @var LoanReturnNoticeMessageProducer $test */
+        $test = $this->get(LoanReturnNoticeMessageProducer::class);
+        $test->produce();
+
+        $this->assertDatabaseCount(2, Message::class);
+        $this->assertDatabaseEntity(Message::class, [
+            'type' => MessageTypeEnum::LOAN_RETURN_NOTICE->value,
+            'user' => $user,
+        ]);
+
+        $test->produce();
+        $this->assertDatabaseCount(2, Message::class);
     }
 }
