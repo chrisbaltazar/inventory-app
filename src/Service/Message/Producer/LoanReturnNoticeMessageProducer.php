@@ -34,8 +34,12 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
         foreach ($loanReturnUsers as $returnDate => $users) {
             /** @var User $user */
             foreach ($users as $user) {
-                $existingMessage = $this->existMessage(MessageTypeEnum::LOAN_RETURN_NOTICE, $user, $returnDate);
-                if ($existingMessage && $this->isRelevant($existingMessage)) {
+                $existingMessage = $this->existMessage([
+                    'user' => $user,
+                    'type' => MessageTypeEnum::LOAN_RETURN_NOTICE,
+                    'keyword' => $returnDate,
+                ]);
+                if ($existingMessage) {
                     continue;
                 }
 
@@ -46,24 +50,9 @@ class LoanReturnNoticeMessageProducer implements MessageProducerInterface
         $this->entityManager->flush();
     }
 
-    public function existMessage(...$args): ?Message
+    public function existMessage(array $data): ?Message
     {
-        /** @var MessageTypeEnum $type */
-        /** @var User $user */
-        [$type, $user, $returnDate] = $args;
-
-        return $this->messageRepository->findOneWith(
-            type: $type,
-            user: $user,
-            keyword: $returnDate,
-        );
-    }
-
-    public function isRelevant(Message $message): bool
-    {
-        $type = MessageTypeEnum::from($message->getType());
-
-        return $this->isRegistered($type);
+        return $this->messageRepository->findOneWith(... $data);
     }
 
     private function getLoanUsers(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array

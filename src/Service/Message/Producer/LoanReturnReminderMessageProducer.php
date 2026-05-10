@@ -5,7 +5,6 @@ namespace App\Service\Message\Producer;
 use App\Entity\Loan;
 use App\Entity\Message;
 use App\Entity\User;
-use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\LoanRepository;
 use App\Repository\MessageRepository;
@@ -32,8 +31,12 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
         $loanReturnUsers = $this->getLoanUsers($returnDate);
         /** @var User $user */
         foreach ($loanReturnUsers as $user) {
-            $existingMessage = $this->existMessage(MessageTypeEnum::LOAN_RETURN_REMINDER, $user, $returnDate);
-            if ($existingMessage && $this->isRelevant($existingMessage)) {
+            $existingMessage = $this->existMessage([
+                'user' => $user,
+                'type' => MessageTypeEnum::LOAN_RETURN_REMINDER,
+                'scheduled' => new \DateTimeImmutable(),
+            ]);
+            if ($existingMessage) {
                 continue;
             }
 
@@ -43,25 +46,9 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
         $this->entityManager->flush();
     }
 
-    public function existMessage(...$args): ?Message
+    public function existMessage(array $data): ?Message
     {
-        /** @var MessageTypeEnum $type */
-        /** @var User $user */
-        [$type, $user] = $args;
-
-        return $this->messageRepository->findOneWith(
-            type: $type,
-            user: $user,
-            scheduled: new \DateTimeImmutable(),
-        );
-    }
-
-    public function isRelevant(Message $message): bool
-    {
-        $type = MessageTypeEnum::from($message->getType());
-
-        return $type->isLoanReturnReminder()
-            && $message->getScheduledAt()?->format('Ymd') === (new \DateTime('now'))->format('Ymd');
+        return $this->messageRepository->findOneWith(... $data);
     }
 
     private function getLoanUsers(\DateTimeImmutable $date): array

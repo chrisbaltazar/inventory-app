@@ -118,6 +118,7 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
 
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            keyword: (new \DateTimeImmutable('now'))->format('d/m/Y'),
             scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0),
         )
             ->setStatus(null)

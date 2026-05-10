@@ -7,11 +7,20 @@ namespace App\Service\Time;
 trait TimeDiff
 {
     public function getDiffHours(
-        \DatetimeInterface $datetime,
-        \DatetimeInterface $baseline = new \DateTimeImmutable('now'),
+        \DateTimeImmutable $datetime,
+        \DateTimeImmutable $baseline = new \DateTimeImmutable('now'),
     ): int {
         $diff = $baseline->diff($datetime);
 
-        return (int) $diff->days * 24 + $diff->h;
+        return $this->getDiffDays($datetime, $baseline) + $diff->h;
+    }
+
+    public function getDiffDays(
+        \DateTimeImmutable $datetime,
+        \DateTimeImmutable $baseline = new \DateTimeImmutable('now'),
+    ): int {
+        $diff = $baseline->diff($datetime);
+
+        return (int) $diff->days;
     }
 }

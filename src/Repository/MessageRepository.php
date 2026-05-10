@@ -44,7 +44,7 @@ class MessageRepository extends ServiceEntityRepository
         MessageTypeEnum $type,
         User $user = null,
         \DateTimeInterface $scheduled = null,
-        ?string $keyword = null,
+        string $keyword = null,
         MessageStatusEnum $status = null,
     ): ?Message {
         $query = $this
