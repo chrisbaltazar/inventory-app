@@ -44,7 +44,7 @@ class MessageRepository extends ServiceEntityRepository
         MessageTypeEnum $type,
         User $user = null,
         \DateTimeInterface $scheduled = null,
-        ?string $keyword = null,
+        string $keyword = null,
         MessageStatusEnum $status = null,
     ): ?Message {
         $query = $this
@@ -73,7 +73,7 @@ class MessageRepository extends ServiceEntityRepository
         }
 
         return $query
-            ->orderBy('m.scheduledAt', 'ASC')
+            ->orderBy('m.scheduledAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

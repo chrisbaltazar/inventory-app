@@ -108,54 +108,55 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
         ];
     }
 
-    public function testMessagesValidation(): void
-    {
+    #[DataProvider('provideExpirationMessages')]
+    public function testMessageExpiration(
+        \DateTimeImmutable $today,
+        MessageTypeEnum $messageType,
+        \DateInterval $diffScheduled,
+        bool $expected,
+    ): void {
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('today')->willReturn($today);
+        $this->set(ClockInterface::class, $clock);
+
         /** @var HolidaysMessageProducer $test */
         $test = $this->get(HolidaysMessageProducer::class);
 
-        $message1 = MessageFactory::create(
-            type: MessageTypeEnum::CHRISTMAS_GREETING,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(18, 0),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
+        $message = MessageFactory::create(
+            type: $messageType,
+            scheduledAt: $today->sub($diffScheduled),
+        );
 
-        $this->assertTrue($test->isRelevant($message1));
+        $this->assertSame($expected, $test->isExpired($message));
+    }
 
-        $message2 = MessageFactory::create(
-            type: MessageTypeEnum::NEW_YEAR_GREETING,
-            scheduledAt: new DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(MessageStatusEnum::SENT->value)
-            ->setProcessedAt(new DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message2));
-
-        $message3 = MessageFactory::create(
-            type: MessageTypeEnum::CHRISTMAS_GREETING,
-            scheduledAt: new DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertTrue($test->isRelevant($message3));
-
-        $message4 = MessageFactory::create(
-            type: MessageTypeEnum::NEW_YEAR_GREETING,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(22, 0),
-        )
-            ->setStatus(MessageStatusEnum::ERROR->value)
-            ->setProcessedAt(new DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message4));
-
-        $message5 = MessageFactory::create(
-            type: MessageTypeEnum::NEW_YEAR_GREETING,
-            scheduledAt: (new DateTimeImmutable('tomorrow'))->setTime(22, 0),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertFalse($test->isRelevant($message5));
+    public static function provideExpirationMessages(): array
+    {
+        return [
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::CHRISTMAS_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-4 hours'),
+                'expected' => false,
+            ],
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::CHRISTMAS_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-8 hours'),
+                'expected' => true,
+            ],
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::NEW_YEAR_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-1 hours'),
+                'expected' => false,
+            ],
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::NEW_YEAR_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-4 hours'),
+                'expected' => true,
+            ],
+        ];
     }
 }

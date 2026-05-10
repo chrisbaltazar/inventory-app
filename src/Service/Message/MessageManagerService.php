@@ -31,8 +31,9 @@ class MessageManagerService
     public function processAllPending(): void
     {
         foreach ($this->messageRepository->findAllPending() as $message) {
+            $messageType = MessageTypeEnum::from($message->getType());
             foreach ($this->messageProducers as $messageProducer) {
-                if ($messageProducer->isRelevant($message)) {
+                if ($messageProducer->isRegistered($messageType) && !$messageProducer->isExpired($message)) {
                     $this->dispatch($message);
                     break;
                 }

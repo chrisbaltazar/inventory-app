@@ -8,10 +8,12 @@ use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Message\MessageComposer;
+use App\Service\Time\TimeDiff;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BirthdayMessageProducer implements MessageProducerInterface
 {
+    use TimeDiff;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -28,8 +30,12 @@ class BirthdayMessageProducer implements MessageProducerInterface
         }
 
         foreach ($birthdayUsers as $user) {
-            $existingMessage = $this->existMessage(MessageTypeEnum::USER_BIRTHDAY_GREET, $user);
-            if ($existingMessage && $this->isRelevant($existingMessage)) {
+            $existingMessage = $this->existMessage([
+                'type' => MessageTypeEnum::USER_BIRTHDAY_GREET,
+                'user' => $user,
+                'scheduled' => new \DateTime('now'),
+            ]);
+            if ($existingMessage) {
                 continue;
             }
 
@@ -49,8 +55,13 @@ class BirthdayMessageProducer implements MessageProducerInterface
                 continue;
             }
 
-            $existingMessage = $this->existMessage(MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF, $admin, $user->getName());
-            if ($existingMessage && $this->isRelevant($existingMessage)) {
+            $existingMessage = $this->existMessage([
+                'type' => MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
+                'user' => $user,
+                'scheduled' => new \DateTime('now'),
+                'keyword' => $user->getEmail(),
+            ]);
+            if ($existingMessage) {
                 continue;
             }
 
@@ -61,25 +72,18 @@ class BirthdayMessageProducer implements MessageProducerInterface
         $this->entityManager->flush();
     }
 
-    public function existMessage(...$args): ?Message
+    public function existMessage(array $data): ?Message
     {
-        /** @var MessageTypeEnum $type */
-        /** @var User $user */
-        [$type, $user, $name] = $args + [null, null, null];
-
-        return $this->messageRepository->findOneWith(
-            type: $type,
-            user: $user,
-            scheduled: new \DateTime('now'),
-            keyword: $name,
-        );
+        return $this->messageRepository->findOneWith(... $data);
     }
 
-    public function isRelevant(Message $message): bool
+    public function isRegistered(MessageTypeEnum $messageType): bool
     {
-        $type = MessageTypeEnum::from($message->getType());
+        return $messageType->isUserBirthdayGreet() || $messageType->isAdminBirthdayNotif();
+    }
 
-        return ($type->isAdminBirthdayNotif() || $type->isUserBirthdayGreet())
-            && $message->getScheduledAt()?->format('Y-m-d') === (new \DateTime('now'))->format('Y-m-d');
+    public function isExpired(Message $message): bool
+    {
+        return $this->getDiffHours($message->getScheduledAt()) > 12;
     }
 }

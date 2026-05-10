@@ -3,17 +3,18 @@
 namespace App\Service\Message\Producer;
 
 use App\Entity\Message;
-use App\Entity\User;
-use App\Enum\MessageStatusEnum;
 use App\Enum\MessageTypeEnum;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Message\MessageComposer;
 use App\Service\Time\ClockInterface;
+use App\Service\Time\TimeDiff;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HolidaysMessageProducer implements MessageProducerInterface
 {
+
+    use TimeDiff;
 
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -36,25 +37,9 @@ class HolidaysMessageProducer implements MessageProducerInterface
         }
     }
 
-    public function existMessage(...$args): ?Message
+    public function existMessage(array $data): ?Message
     {
-        /** @var MessageTypeEnum $messageType */
-        /** @var User $user */
-        [$messageType, $user] = $args;
-
-        return $this->messageRepository->findOneWith(
-            type: $messageType,
-            user: $user,
-            scheduled: $this->clock->today(),
-        );
-    }
-
-    public function isRelevant(Message $message): bool
-    {
-        $type = MessageTypeEnum::from($message->getType());
-
-        return ($type->isChristmasGreeting() || $type->isNewYearGreeting())
-            && $message->getScheduledAt()?->format('Y-m-d') === $this->clock->today()->format('Y-m-d');
+        return $this->messageRepository->findOneWith(... $data);
     }
 
     private function isXmas(): bool
@@ -70,8 +55,12 @@ class HolidaysMessageProducer implements MessageProducerInterface
     private function createXmasMessages(array $allUsers): void
     {
         foreach ($allUsers as $user) {
-            $existingMessage = $this->existMessage(MessageTypeEnum::CHRISTMAS_GREETING, $user);
-            if ($existingMessage && $this->isRelevant($existingMessage)) {
+            $existingMessage = $this->existMessage([
+                'user' => $user,
+                'type' => MessageTypeEnum::CHRISTMAS_GREETING,
+                'scheduled' => $this->clock->today(),
+            ]);
+            if ($existingMessage) {
                 continue;
             }
 
@@ -84,8 +73,12 @@ class HolidaysMessageProducer implements MessageProducerInterface
     private function createNewYearMessages(array $allUsers): void
     {
         foreach ($allUsers as $user) {
-            $existingMessage = $this->existMessage(MessageTypeEnum::NEW_YEAR_GREETING, $user);
-            if ($existingMessage && $this->isRelevant($existingMessage)) {
+            $existingMessage = $this->existMessage([
+                'user' => $user,
+                'type' => MessageTypeEnum::NEW_YEAR_GREETING,
+                'scheduled' => $this->clock->today(),
+            ]);
+            if ($existingMessage) {
                 continue;
             }
 
@@ -93,5 +86,19 @@ class HolidaysMessageProducer implements MessageProducerInterface
             $this->entityManager->persist($message);
         }
         $this->entityManager->flush();
+    }
+
+    public function isRegistered(MessageTypeEnum $messageType): bool
+    {
+        return $messageType->isChristmasGreeting() || $messageType->isNewYearGreeting();
+    }
+
+    public function isExpired(Message $message): bool
+    {
+        return match (MessageTypeEnum::from($message->getType())) {
+            MessageTypeEnum::CHRISTMAS_GREETING => $this->getDiffHours($message->getScheduledAt()) > 6,
+            MessageTypeEnum::NEW_YEAR_GREETING => $this->getDiffHours($message->getScheduledAt()) > 2,
+            default => true
+        };
     }
 }

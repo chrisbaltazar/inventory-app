@@ -32,4 +32,8 @@ trait WithDatabase
         self::assertNotNull($result);
     }
 
+    public function query(string $entity, array $args = []): array
+    {
+        return $this->entityManager->getRepository($entity)->findBy($args);
+    }
 }

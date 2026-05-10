@@ -77,45 +77,27 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $this->assertDatabaseCount(4, Message::class);
     }
 
-    public function testMessagesValidation(): void
+    public function testMessageExpiration(): void
     {
         /** @var BirthdayMessageProducer $test */
         $test = $this->get(BirthdayMessageProducer::class);
 
         $message1 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
+            scheduledAt: new \DateTimeImmutable('-1 hour'),
+        );
+        $message1->setStatus(null);
+        $message1->setProcessedAt(null);
 
-        $this->assertTrue($test->isRelevant($message1));
+        $this->assertFalse($test->isExpired($message1));
 
         $message2 = MessageFactory::create(
             type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(MessageStatusEnum::SENT->value)
-            ->setProcessedAt(new \DateTimeImmutable('now'));
+            scheduledAt: new \DateTimeImmutable('-1 day'),
+        );
+        $message2->setStatus(null);
+        $message2->setProcessedAt(null);
 
-        $this->assertTrue($test->isRelevant($message2));
-
-        $message3 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertTrue($test->isRelevant($message3));
-
-        $message4 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
-        )
-            ->setStatus(MessageStatusEnum::ERROR->value)
-            ->setProcessedAt(new \DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message4));
+        $this->assertTrue($test->isExpired($message2));
     }
 }
