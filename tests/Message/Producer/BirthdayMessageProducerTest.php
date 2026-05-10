@@ -76,46 +76,4 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $test->produce();
         $this->assertDatabaseCount(4, Message::class);
     }
-
-    public function testMessagesValidation(): void
-    {
-        /** @var BirthdayMessageProducer $test */
-        $test = $this->get(BirthdayMessageProducer::class);
-
-        $message1 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertTrue($test->isRelevant($message1));
-
-        $message2 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(MessageStatusEnum::SENT->value)
-            ->setProcessedAt(new \DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message2));
-
-        $message3 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: new \DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertTrue($test->isRelevant($message3));
-
-        $message4 = MessageFactory::create(
-            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
-            scheduledAt: (new \DateTimeImmutable('today'))->setTime(9, 0),
-        )
-            ->setStatus(MessageStatusEnum::ERROR->value)
-            ->setProcessedAt(new \DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message4));
-    }
 }

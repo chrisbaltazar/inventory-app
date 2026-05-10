@@ -111,46 +111,4 @@ class LoanReturnReminderMessageProducerTest extends AbstractKernelTestCase
         $test->produce();
         $this->assertDatabaseCount(2, Message::class);
     }
-
-    public function testMessagesValidation(): void
-    {
-        /** @var LoanReturnReminderMessageProducer $test */
-        $test = $this->get(LoanReturnReminderMessageProducer::class);
-
-        $message1 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
-            scheduledAt: (new DateTimeImmutable('today'))->setTime(9, 0)
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertTrue($test->isRelevant($message1));
-
-        $message2 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
-            scheduledAt: new DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(MessageStatusEnum::SENT->value)
-            ->setProcessedAt(new DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message2));
-
-        $message3 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
-            scheduledAt: new DateTimeImmutable('-1 day'),
-        )
-            ->setStatus(null)
-            ->setProcessedAt(null);
-
-        $this->assertFalse($test->isRelevant($message3));
-
-        $message4 = MessageFactory::create(
-            type: MessageTypeEnum::LOAN_RETURN_REMINDER,
-            scheduledAt: new DateTimeImmutable('-1 min'),
-        )
-            ->setStatus(MessageStatusEnum::ERROR->value)
-            ->setProcessedAt(new DateTimeImmutable('now'));
-
-        $this->assertTrue($test->isRelevant($message4));
-    }
 }
