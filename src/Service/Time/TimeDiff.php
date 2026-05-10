@@ -12,7 +12,7 @@ trait TimeDiff
     ): int {
         $diff = $baseline->diff($datetime);
 
-        return $this->getDiffDays($datetime, $baseline) + $diff->h;
+        return (int) $diff->days * 24 + $diff->h;
     }
 
     public function getDiffDays(

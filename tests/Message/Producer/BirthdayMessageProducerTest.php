@@ -76,4 +76,28 @@ class BirthdayMessageProducerTest extends AbstractKernelTestCase
         $test->produce();
         $this->assertDatabaseCount(4, Message::class);
     }
+
+    public function testMessageExpiration(): void
+    {
+        /** @var BirthdayMessageProducer $test */
+        $test = $this->get(BirthdayMessageProducer::class);
+
+        $message1 = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            scheduledAt: new \DateTimeImmutable('-1 hour'),
+        );
+        $message1->setStatus(null);
+        $message1->setProcessedAt(null);
+
+        $this->assertFalse($test->isExpired($message1));
+
+        $message2 = MessageFactory::create(
+            type: MessageTypeEnum::USER_BIRTHDAY_GREET,
+            scheduledAt: new \DateTimeImmutable('-1 day'),
+        );
+        $message2->setStatus(null);
+        $message2->setProcessedAt(null);
+
+        $this->assertTrue($test->isExpired($message2));
+    }
 }

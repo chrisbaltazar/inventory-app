@@ -72,6 +72,6 @@ class LoanReturnReminderMessageProducer implements MessageProducerInterface
 
     public function isExpired(Message $message): bool
     {
-        return true;
+        return $this->getDiffHours($message->getScheduledAt()) > 12;
     }
 }

@@ -148,4 +148,30 @@ class LoanReturnNoticeMessageProducerTest extends AbstractKernelTestCase
         $test->produce();
         $this->assertDatabaseCount(1, Message::class);
     }
+
+    public function testMessageExpiration(): void
+    {
+        /** @var LoanReturnNoticeMessageProducer $test */
+        $test = $this->get(LoanReturnNoticeMessageProducer::class);
+
+        $returnDate = new DateTimeImmutable('+1 day');
+        $message1 = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            user: UserFactory::create(),
+            keyword: $returnDate->format('d/m/Y'),
+            scheduledAt: new DateTimeImmutable('-1 day'),
+        );
+
+        $this->assertFalse($test->isExpired($message1));
+
+        $returnDate = new DateTimeImmutable('+1 day');
+        $message2 = MessageFactory::create(
+            type: MessageTypeEnum::LOAN_RETURN_NOTICE,
+            user: UserFactory::create(),
+            keyword: $returnDate->format('d/m/Y'),
+            scheduledAt: new DateTimeImmutable('-4 days'),
+        );
+
+        $this->assertTrue($test->isExpired($message2));
+    }
 }

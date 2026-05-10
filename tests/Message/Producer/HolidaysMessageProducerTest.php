@@ -107,4 +107,56 @@ class HolidaysMessageProducerTest extends AbstractKernelTestCase
             ],
         ];
     }
+
+    #[DataProvider('provideExpirationMessages')]
+    public function testMessageExpiration(
+        \DateTimeImmutable $today,
+        MessageTypeEnum $messageType,
+        \DateInterval $diffScheduled,
+        bool $expected,
+    ): void {
+        $clock = $this->createMock(ClockInterface::class);
+        $clock->method('today')->willReturn($today);
+        $this->set(ClockInterface::class, $clock);
+
+        /** @var HolidaysMessageProducer $test */
+        $test = $this->get(HolidaysMessageProducer::class);
+
+        $message = MessageFactory::create(
+            type: $messageType,
+            scheduledAt: $today->sub($diffScheduled),
+        );
+
+        $this->assertSame($expected, $test->isExpired($message));
+    }
+
+    public static function provideExpirationMessages(): array
+    {
+        return [
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::CHRISTMAS_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-4 hours'),
+                'expected' => false,
+            ],
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::CHRISTMAS_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-8 hours'),
+                'expected' => true,
+            ],
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::NEW_YEAR_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-1 hours'),
+                'expected' => false,
+            ],
+            [
+                'today' => new \DateTimeImmutable('now'),
+                'messageType' => MessageTypeEnum::NEW_YEAR_GREETING,
+                'diffScheduled' => \DateInterval::createFromDateString('-4 hours'),
+                'expected' => true,
+            ],
+        ];
+    }
 }

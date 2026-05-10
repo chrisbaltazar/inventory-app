@@ -73,7 +73,7 @@ class MessageRepository extends ServiceEntityRepository
         }
 
         return $query
-            ->orderBy('m.scheduledAt', 'ASC')
+            ->orderBy('m.scheduledAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
