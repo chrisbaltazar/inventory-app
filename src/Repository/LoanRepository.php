@@ -237,14 +237,14 @@ class LoanRepository extends ServiceEntityRepository
                 'u.name AS userName',
                 'u.email AS userEmail',
                 'u.phone AS userPhone',
-                'COUNT(l.id) AS loans'
+                'COUNT(l.id) AS loans',
             )
             ->join('l.user', 'u')
             ->join('l.event', 'e')
             ->where('l.endDate IS NULL')
             ->andWhere('e.returnDate IS NOT NULL')
             ->andWhere('e.returnDate < :now')
-            ->setParameter('now', new \DateTimeImmutable('now'))
+            ->setParameter('now', (new \DateTimeImmutable('now'))->format('Y-m-d'))
             ->groupBy('u.id', 'u.name', 'u.email')
             ->getQuery()
             ->getArrayResult();
