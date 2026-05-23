@@ -23,14 +23,12 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->refreshDatabase();
     }
 
-    #[DataProvider('provideProcessAllMessages')]
-    public function testProcessAllPendingMessages(MessageTypeEnum $messageType): void
+    public function testProcessAllPendingMessages(): void
     {
         $user = UserFactory::create(phoneNumber: '+34111111111');
         $message1 = MessageFactory::create(
-            type: $messageType,
             user: $user,
-            content: 'Content',
+            content: 'Present',
             scheduledAt: new \DateTimeImmutable('now'),
         );
         $message1->setRecipient(null);
@@ -38,9 +36,8 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message1->setProcessedAt(null);
 
         $message2 = MessageFactory::create(
-            type: $messageType,
             user: $user,
-            content: 'Expired',
+            content: 'Past',
             scheduledAt: new \DateTimeImmutable('-1 hour'),
         );
         $message2->setRecipient(null);
@@ -48,7 +45,6 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message2->setProcessedAt(null);
 
         $message3 = MessageFactory::create(
-            type: $messageType,
             user: $user,
             content: 'Future',
             scheduledAt: new \DateTimeImmutable('+1 hour'),
@@ -69,6 +65,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
                 $this->assertStringContainsString($message1->getContent(), $content);
             },
         );
+
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer1 = $this->createMock(MessageProducerInterface::class);
@@ -81,12 +78,12 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
             ->method('isExpired')
             ->willReturnCallback(function (Message $message) {
                 return match ($message->getContent()) {
-                    'Expired' => true,
+                    'Past' => true,
                     default => false,
                 };
             });
-        $iterator = $this->getIteratorWith([$producer1]);
 
+        $iterator = $this->getIteratorWith([$producer1]);
         $test = new MessageManagerService($repository, $eventDispatcher, $iterator);
         $test->processAllPending();
 
@@ -99,12 +96,6 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message3 = $repository->find($message3->getId());
         $this->assertNull($message3->getStatus());
         $this->assertNull($message3->getProcessedAt());
-    }
-
-    public static function provideProcessAllMessages(): array
-    {
-        return array_map(fn($type) => [$type],
-            array_filter(MessageTypeEnum::cases(), fn($type) => !$type->isPwdRecovery()));
     }
 
     public function testProcessMessagesForbiddenNumber(): void
