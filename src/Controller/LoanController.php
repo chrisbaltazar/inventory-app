@@ -82,7 +82,7 @@ class LoanController extends AbstractController
         UserRepository $userRepository,
         EventRepository $eventRepository,
         LoanDataService $loanDataService,
-        ?User $user = null
+        ?User $user = null,
     ): Response {
         $openLoans = [];
         $closedLoans = [];
@@ -118,7 +118,7 @@ class LoanController extends AbstractController
         ItemRepository $itemRepository,
         LoanRepository $loanRepository,
         ?Item $item = null,
-        ?Inventory $invent = null
+        ?Inventory $invent = null,
     ): Response {
         return $this->render('loan/item.html.twig', [
             'items' => $itemRepository->findAll(),
@@ -129,11 +129,24 @@ class LoanController extends AbstractController
         ]);
     }
 
+    #[Route('/event/{event?}', name: 'app_loan_event', methods: ['GET'])]
+    public function showEvent(
+        EventRepository $eventRepository,
+        LoanRepository $loanRepository,
+        ?Event $event = null,
+    ): Response {
+        return $this->render('loan/event.html.twig', [
+            'event' => $event,
+            'events' => $eventRepository->findAll(),
+            'loans' => $event ? $loanRepository->findAllByEvent($event) : [],
+        ]);
+    }
+
     #[Route('/update', name: 'app_loan_update', methods: ['POST'])]
     public function update(
         Request $request,
         LoanRepository $loanRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         $id = $request->get('id');
         $loan = $loanRepository->find($id) ?? throw new NotFoundHttpException();
@@ -179,7 +192,7 @@ class LoanController extends AbstractController
         #[MapQueryParameter] int $user,
         EventRepository $eventRepository,
         UserRepository $userRepository,
-        LoanTransferService $loanTransfer
+        LoanTransferService $loanTransfer,
     ): Response {
         try {
             $user = $userRepository->find($user) ?? throw new NotFoundHttpException();

@@ -7,6 +7,7 @@ use App\Entity\Inventory;
 use App\Entity\Item;
 use App\Entity\Loan;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -165,6 +166,9 @@ class LoanRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Loan[]
+     */
     public function findAllWithReturnBetween(\DateTimeImmutable $date1, \DateTimeImmutable $date2): array
     {
         return $this
@@ -183,6 +187,9 @@ class LoanRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Loan[]
+     */
     public function findAllWithReturnIn(\DateTimeImmutable $date): array
     {
         return $this
@@ -195,6 +202,26 @@ class LoanRepository extends ServiceEntityRepository
             ->setParameter('date', $date->format('Y-m-d'))
             ->orderBy('e.returnDate', 'ASC')
             ->addOrderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Loan[]
+     */
+    public function findAllByEvent(Event $event): array
+    {
+        return $this
+            ->createQueryBuilder('l')
+            ->select('l', 'e', 'u')
+            ->join('l.event', 'e')
+            ->join('l.user', 'u')
+            ->join('l.item', 'i')
+            ->where('l.event = :event')
+            ->setParameter('event', $event)
+            ->orderBy('u.name', 'ASC')
+            ->addOrderBy('i.region', 'ASC')
+            ->addOrderBy('i.name', 'ASC')
             ->getQuery()
             ->getResult();
     }

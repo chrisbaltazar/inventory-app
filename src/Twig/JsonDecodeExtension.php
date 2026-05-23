@@ -14,8 +14,8 @@ class JsonDecodeExtension extends AbstractExtension
         ];
     }
 
-    public function jsonDecode(string $json): array
+    public function jsonDecode(?string $json): array
     {
-        return json_decode($json, true);
+        return json_decode($json ?? '', true);
     }
 }
