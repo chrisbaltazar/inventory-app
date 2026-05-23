@@ -7,7 +7,6 @@ use App\Entity\Inventory;
 use App\Entity\Item;
 use App\Entity\Loan;
 use App\Entity\User;
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -224,5 +223,30 @@ class LoanRepository extends ServiceEntityRepository
             ->addOrderBy('i.name', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return Loan[]
+     */
+    public function findAllDelayedWithCount(): array
+    {
+        return $this
+            ->createQueryBuilder('l')
+            ->select(
+                'u.id AS userId',
+                'u.name AS userName',
+                'u.email AS userEmail',
+                'u.phone AS userPhone',
+                'COUNT(l.id) AS loans'
+            )
+            ->join('l.user', 'u')
+            ->join('l.event', 'e')
+            ->where('l.endDate IS NULL')
+            ->andWhere('e.returnDate IS NOT NULL')
+            ->andWhere('e.returnDate < :now')
+            ->setParameter('now', new \DateTimeImmutable('now'))
+            ->groupBy('u.id', 'u.name', 'u.email')
+            ->getQuery()
+            ->getArrayResult();
     }
 }
