@@ -108,5 +108,16 @@ class MessageComposer
         return $message;
     }
 
+    public function createLoanDelayedReminderMessage(User $user, int $count): Message
+    {
+        $message = new Message();
+        $message->setUser($user);
+        $message->setType(MessageTypeEnum::LOAN_DELAYED_REMINDER->value);
+        $message->setScheduledAt((new \DateTimeImmutable('now'))->setTime(10, 0));
+        $message->setContent(
+            "Hola {$user->getName()}, aviso de retraso en la devolución del vestuario (total piezas: $count). Favor de gestionar lo antes posible. Gracias",
+        );
 
+        return $message;
+    }
 }

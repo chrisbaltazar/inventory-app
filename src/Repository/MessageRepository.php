@@ -78,4 +78,20 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findLastSince(MessageTypeEnum $type, User $user, \DateTimeImmutable $date): ?Message
+    {
+        return $this
+            ->createQueryBuilder('m')
+            ->where('m.type = :type')
+            ->setParameter('type', $type->value)
+            ->andWhere('m.user = :user')
+            ->setParameter('user', $user)
+            ->andWhere('DATE(m.scheduledAt) >= :date')
+            ->setParameter('date', $date->format('Y-m-d'))
+            ->orderBy('m.scheduledAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
