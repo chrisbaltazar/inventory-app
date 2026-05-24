@@ -26,8 +26,8 @@ class LoanDelayedReminedProducer implements MessageProducerInterface
 
     public function produce(): void
     {
+        // 1 day grace period to start sending messages
         $date = new \DateTimeImmutable('-1 day');
-//        dd($date);
         $allDelayedLoans = $this->loanRepository->findAllDelayedSince($date);
         foreach ($allDelayedLoans as $loan) {
             $user = $this->userRepository->find($loan['userId']);
