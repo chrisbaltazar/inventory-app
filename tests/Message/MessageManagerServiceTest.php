@@ -11,6 +11,7 @@ use App\Service\Message\Channel\Sms\SMSProviderInterface;
 use App\Service\Message\MessageManagerService;
 use App\Service\Message\Producer\MessageProducerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Tests\AbstractKernelTestCase;
 
@@ -23,10 +24,13 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $this->refreshDatabase();
     }
 
-    public function testProcessAllPendingMessages(): void
+    #[Test]
+    #[DataProvider('provide_process_all_messages')]
+    public function process_all_pending_messages(MessageTypeEnum $messageType): void
     {
         $user = UserFactory::create(phoneNumber: '+34111111111');
         $message1 = MessageFactory::create(
+            type: $messageType,
             user: $user,
             content: 'Present',
             scheduledAt: new \DateTimeImmutable('now'),
@@ -36,6 +40,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message1->setProcessedAt(null);
 
         $message2 = MessageFactory::create(
+            type: $messageType,
             user: $user,
             content: 'Past',
             scheduledAt: new \DateTimeImmutable('-1 hour'),
@@ -45,6 +50,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message2->setProcessedAt(null);
 
         $message3 = MessageFactory::create(
+            type: $messageType,
             user: $user,
             content: 'Future',
             scheduledAt: new \DateTimeImmutable('+1 hour'),
@@ -65,7 +71,6 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
                 $this->assertStringContainsString($message1->getContent(), $content);
             },
         );
-
         $this->set(SMSProviderInterface::class, $smsProvider);
 
         $producer1 = $this->createMock(MessageProducerInterface::class);
@@ -88,7 +93,11 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $test->processAllPending();
 
         $message1 = $repository->find($message1->getId());
-        $this->assertSame(MessageStatusEnum::SENT->value, $message1->getStatus());
+        $this->assertSame(
+            MessageStatusEnum::SENT->value,
+            $message1->getStatus(),
+            'Maybe the message type is not handled?',
+        );
         $this->assertNotNull($message1->getProcessedAt());
         $message2 = $repository->find($message2->getId());
         $this->assertNull($message2->getStatus());
@@ -96,6 +105,12 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
         $message3 = $repository->find($message3->getId());
         $this->assertNull($message3->getStatus());
         $this->assertNull($message3->getProcessedAt());
+    }
+
+    public static function provide_process_all_messages(): array
+    {
+        return array_map(fn($type) => [$type],
+            array_filter(MessageTypeEnum::cases(), fn($type) => !$type->isPwdRecovery()));
     }
 
     public function testProcessMessagesForbiddenNumber(): void
