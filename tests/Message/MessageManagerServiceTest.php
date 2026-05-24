@@ -109,8 +109,7 @@ class MessageManagerServiceTest extends AbstractKernelTestCase
 
     public static function provide_process_all_messages(): array
     {
-        return array_map(fn($type) => [$type],
-            array_filter(MessageTypeEnum::cases(), fn($type) => !$type->isPwdRecovery()));
+        return array_map(fn($type) => [$type], MessageTypeEnum::cases());
     }
 
     public function testProcessMessagesForbiddenNumber(): void
