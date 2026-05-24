@@ -31,13 +31,14 @@ class SMSMessageChannelSubscriber implements EventSubscriberInterface
     private function isMessageSMS(MessageTypeEnum $messageType): bool
     {
         return match ($messageType) {
-            MessageTypeEnum::PWD_RECOVERY => true,
-            MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF => true,
-            MessageTypeEnum::USER_BIRTHDAY_GREET => true,
-            MessageTypeEnum::CHRISTMAS_GREETING => true,
-            MessageTypeEnum::NEW_YEAR_GREETING => true,
-            MessageTypeEnum::LOAN_RETURN_NOTICE => true,
-            MessageTypeEnum::LOAN_RETURN_REMINDER => true,
+            MessageTypeEnum::PWD_RECOVERY,
+            MessageTypeEnum::ADMIN_BIRTHDAY_NOTIF,
+            MessageTypeEnum::USER_BIRTHDAY_GREET,
+            MessageTypeEnum::CHRISTMAS_GREETING,
+            MessageTypeEnum::NEW_YEAR_GREETING,
+            MessageTypeEnum::LOAN_RETURN_NOTICE,
+            MessageTypeEnum::LOAN_RETURN_REMINDER,
+            MessageTypeEnum::LOAN_DELAYED_REMINDER => true,
             default => false,
         };
     }

@@ -29,28 +29,37 @@ class LoanDelayedReminedProducerTest extends AbstractKernelTestCase
         $item = ItemFactory::create();
         $userDelayed1 = UserFactory::create();
         $userDelayed2 = UserFactory::create();
-        $eventClosed = EventFactory::create(returnDate: new \DateTimeImmutable('-3 days'));
+        $userDelayed3 = UserFactory::create();
+        $eventRecentClosed = EventFactory::create(returnDate: new \DateTimeImmutable('-1 day'));
+        $eventLongClosed = EventFactory::create(returnDate: new \DateTimeImmutable('-2 days'));
         $loanOpen1 = LoanFactory::create(
             startDate: new \DateTimeImmutable('-7 days'),
             endDate: null,
             user: $userDelayed1,
-            event: $eventClosed,
+            event: $eventRecentClosed,
             item: $item,
         );
         $loanOpen2 = LoanFactory::create(
             startDate: new \DateTimeImmutable('-7 days'),
             endDate: null,
             user: $userDelayed2,
-            event: $eventClosed,
+            event: $eventRecentClosed,
+            item: $item,
+        );
+        $loanOpen3 = LoanFactory::create(
+            startDate: new \DateTimeImmutable('-7 days'),
+            endDate: null,
+            user: $userDelayed3,
+            event: $eventLongClosed,
             item: $item,
         );
 
         $userCorrect = UserFactory::create();
         $loanEnded = LoanFactory::create(
             startDate: new \DateTimeImmutable('-7 days'),
-            endDate: new \DateTimeImmutable('-3 days'),
+            endDate: new \DateTimeImmutable('-1 day'),
             user: $userCorrect,
-            event: $eventClosed,
+            event: $eventRecentClosed,
             item: $item,
         );
 
@@ -65,9 +74,12 @@ class LoanDelayedReminedProducerTest extends AbstractKernelTestCase
             $userCorrect,
             $userDelayed1,
             $userDelayed2,
-            $eventClosed,
+            $userDelayed3,
+            $eventRecentClosed,
+            $eventLongClosed,
             $loanOpen1,
             $loanOpen2,
+            $loanOpen3,
             $loanEnded,
             $existingMessage,
         );
@@ -79,11 +91,11 @@ class LoanDelayedReminedProducerTest extends AbstractKernelTestCase
         $this->assertDatabaseCount(2, Message::class);
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::LOAN_DELAYED_REMINDER->value,
-            'user' => $userDelayed1,
+            'user' => $userDelayed1, // pre-existing
         ]);
         $this->assertDatabaseEntity(Message::class, [
             'type' => MessageTypeEnum::LOAN_DELAYED_REMINDER->value,
-            'user' => $userDelayed2,
+            'user' => $userDelayed3, // new
         ]);
 
         // Re-run

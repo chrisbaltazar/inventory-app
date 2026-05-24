@@ -228,24 +228,21 @@ class LoanRepository extends ServiceEntityRepository
     /**
      * @return Loan[]
      */
-    public function findAllDelayedWithCount(): array
+    public function findAllDelayedSince(\DateTimeImmutable $date): array
     {
         return $this
             ->createQueryBuilder('l')
             ->select(
                 'u.id AS userId',
-                'u.name AS userName',
-                'u.email AS userEmail',
-                'u.phone AS userPhone',
-                'COUNT(l.id) AS loans',
+                'SUM(l.quantity) AS pieces',
             )
             ->join('l.user', 'u')
             ->join('l.event', 'e')
             ->where('l.endDate IS NULL')
             ->andWhere('e.returnDate IS NOT NULL')
-            ->andWhere('e.returnDate < :now')
-            ->setParameter('now', (new \DateTimeImmutable('now'))->format('Y-m-d'))
-            ->groupBy('u.id', 'u.name', 'u.email')
+            ->andWhere('e.returnDate < :date')
+            ->setParameter('date', $date->format('Y-m-d'))
+            ->groupBy('u.id')
             ->getQuery()
             ->getArrayResult();
     }
