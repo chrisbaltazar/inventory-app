@@ -8,7 +8,7 @@
 
         {% for suit in suits %}
             <div class="col-12 col-md-4 suit-container mb-3">
-                <a href="{{ path('app_suit_show', {id: suit.id}) }}">
+                <a href="{{ path('app_suit_show', {'id': suit.id, 'region': suit.region|lower|slug, 'name': suit.name|lower|slug, 'gender': suit.genderName|lower|slug}) }}">
                     <div class="card text-bg-light shadow rounded h-100">
                         <img src="{{ asset(suit.picture|default('img/image-placeholder.png')) }}"
                              class="suit-thumbnail card-img-top " alt="{{ suit.name }}">
