@@ -26,7 +26,9 @@ class LoanDelayedReminedProducer implements MessageProducerInterface
 
     public function produce(): void
     {
-        $allDelayedLoans = $this->loanRepository->findAllDelayedWithCount();
+        $date = new \DateTimeImmutable('-1 day');
+//        dd($date);
+        $allDelayedLoans = $this->loanRepository->findAllDelayedSince($date);
         foreach ($allDelayedLoans as $loan) {
             $user = $this->userRepository->find($loan['userId']);
             $existingMessage = $this->existMessage([
@@ -39,7 +41,7 @@ class LoanDelayedReminedProducer implements MessageProducerInterface
                 continue;
             }
 
-            $message = $this->messageComposer->createLoanDelayedReminderMessage($user, $loan['loans']);
+            $message = $this->messageComposer->createLoanDelayedReminderMessage($user, $loan['pieces']);
             $this->entityManager->persist($message);
         }
 
