@@ -15,11 +15,17 @@
                         Inicio
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ route starts with 'app_suit' ? 'active':'' }}" aria-current="page"
-                       href="{{ path('app_suit_index') }}">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ route starts with 'app_suit' ? 'active':'' }}"
+                       data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
                         Trajes
                     </a>
+                    <ul class="dropdown-menu">
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <li><a class="dropdown-item" href="{{ path('app_suit_index') }}">Edición</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="{{ path('app_suit_list') }}">Catálogo</a></li>
+                    </ul>
                 </li>
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="nav-item">
