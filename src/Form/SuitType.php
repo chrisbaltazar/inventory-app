@@ -22,7 +22,6 @@ class SuitType extends AbstractType
 
         $builder
             ->add('name')
-            ->add('description')
             ->add('region', ChoiceType::class, [
                 'choices' => $regions,
             ])

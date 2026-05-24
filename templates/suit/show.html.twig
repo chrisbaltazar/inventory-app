@@ -4,9 +4,9 @@
 
 {% block body %}
     <div class="row w-auto px-2">
-        <div class="card text-bg-dark rounded shadow">
+        <div class="card text-bg-dark rounded shadow col-sm-12 col-md-10 offset-md-1">
             <div class="row">
-                <div class="col-12 col-md-{{ suit.picture ? '6' : '12' }}">
+                <div class="col-12">
                     {% if suit.picture %}
                         <img src="{{ asset(suit.picture) }}" class="card-img-top" alt="{{ suit.name }}">
                     {% endif %}
