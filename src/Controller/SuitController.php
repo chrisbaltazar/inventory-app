@@ -64,7 +64,7 @@ class SuitController extends AbstractController
         ]);
     }
 
-    #[Route('/{id<\d+>}', name: 'app_suit_show', methods: ['GET'])]
+    #[Route('/{id<\d+>}/{region}/{name}/{gender}', name: 'app_suit_show', methods: ['GET'])]
     public function show(Suit $suit): Response
     {
         return $this->render('suit/show.html.twig', [

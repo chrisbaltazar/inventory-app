@@ -37,7 +37,7 @@
                             <i class="fa-solid fa-pencil"></i>
                         </a>
                         <a class="float-end mx-1 btn btn-info btn-sm"
-                           href="{{ path('app_suit_show', {'id': suit.id}) }}">
+                           href="{{ path('app_suit_show', {'id': suit.id, 'region': suit.region|lower|slug, 'name': suit.name|lower|slug, 'gender': suit.genderName|lower|slug}) }}">
                             <i class="fa-solid fa-circle-info"></i>
                         </a>
                     </td>
