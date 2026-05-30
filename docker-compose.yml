@@ -1,6 +1,6 @@
 services:
   app:
-    image: chrisbaltazar/symfony-php-8.1
+    build: .
     container_name: inventory-app
     restart: unless-stopped
     volumes:
