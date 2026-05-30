@@ -15,9 +15,9 @@ class UserFactory extends AbstractFactory
         \DateTime $birthday = null,
     ): User {
         $user = new User();
-        $user->setName($name ?? self::faker()->name);
-        $user->setEmail($email ?? self::faker()->email);
-        $user->setPassword($password ?? self::faker()->password);
+        $user->setName($name ?? self::faker()->name());
+        $user->setEmail($email ?? self::faker()->email());
+        $user->setPassword($password ?? self::faker()->password());
         $user->setRoles($roles ?? []);
         $user->setPhone($phoneNumber ?? sprintf('+34%d', self::faker()->randomNumber(9)));
         $user->setBirthday($birthday ?? self::faker()->dateTimeBetween('-50 years', '-18 years'));

@@ -17,7 +17,7 @@ class EventFactory extends AbstractFactory
         $event->setReturnDate($returnDate);
         $event->setDate($date ?? self::faker()->dateTime);
         $event->setDeliveryDate($deliveryDate ?? self::faker()->dateTime);
-        $event->setName($name ?? self::faker()->name);
+        $event->setName($name ?? self::faker()->name());
         $event->setPublic($public ?? self::faker()->boolean);
 
         return $event;
