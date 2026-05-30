@@ -15,10 +15,10 @@ class EventFactory extends AbstractFactory
     ): Event {
         $event = new Event();
         $event->setReturnDate($returnDate);
-        $event->setDate($date ?? self::faker()->dateTime);
-        $event->setDeliveryDate($deliveryDate ?? self::faker()->dateTime);
+        $event->setDate($date ?? self::faker()->dateTime());
+        $event->setDeliveryDate($deliveryDate ?? self::faker()->dateTime());
         $event->setName($name ?? self::faker()->name());
-        $event->setPublic($public ?? self::faker()->boolean);
+        $event->setPublic($public ?? self::faker()->boolean());
 
         return $event;
     }

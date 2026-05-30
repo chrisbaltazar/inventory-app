@@ -33,7 +33,7 @@ class LoanFactory extends AbstractFactory
         $loan->setInfo(json_encode($inventory->getInfo(), JSON_UNESCAPED_UNICODE));
         $loan->setQuantity($quantity ?? self::faker()->numberBetween(1, 10));
         $loan->setStatus($status->value ?? self::faker()->randomElement(LoanStatusEnum::values()));
-        $loan->setComments($comments ?? self::faker()->paragraph);
+        $loan->setComments($comments ?? self::faker()->paragraph());
 
         return $loan;
     }
