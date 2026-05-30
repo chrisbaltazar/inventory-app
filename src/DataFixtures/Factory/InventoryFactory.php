@@ -19,7 +19,7 @@ class InventoryFactory extends AbstractFactory
         $inventory->setSize($size ?? self::faker()->randomElement(SizeEnum::values()));;
         $inventory->setDescription($description ?? self::faker()->words(3, true));
         $inventory->setQuantity($quantity ?? self::faker()->numberBetween(1, 10));
-        $inventory->setComments($comments ?? self::faker()->paragraph);
+        $inventory->setComments($comments ?? self::faker()->paragraph());
         $inventory->setItem($item ?? ItemFactory::create());
 
         return $inventory;

@@ -13,8 +13,8 @@ class ItemFactory extends AbstractFactory
         string $gender = null,
     ): Item {
         $item = new Item();
-        $item->setRegion($region ?? self::faker()->name);
-        $item->setName($name ?? self::faker()->name);
+        $item->setRegion($region ?? self::faker()->name());
+        $item->setName($name ?? self::faker()->name());
         $item->setGender($gender ?? self::faker()->randomElement(GenderEnum::names()));
 
         return $item;
