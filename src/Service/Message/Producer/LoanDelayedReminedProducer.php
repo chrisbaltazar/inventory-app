@@ -41,7 +41,7 @@ class LoanDelayedReminedProducer implements MessageProducerInterface
                 continue;
             }
 
-            $message = $this->messageComposer->createLoanDelayedReminderMessage($user, $loan['pieces']);
+            $message = $this->messageComposer->createLoanDelayedReminderMessage($user, (int) $loan['pieces']);
             $this->entityManager->persist($message);
         }
 
