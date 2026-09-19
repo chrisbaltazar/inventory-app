@@ -12,13 +12,13 @@ class TwilioSMSProvider implements SMSProviderInterface
         private readonly string $fromNumber,
     ) {}
 
-    public function send(string $number, string $sender, string $message): mixed
+    public function send(string $number, string $message): mixed
     {
         return $this->twilio->messages->create(
             $number,
             [
                 'from' => $this->fromNumber,
-                'body' => sprintf('%s: %s', $sender, $message),
+                'body' => $message,
             ],
         );
     }

@@ -14,7 +14,7 @@ class TelnyxSMSProvider implements SmsProviderInterface
         private readonly HttpClientInterface $retryClient,
     ) {}
 
-    public function send(string $number, string $sender, string $message): mixed
+    public function send(string $number, string $message): mixed
     {
         $uri = sprintf('%s/%s', rtrim($this->baseUrl, '/'), 'messages');
 

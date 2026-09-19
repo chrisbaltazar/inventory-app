@@ -23,8 +23,8 @@ class SMSMessageHandler implements MessageHandlerInterface
     {
         try {
             $recipient = $this->getMessageRecipient($message);
-            $messageBody = $this->getMessageBody($message);
             $sender = $message->getSender() ?? $this->appName;
+            $messageBody = $this->getMessageBody($message, $sender);
             $this->provider->send($recipient, $sender, $messageBody);
             $this->markMessageAs(MessageStatusEnum::SENT, $message);
         } catch (\Exception $e) {
@@ -34,16 +34,17 @@ class SMSMessageHandler implements MessageHandlerInterface
     }
 
 
-    private function getMessageBody(Message $message): string
+    private function getMessageBody(Message $message, string $sender): string
     {
-        return substr($message->getContent(), 0, self::MAX_MESSAGE_LENGTH);
+        $messageBody = sprintf('%s: %s', $sender, $message->getContent());
+
+        return substr($messageBody, 0, self::MAX_MESSAGE_LENGTH);
     }
 
 
     private function getMessageRecipient(Message $message): string
     {
-        $recipientNumber = $message->getRecipient() ?? $message->getUser()?->getPhone(
-        ) ?? throw new \UnexpectedValueException(
+        $recipientNumber = $message->getRecipient() ?? $message->getUser()?->getPhone() ?? throw new \UnexpectedValueException(
             'No recipient or user phone to send SMS message: ' . $message->getId(),
         );
 
