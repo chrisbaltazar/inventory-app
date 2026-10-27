@@ -5,6 +5,13 @@ framework:
     http_method_override: false
     handle_all_throwables: true
 
+    # Config needed when running behind a reverse proxy (e.g. when using Docker)
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers:
+        - 'x-forwarded-for'
+        - 'x-forwarded-proto'
+        - 'x-forwarded-port'
+
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
