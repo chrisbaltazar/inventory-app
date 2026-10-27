@@ -7,15 +7,21 @@ use App\Repository\UserRepository;
 use App\Service\Auth\GoogleOAuthService;
 use App\Service\Auth\SSOAuthenticatorInterface;
 use App\Service\User\UserAccessService;
+use Exception;
+use LogicException;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Throwable;
 
 class LoginController extends AbstractController
 {
@@ -23,12 +29,27 @@ class LoginController extends AbstractController
     const USER_ACCESS_ID = '_sdm_user_access_id';
 
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
-    public function index(AuthenticationUtils $utils, GoogleOAuthService $googleAuth): Response
-    {
-        if ($this->isGranted('ROLE_USER')) {
-            $url = $this->generateUrl('app_home_index');
+    public function index(
+        AuthenticationUtils $utils,
+        GoogleOAuthService $googleAuth,
+        Request $request,
+        LoggerInterface $logger,
+    ): Response {
+        $logger->warning('LOGIN', [
+            'user' => $this->getUser()?->getUserIdentifier(),
+            'ip' => $request->getClientIp(),
+            'route' => $request->attributes->get('_route'),
+            'method' => $request->getMethod(),
+            'referer' => $request->headers->get('referer'),
+            'secure' => $request->isSecure(),
+            'scheme' => $request->getScheme(),
+            'x-forwarded-proto' => $request->headers->get('x-forwarded-proto'),
+        ]);
 
-            return new RedirectResponse(str_replace('http:', 'https:', $url));
+        if ($this->isGranted('ROLE_USER')) {
+            $url = $this->generateUrl('app_home_index', referenceType: UrlGeneratorInterface::RELATIVE_PATH);
+
+            return new RedirectResponse($url);
         }
 
         $error = $utils->getLastAuthenticationError();
@@ -55,9 +76,9 @@ class LoginController extends AbstractController
             $user = $auth->authenticate($request);
 
             return $security->login($user);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return $this->redirectWithAuthError($request, $e);
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             throw $this->createAccessDeniedException($t->getMessage(), $t);
         }
     }
@@ -83,7 +104,7 @@ class LoginController extends AbstractController
 
                 return $this->redirectToRoute('app_login_code');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->redirectWithAuthError($request, $e);
         }
 
@@ -105,7 +126,7 @@ class LoginController extends AbstractController
 
         try {
             $userSessionId = $request->getSession()->get(self::USER_ACCESS_ID);
-            $user = $userRepository->find($userSessionId) ?? throw new \RuntimeException('User not found');
+            $user = $userRepository->find($userSessionId) ?? throw new RuntimeException('User not found');
 
             if ($request->isMethod('POST')) {
                 if (!$this->isCsrfTokenValid('access_code', $request->get('csrf_token'))) {
@@ -121,9 +142,9 @@ class LoginController extends AbstractController
 
                 return $this->redirectToRoute('app_login_code');
             }
-        } catch (\LogicException $e) {
+        } catch (LogicException $e) {
             return $this->redirectWithAuthError($request, $e);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw $this->createAccessDeniedException($e->getMessage(), $e);
         }
 
@@ -137,7 +158,7 @@ class LoginController extends AbstractController
         ]);
     }
 
-    private function redirectWithAuthError(Request $request, \Exception $e): Response
+    private function redirectWithAuthError(Request $request, Exception $e): Response
     {
         $session = $request->getSession();
         $session->set(
