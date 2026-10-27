@@ -35,7 +35,7 @@ class LoginController extends AbstractController
         Request $request,
         LoggerInterface $logger,
     ): Response {
-        $logger->warning("LOGIN - {$request->getMethod()}", [
+        $logger->error("LOGIN - {$request->getMethod()}", [
             'route' => $request->attributes->get('_route'),
             'user' => $this->getUser()?->getUserIdentifier(),
             'ip' => $request->getClientIp(),
