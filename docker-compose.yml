@@ -5,15 +5,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/app
-
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.inventory-app.rule=Host(`inventory-app.localhost`)"
       - "traefik.http.services.inventory-app.loadbalancer.server.port=80"
-
-    networks:
-      - docker-dev
-
-networks:
-  docker-dev:
-    external: true

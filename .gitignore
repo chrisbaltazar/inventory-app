@@ -18,3 +18,5 @@
 /public/assets/
 ###< symfony/asset-mapper ###
 /public/uploads/
+
+docker-compose.override.*
