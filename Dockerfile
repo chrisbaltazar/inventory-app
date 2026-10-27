@@ -1,30 +1,11 @@
-FROM php:8.1.34-trixie
+FROM dunglas/frankenphp:1.13.3-php8.4-alpine
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && install-php-extensions pdo_mysql zip \
+    && apk add --no-cache unzip
 
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Install Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | bash && \
-    mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+COPY php.ini $PHP_INI_DIR/conf.d/99-custom.ini
 
-# Create a non-root user
-RUN useradd -m -u 1000 -s /bin/bash app
-
-WORKDIR /var/www/html
-
-# Change ownership of the working directory
-RUN chown -R app:app /var/www/html
-
-# Switch to non-root user
-USER app
-
-EXPOSE 8000
+ENV SERVER_NAME=:80
