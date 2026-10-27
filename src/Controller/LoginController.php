@@ -25,7 +25,7 @@ class LoginController extends AbstractController
     public function index(AuthenticationUtils $utils, GoogleOAuthService $googleAuth): Response
     {
         if ($this->isGranted('ROLE_USER')) {
-            return $this->redirectToRoute('app_home_index');
+            return str_replace('http:', 'https:', $this->redirectToRoute('app_home_index'));
         }
 
         $error = $utils->getLastAuthenticationError();
