@@ -46,9 +46,10 @@ class LoginController extends AbstractController
         ]);
 
         if ($this->isGranted('ROLE_USER')) {
-            $url = $this->generateUrl('app_home_index', referenceType: UrlGeneratorInterface::RELATIVE_PATH);
+//            $url = $this->generateUrl('app_home_index', referenceType: UrlGeneratorInterface::RELATIVE_PATH);
 
-            return new RedirectResponse($url);
+//            return new RedirectResponse($url);
+            return $this->redirectToRoute('app_home_index');
         }
 
         $error = $utils->getLastAuthenticationError();
