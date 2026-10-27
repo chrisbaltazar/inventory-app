@@ -9,6 +9,7 @@ use App\Service\Auth\SSOAuthenticatorInterface;
 use App\Service\User\UserAccessService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,7 +26,9 @@ class LoginController extends AbstractController
     public function index(AuthenticationUtils $utils, GoogleOAuthService $googleAuth): Response
     {
         if ($this->isGranted('ROLE_USER')) {
-            return str_replace('http:', 'https:', $this->redirectToRoute('app_home_index'));
+            $url = $this->generateUrl('app_home_index');
+
+            return new RedirectResponse(str_replace('http:', 'https:', $url));
         }
 
         $error = $utils->getLastAuthenticationError();
