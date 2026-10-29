@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\Message\MessageManagerService;
+use DateTimeInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,18 +34,26 @@ class MessageHandlerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $io->info($this->getLogMessage('Starting message processing...'));
 
         try {
             $this->messageManager->produceNew();
             $this->messageManager->processAllPending();
-            $io->success('All pending messages have been processed.');
+            $io->success($this->getLogMessage('All pending messages have been processed.'));
 
             return Command::SUCCESS;
         } catch (\Throwable $t) {
             $error = sprintf('%s: %s', $t->getMessage(), $t->getTraceAsString());
-            $io->error($error);
+            $io->error($this->getLogMessage($error));
 
             return Command::FAILURE;
         }
+    }
+
+    private function getLogMessage(string $message): string
+    {
+        $date = new \DateTimeImmutable()->format(DateTimeInterface::ATOM);
+
+        return "[$date] $message";
     }
 }
