@@ -36,7 +36,7 @@ class SMSTestCommand extends Command
         $text = $input->getArgument('text') ?? 'Hello! the time is ' . (new \DateTime())->format('H:i:s');
 
         try {
-            $this->sms->send($to, 'Sandbox', $text);
+            $this->sms->send($to, $text);
             $io->success('Message sent...');
 
             return Command::SUCCESS;
