@@ -4,7 +4,7 @@ namespace App\Service\Message\Channel\Sms;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class TelnyxSMSProvider implements SmsProviderInterface
+class TelnyxSMSProvider implements SMSProviderInterface
 {
 
     public function __construct(
