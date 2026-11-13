@@ -27,9 +27,11 @@ class SMSMessageHandler implements MessageHandlerInterface
             $messageBody = $this->getMessageBody($message, $sender);
             $this->provider->send($recipient, $messageBody);
             $this->markMessageAs(MessageStatusEnum::SENT, $message);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('Error sending SMS: ' . $e->getMessage());
             $this->markMessageAs(MessageStatusEnum::ERROR, $message, $e->getMessage());
+
+            throw $e;
         }
     }
 
